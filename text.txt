@@ -1,0 +1,48 @@
+
+// ty to jjxtra at https://stackoverflow.com/questions/12751080/glsl-point-inside-box-test/37426532
+vec2 inBox(vec2 v, vec2 bottomLeft, vec2 topRight) {
+    vec2 s = step(bottomLeft, v) - step(topRight, v);
+    return v * (s.x * s.y);   
+}
+
+float renderChar(vec2 uv, Char char, float time) {
+    vec2 scale   = vec2(1.)/char.dims;
+    vec2 font_uv = inBox(scale * (uv - char.pos) + char.pos, vec2(0.), vec2(1.));
+    vec2 font_coord = font_uv / vec2(16.) + char.char;
+    vec4 sdf = texture(iChannel3, font_coord);
+    
+    
+    float sdf_w = (sdf.w - 127. / 255.);
+    
+    float smoothed1 = smoothstep(-.09, 0.19, sdf_w);
+    float smoothed2 = smoothstep(-.09, 0.15,  sdf_w);
+    
+    float mask = smoothed2 > 0.5 ? 0. : 1.;
+    //return 1.-smoothed1;
+    return max(mask, 1.- mix(smoothed1, smoothed2, sin(iTime)));
+}
+
+vec3 textSDF(vec2 uv, float time)
+{
+    float mask = max( renderChar(uv, b, time), max( renderChar(uv, o, time), renderChar(uv, x, time) ) );
+    
+    return vec3(mask);
+    
+    return vec3(mask);
+
+}
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = fragCoord/iResolution.xy;
+
+    fragColor = vec4(textSDF(uv,iTime),1.);
+
+    // Time varying pixel color
+    //vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
+
+    // Output to screen
+    //fragColor = vec4(col,1.0);
+}

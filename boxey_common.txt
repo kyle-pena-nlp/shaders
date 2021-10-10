@@ -1,0 +1,478 @@
+
+// Antialiasing: number of samples in x and y dimensions
+#define AA 2
+#define LOGO 0
+
+// OPTIONS are labeled 1..5
+#define BOX_MAT     2
+#define PLANE_MAT   1
+#define FRACTAL_MAT 1
+
+const vec3 SKY_BASE_COLOR = vec3(0.7, 0.9, 1.0);
+
+const float PI = 3.14159;
+
+struct Params {
+    vec3  effect;           
+    vec3  angleDeviation;   
+    vec2  fragCoord;
+    vec2  iResolution;               
+	float time;       
+    float planeLastClickedTime;
+};
+
+// how to cast into the scene --- castRay returns a vec4 of <d, obj_id, uv>
+struct Query {
+    vec3 ro;
+    vec3 rd;
+};
+
+// what gets returns from a uv/material query
+struct Material {
+   vec3  col;
+   vec3  nor;
+   float spec;
+};
+
+struct QueryResult {
+    float d;
+    float obj_id;
+    vec3 uvw;
+    //vec3 norm;
+    
+};
+
+// for camera and box
+struct Transform {
+    mat4 txi;
+    mat4 txx;
+};
+
+
+struct Char {
+    vec2 char;
+    vec2 pos;
+    vec2 dims;
+};
+
+// object ID definitions (DO NOT MODIFY)
+const float SKY   = -1.;
+const float PLANE = 1.;
+const float BEVEL = 2.;
+const float BOX   = 3.;
+const float TEXT  = 4.;
+const float EFFECT = 5.;
+
+
+// mandelbrot parameters
+const float CYCLE_SPEED = 1.;
+const vec3  BASE_EXTERIOR_COLOR = vec3(0.,1.,0.);
+const vec3  BASE_BULB_COLOR     = vec3(0., 0., 0.);
+const int   STEPS = 100;
+
+
+// buffer addresses for app state
+const ivec2 IMPULSE_ADDR            = ivec2(0, 0);
+const ivec2 RADIAL_VELOCITY_ADDR    = ivec2(0, 1);
+const ivec2 ANGLE_DEVIATION_ADDR    = ivec2(0, 2);
+const ivec2 MOUSE_DOWN_ADDR         = ivec2(0, 3);
+const ivec2 ON_CLICK_ADDR           = ivec2(0, 4);
+const ivec2 MOUSE_WORLD_POS_ADDR    = ivec2(0, 5);
+const ivec2 PLANE_LAST_CLICKED_ADDR = ivec2(0, 6);
+
+
+// physics parameters
+const float K = 0.05;
+const float DAMPENING = 0.08;
+const float BOX_MASS = 1.;
+const float IMPULSE_DECAY = 0.01;
+const float IMPULSE_STRENGTH = 0.1;
+
+// physics clamping (to prevent wild behavior)
+const vec3 MAX_VEL = vec3(1.);
+const vec3 MAX_ACC = vec3(1.);
+const vec3 MAX_FORCE = vec3(1.);
+
+// geometric parameters
+const float BOX_DEPTH = 0.1;
+const float BOX_WIDTH = 0.5;
+const float BEVEL_SCALE = 0.9;
+const float MANDEL_RELIEF = 0.005;
+const vec3 BOX_DIMS = vec3(BOX_DEPTH,BOX_WIDTH,BOX_WIDTH);
+const vec3 BEVEL_DIMS = BEVEL_SCALE * BOX_DIMS;
+
+// environment
+const vec3 SUNLIGHT_DIR = vec3(0.4, 0.7, 0.1);
+
+// animation parameters
+const float BOX_ROTATE_RATE = 0.1;
+const float CAMERA_ROTATE_RATE = 0.;
+const float CAMERA_DIST = 1.7;
+const float CAMERA_MOUSE  = 1.;
+const float BOX_HOVER_SPEED = 0.1;//0.1;
+const float BOX_HOVER_HEIGHT = 1.;
+const float REVEAL_RATE = 0.33;
+
+// text rendering stuff
+const float eps = 1e-6;
+const float CHAR_WIDTH = 1./4.;
+const vec2 TEXT_DIMS   = vec2(0.2);
+const Char _ = Char(vec2(0,5) / 16., vec2(0.), vec2(0.1));
+const Char b = Char(vec2(2,9)  / 16.,   vec2(1. * CHAR_WIDTH, 0.45), TEXT_DIMS);
+const Char o = Char(vec2(15,9) / 16.,   vec2(2. * CHAR_WIDTH, 0.45), TEXT_DIMS);
+const Char x = Char(vec2(8,8)  / 16.,   vec2(3. * CHAR_WIDTH, 0.45), TEXT_DIMS);
+
+
+
+
+// from https://www.shadertoy.com/view/MsjXRt
+// todo: my own implementation
+vec4 HueShift (in vec3 Color, in float Shift)
+{
+    vec3 P = vec3(0.55735)*dot(vec3(0.55735),Color);
+    
+    vec3 U = Color-P;
+    
+    vec3 V = cross(vec3(0.55735),U);    
+
+    Color = U*cos(Shift*6.2832) + V*sin(Shift*6.2832) + P;
+    
+    return vec4(Color,1.0);
+}
+
+// calculate mandelbrot
+// todo: make this in/out and escape, not color/height)
+// todo: alternative for escape time coloring, etc. (like moving average of abs of z_n)
+vec4 mandelbrot(vec2 fragCoord, float time)
+{
+      
+    vec2 scale = vec2(1.);
+    vec3 coords = vec3(-0.5,0.0,1.0); // center, half-width
+
+    // -1 to 1 on y axis with equal aspect ratio
+    vec2 uv = 2.0 * (fragCoord - scale.xy * 0.5)/scale.xy;
+
+    // to cartesian space per coords
+    vec2 c = (uv + coords.xy) * coords.z;
+    
+    // domain repetition for out-of-bounds (heplful for debugging)
+    c = mod(c + 2., 4.) - 2.;
+    
+    vec2 z = c.xy;
+    
+    float exterior_shade   = 0.;
+    float mag     = length(c);
+    float bInSet  = 1.-step(2.,mag);
+    float temp_i  = 1.;
+    
+    for (int i = 0; i < STEPS; i++)
+    {
+    
+        
+        // update Z if still in the set
+        z = bInSet * vec2((z.x*z.x - z.y*z.y + c.x), 2.*z.x*z.y + c.y) + (1. - bInSet) * z;
+        
+        temp_i = bInSet * float(i) + (1. - bInSet) * temp_i;
+        
+        // update shading calculation
+        exterior_shade =  clamp((temp_i + 1. - log(log(length(z)))/log(2.))/ float(STEPS), 0., 1.);
+    
+        
+        // update magnitude
+        mag = length(z);
+
+        
+        // update inSet if still inSet
+        bInSet = bInSet * (1.-step(2.,mag));
+    }
+
+    float interior_shade = clamp(mag/2., 0., 1.);
+    
+    // shading mode 3 - both interior and exterior
+    float shade = bInSet * interior_shade + (1. - bInSet) * exterior_shade;// * interior_shade + exterior_shade;
+    
+    float CYCLE_OFFSET = sin(0.1*time);
+    vec3 exterior_color = HueShift(BASE_EXTERIOR_COLOR, CYCLE_SPEED*shade + CYCLE_OFFSET).xyz;
+    
+    return vec4(exterior_color,1.);
+}
+
+
+
+
+// Compute camera-to-world transformation.
+mat3 setCamera( in vec3 ro, in vec3 ta, float cr )
+{
+	vec3 cw = normalize(ta - ro);
+	vec3 cp = vec3(sin(cr), cos(cr),0.0);
+	vec3 cu = normalize( cross(cw,cp) );
+	vec3 cv = normalize( cross(cu,cw) );
+    return mat3( cu, cv, cw );
+}
+
+float getRevealTime(float time)
+{
+# if LOGO > 0
+    return 1.;
+# else
+    return 1. - smoothstep(0., 1., REVEAL_RATE*time);
+# endif
+}
+
+
+Query getQuery(in Params params)
+{
+    vec2 p = (-params.iResolution.xy + 2.0*params.fragCoord)/params.iResolution.y;
+
+    // camera (ro = ray origin)	
+    float revealTime = getRevealTime(params.time);
+    
+    // todo: move camera on right click, interact on left click: + CAMERA_MOUSE * 2. * mo.y
+    vec3 ro = vec3( (0.5*revealTime + CAMERA_DIST)*cos(PI*revealTime), 0.75, (0.5 * revealTime + CAMERA_DIST) * sin(PI*revealTime) );
+    vec3 ta = vec3( 0.0, 1.0, 0.0 );
+    // camera-to-world transformation
+    mat3 ca = setCamera( ro, ta, 0.0 );
+    // ray direction
+    vec3 rd = ca * normalize( vec3(p.xy,2.0) );
+    
+    return Query(ro, rd);
+}
+
+
+// matrix math helper. ty inigo quilez
+mat4 translate( float x, float y, float z )
+{
+    return mat4( 1.0, 0.0, 0.0, 0.0,
+				 0.0, 1.0, 0.0, 0.0,
+				 0.0, 0.0, 1.0, 0.0,
+				 x,   y,   z,   1.0 );
+}
+
+// matrix math helper, ty inigo quilez
+mat4 rotationAxisAngle( vec3 v, float angle )
+{
+    float s = sin( angle );
+    float c = cos( angle );
+    float ic = 1.0 - c;
+
+    return mat4( v.x*v.x*ic + c,     v.y*v.x*ic - s*v.z, v.z*v.x*ic + s*v.y, 0.0,
+                 v.x*v.y*ic + s*v.z, v.y*v.y*ic + c,     v.z*v.y*ic - s*v.x, 0.0,
+                 v.x*v.z*ic - s*v.y, v.y*v.z*ic + s*v.x, v.z*v.z*ic + c,     0.0,
+			     0.0,                0.0,                0.0,                1.0 );
+}
+
+
+Transform getBoxTransform(in Params params, vec3 offset)
+{
+    float box_height = BOX_HOVER_HEIGHT+BOX_HOVER_SPEED*sin(params.time);
+    mat4 rot1 = rotationAxisAngle( normalize(vec3(1.0,0.0,0.0)), params.angleDeviation.x  );
+    mat4 rot2 = rotationAxisAngle( normalize(vec3(0.0,1.0,0.0)), params.angleDeviation.y + BOX_ROTATE_RATE*params.time);
+    mat4 rot3 = rotationAxisAngle( normalize(vec3(0.0,0.0,1.0)), params.angleDeviation.z );
+	mat4 tra1 = translate( 0.0, box_height, 0.0 );
+    mat4 tra2 = translate(offset.x, offset.y, offset.z);
+	mat4 txi =  tra1 * rot3 * rot2 * rot1 * tra2;// order deliberate.
+	mat4 txx = inverse( txi );
+    return Transform(txi, txx);
+}
+
+
+// vec3(distance, material uv)
+QueryResult sdPlane( vec3 p, vec3 effect, float time, float planeLastClickedTime )
+{
+    float elapsed = time - planeLastClickedTime;
+    float timeDampening = (1. + elapsed)*(1. + elapsed);
+    float distanceDampening = clamp(length(p.xz - effect.xz), 1., 100.);
+    float ripple = (cos(-5.*time + 15.*length(p.xz - effect.xz)));
+
+    //vec2 uv_coords = p.xy;
+    float displacement = -0.1 * ripple / ( distanceDampening*timeDampening );
+    
+    float d  = p.y + displacement;
+    vec3 uvw  = p.xzy;
+
+	return QueryResult(d, PLANE, uvw); // vec4(p.y, p.xyz) maybe?
+}
+
+// vec3(distance, material uv)
+QueryResult sdBox( vec3 p, vec3 b )
+{
+    //vec3 uv_coords = p.xzy / b.yzy + vec3(0.5, 0.5, 0.5);
+    vec3 uv_coords = p.xyz / b.yyz * vec3(1.,-1,1.); // hack: -1 to get the touch effect right
+    vec3 d         = abs(p) - b;
+    float dist     = min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+    vec3 uvw        = uv_coords.yzx;
+    return QueryResult(dist, BOX, uvw);
+}
+
+// Distance from p to box whose half-dimensions are b.x, b.y, b.z
+// Format: vec4(distnace, material uv)
+QueryResult sdBoxWithDisplacement( vec3 p, vec3 b )
+{
+    // box space to uv coords
+    // i reverseed the second coordinate (which is the x in the buffer lookup)
+    // this is because this box gets subtracted from the other box, which mirrors the image
+    vec3 cartesian_coords = (0.5 * vec3(1.,-1.,1.) * (p.xzy) / b.yzy) + vec3(0.5);
+
+    float displacement = mandelbrot(cartesian_coords.yz, 0.).w;
+    b += -MANDEL_RELIEF*vec3(displacement, 0., 0.);
+    vec3 d = abs(p) - b;
+    float dist = min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+    
+    vec3 uvw = cartesian_coords.yzx;
+
+    return QueryResult(dist, BEVEL, uvw);
+}
+
+
+
+
+
+//------------------------------------------------------------------
+// CSG operations
+
+
+// x, m, uv
+QueryResult opS2(in QueryResult d1, in QueryResult d2 )
+{
+    float a = (d1.d > -d2.d) ? 1. : 0.;
+    float b = 1. - a;
+
+    float d      = a * d1.d  + b * -d2.d;
+    float obj_id = a * d1.obj_id  + b * d2.obj_id;
+    vec3 uvw     = a * d1.uvw + b * d2.uvw;
+
+    return QueryResult(d, obj_id, uvw);
+    //return (d1.d > -d2.d) ? d1 : Casting(-d2.d, d2.mat, d2.mat_aux);
+    //max(d1.x, -d2.x)
+}
+
+// union primitives 1 and 2
+// d1 is a vec2 where .x is the distance, and .y is the color/material code.
+QueryResult opU2(in QueryResult d1, in QueryResult d2 )
+{
+    float a = (d1.d < d2.d) ? 1.0 : 0.0;
+    float b = 1. - a;
+
+    float d      = a * d1.d  + b * d2.d;
+    float obj_id = a * d1.obj_id  + b * d2.obj_id;
+    vec3 uvw     = a * d1.uvw + b * d2.uvw;
+
+	//return (d1.d<d2.d) ? d1 : d2;
+    return QueryResult(d, obj_id, uvw);
+}
+
+QueryResult map( in vec3 pos, in Params params, bool renderBox, bool renderBevel)
+{
+    
+    // plane
+    QueryResult scene = sdPlane(pos, params.effect, params.time, params.planeLastClickedTime);
+
+    // box
+    Transform boxTransform = getBoxTransform(params, vec3(0.));
+    vec3 boxSpacePos = (boxTransform.txx * vec4(pos,1.)).xyz;
+    QueryResult box = sdBox( boxSpacePos, BOX_DIMS );
+    
+    // bevel
+    Transform bevelTransform = getBoxTransform(params, vec3(0.1, 0., 0.)); 
+    vec3 bevelSpacePos = (bevelTransform.txx * vec4(pos,1.)).xyz;
+    QueryResult bevel = sdBoxWithDisplacement( bevelSpacePos, BEVEL_DIMS);
+    
+    if (renderBevel) {
+        // subtract the bevel from the box
+        box = opS2(box, bevel);
+    }
+    
+    
+    if (renderBox) {
+        scene = opU2(scene, box);
+    }
+    
+    return scene;
+}
+
+// Cast a ray from origin ro in direction rd until it hits an object.
+// Return (t,m,a) where t is distance traveled along the ray, and m
+// is the material of the object hit, and a is an auxilliary material channel
+QueryResult castRay( in Query query, in Params params, bool renderBox, bool renderBevel )
+{
+    float tmin = 1.0;
+    float tmax = 20.0;
+
+    vec3 rd = query.rd;
+    vec3 ro = query.ro;
+   
+    // bounding volume
+    float tp1 = (-0.1-ro.y)/rd.y; if( tp1>0.0 ) tmax = min( tmax, tp1 );
+    float tp2 = (1.6-ro.y)/rd.y; if( tp2>0.0 ) { if( ro.y>1.6 ) tmin = max( tmin, tp2 );
+                                                 else           tmax = min( tmax, tp2 ); }
+    
+    float t = tmin;
+
+
+    float obj_id = -1.0;
+    vec3  uvw    = vec3(0.);
+
+    for( int i=0; i<64; i++ )
+    {
+	    float precis = 0.0001*t;
+	    QueryResult res = map( ro+rd*t, params, renderBox, renderBevel);
+        if( res.d<precis || t>tmax ) break;
+        t += 0.9*res.d;
+	    obj_id = res.obj_id;
+        uvw = res.uvw;
+    }
+
+    if( t>tmax )
+    {
+        obj_id=SKY;
+        uvw = vec3(0.,rd.y, 0.);
+    }
+    return QueryResult( t, obj_id, uvw);
+}
+
+
+// Cast a shadow ray from origin ro (an object surface) in direction rd
+// to compute soft shadow in that direction. Returns a lower value
+// (darker shadow) when there is more stuff nearby as we step along the shadow ray.
+float softshadow( in vec3 ro, in vec3 rd, in float mint, in float tmax, in Params params, bool renderBox, bool renderBevel)
+{
+	float res = 1.0;
+    float t = mint;
+    for( int i=0; i<16; i++ )
+    {
+		float h = map( ro + rd*t, params, renderBox, renderBevel).d;
+        res = min( res, 6.0*h/t );
+        t += clamp( h, 0.02, 0.10 );
+        if( h<0.001 || t>tmax ) break;
+    }
+    return clamp( res, 0.0, 1.0 );
+}
+
+// Compute normal vector to surface at pos, using central differences method?
+vec3 calcNormal( in vec3 pos, in Params params, bool renderBox, bool renderBevel )
+{
+    // epsilon = a small number
+    vec2 e = vec2(1.0,-1.0)*0.5773*0.0005;
+    
+    return normalize( e.xyy*map( pos + e.xyy, params, renderBox, renderBevel ).d + 
+					  e.yyx*map( pos + e.yyx, params, renderBox, renderBevel ).d + 
+					  e.yxy*map( pos + e.yxy, params, renderBox, renderBevel ).d + 
+					  e.xxx*map( pos + e.xxx, params, renderBox, renderBevel ).d );
+
+}
+
+// compute ambient occlusion value at given position/normal
+float calcAO( in vec3 pos, in vec3 nor, in Params params, bool renderBox, bool renderBevel )
+{
+	float occ = 0.0;
+    float sca = 1.0;
+    for( int i=0; i<5; i++ )
+    {
+        float hr = 0.01 + 0.12*float(i)/4.0;
+        vec3 aopos =  nor * hr + pos;
+        float dd = map( aopos, params, renderBox, renderBevel).d;
+        occ += -(dd-hr)*sca;
+        sca *= 0.95;
+    }
+    return clamp( 1.0 - 3.0*occ, 0.0, 1.0 );    
+}

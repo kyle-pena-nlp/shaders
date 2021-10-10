@@ -1,0 +1,156 @@
+// BUFFER C - MEMORY FOR HACKED STATEFULNESS
+// Inspiration: https://www.shadertoy.com/view/tdGBDG
+// This is where all the dynamics / interactivity happens.
+// State is stored in the buffer and is read out using texelFetch
+
+
+vec3 getEffect() {
+    return texelFetch(iChannel2, MOUSE_WORLD_POS_ADDR, 0).xyz;
+}
+
+
+vec3 getAngleDeviation() {
+    return texelFetch(iChannel2, ANGLE_DEVIATION_ADDR, 0).xyz;
+}
+
+vec3 getVelocity() {
+    return texelFetch(iChannel2, RADIAL_VELOCITY_ADDR, 0).xyz;
+}
+
+
+float getPlaneLastClickedTime() {
+    return texelFetch(iChannel2, PLANE_LAST_CLICKED_ADDR, 0).x;
+}
+
+vec3 getDampening() {
+    return DAMPENING * getVelocity();
+}
+
+
+// Force as a function of spring displacement, per Hooke's law
+vec3 Spring_Force() {
+    return -1. * K * getAngleDeviation() - getDampening();
+}
+
+vec3 Impulse_Force() {
+    return texelFetch(iChannel2, IMPULSE_ADDR, 0).xyz;
+}
+
+vec3 Force() {
+    return clamp(Impulse_Force() + Spring_Force(), -MAX_FORCE, MAX_FORCE);
+}
+
+// F / m = a
+vec3 getAcceleration() {
+    return Force() / BOX_MASS;
+}
+
+
+bool isThisAddr(in vec2 buf_pos, ivec2 addr) {
+    return ivec2(buf_pos) == addr;
+}
+
+vec3 boxAxisForce(in Params params, in Query query, in QueryResult scene)
+{
+
+    float d            = scene.d;
+    float obj_id       = scene.obj_id;
+    vec3  pos          = query.ro + d * query.rd; 
+    vec3 norm          = calcNormal( pos, params, true, true ); //(TODO: return with all scene queries)
+    
+    
+    // translate the rd, scene position, and surface normal into box space
+    Transform boxTransform = getBoxTransform(params, vec3(0.));
+    vec3 box_vec     = (boxTransform.txx * vec4(pos,1.)).xyz;
+    vec3 box_norm    = (boxTransform.txx * vec4(norm, 0.)).xyz;
+    
+    
+    // how much force is imparted on the surface considering the camera ray?
+    vec3 surfaceForce = box_norm;// * box_rd;
+    
+    // how is that force translated into force around the three axes of the box?
+    vec3 rCrossF = cross(box_vec, box_norm);
+    
+    vec3 axes = vec3(1.,0.,0.);
+    
+    vec3 axisForce = vec3( dot(rCrossF, axes.xzz), dot(rCrossF, axes.zxz), dot(rCrossF, axes.zzx));
+    
+    return step(-obj_id, -1. *  1.5) * step(obj_id, 2.5) * axisForce.xyz +
+           step(-obj_id, -1. *  2.5) * step(obj_id, 3.5) * axisForce.xyz;
+}
+
+vec3 planeWorldPos(in Params params, in Query query, in QueryResult scene) {
+
+    float d                = scene.d;
+    vec3  pos              = query.ro + d * query.rd;
+    return pos;
+}
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    
+    // params for querying the mouse location
+    Params mousePosParams  = Params( getEffect(), getAngleDeviation(), iMouse.xy, iResolution.xy, iTime, getPlaneLastClickedTime());
+    Query query            = getQuery(mousePosParams);
+    QueryResult scene      = castRay( query, mousePosParams, true, true );
+
+    // value of the current address for the prior frame
+    vec4 value     = texelFetch(iChannel2, ivec2(fragCoord), 0);
+
+    // value of whether or not the mouse was clicked for the prior frame
+    float onClick  = texelFetch(iChannel2, ON_CLICK_ADDR, 0).x;  
+
+    // was the plane clicked last frame?
+    float planeWasClicked = onClick * step(-scene.obj_id, -1. *  0.5) * step(scene.obj_id, 1.5);
+
+    // when was the plane last clicked?
+    float planeLastClickedTime = getPlaneLastClickedTime();
+
+    // update the click time if the plane was clicked
+    if (isThisAddr(fragCoord, PLANE_LAST_CLICKED_ADDR)) {
+        
+        value.xyz = planeWasClicked * vec3(mousePosParams.time) + (1. - planeWasClicked) * value.xyz; 
+    }
+    // update the world position of the click if the plane was clicked
+    else if (isThisAddr(fragCoord, MOUSE_WORLD_POS_ADDR)) {
+        value.xyz = planeWasClicked * planeWorldPos(mousePosParams, query, scene) + (1. - planeWasClicked) * value.xyz;
+        
+    }
+    // update the box impulse if the box was clicked
+    else if (isThisAddr(fragCoord, IMPULSE_ADDR)) {
+
+        vec3 boxAxisForce = boxAxisForce(mousePosParams, query, scene);
+              
+        value.xyz = boxAxisForce * IMPULSE_STRENGTH * onClick;
+    }
+    // (physics) update the box radial velocities
+    else if (isThisAddr(fragCoord, RADIAL_VELOCITY_ADDR)) {
+        // velocity update
+        value.xyz += clamp(getAcceleration(), -MAX_ACC, MAX_ACC);
+    }
+    // (physics) update the box axis angles
+    else if (isThisAddr(fragCoord, ANGLE_DEVIATION_ADDR)) {
+        value.xyz += clamp(getVelocity(),     -MAX_VEL, MAX_VEL);
+    }
+    // update the mouse down flag (for detecting onclick for the next frame)
+    else if (isThisAddr(fragCoord, MOUSE_DOWN_ADDR)) {
+        // record whether the mouse is down
+        value.x = (iMouse.z > 0.) ? 1. : 0.;
+    }
+    else if (isThisAddr(fragCoord, ON_CLICK_ADDR)) {
+    
+        float lastFrameMouseDown = texelFetch(iChannel2, MOUSE_DOWN_ADDR, 0).x;
+        float thisFrameMouseDown = (iMouse.z > 0.) ? 1.: 0.;
+        
+        // a manually wired up onclick event
+        if ((lastFrameMouseDown == 0.) && (thisFrameMouseDown == 1.)) {
+            value.x = 1.;
+        }
+        else {
+            value.x = 0.;
+        }
+    }
+
+    
+    fragColor = value;
+}

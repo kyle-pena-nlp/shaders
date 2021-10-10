@@ -1,0 +1,130 @@
+// https://thebookofshaders.com/12/
+vec2 random2f( vec2 p ) {
+    return fract(
+        sin(
+            vec2(
+                dot(p,vec2(127.1,311.7)),
+                dot(p,vec2(269.5,183.3)))
+        )*(43758.5453)
+    );
+}
+
+
+float veronoi_metric( in vec2 r, float exponent, float angle ) {
+    // manhattan
+    //return dot(abs(r), vec2(1.));
+    // euclidean
+    //return dot(r,r);
+    return dot(pow(abs(r),vec2(exponent)), 0.01+abs(vec2(cos(angle), sin(angle))));
+}
+
+/*
+otherwise, lifted from iq @ https://www.iquilezles.org/www/articles/smoothvoronoi/smoothvoronoi.htm
+*/
+
+float smoothVoronoi_f1_height( in vec2 x, float randomness, float power, float angle )
+{
+    vec2 p = floor( x );
+    vec2  f = fract( x );
+
+    float res = 0.0;
+    for( int j=-1; j<=1; j++ )
+    for( int i=-1; i<=1; i++ )
+    {
+        vec2 b = vec2( i, j );
+        vec2 point = randomness * random2f( p + b );
+        vec2  r = vec2( b ) - f + point;
+        float d = veronoi_metric( r, power, angle );
+
+        res += 1.0/pow( d, 8.0 );
+    }
+    return pow( 1.0/res, 1.0/16.0 );
+}
+
+vec4 voronoi_f1_colors( in vec2 x, float randomness, float power, float angle )
+{
+    vec2 p = floor( x );
+    vec2  f = fract( x );
+
+    float res = 8.0;
+    vec3 res_col = vec3(0.);
+    for( int j=-1; j<=1; j++ )
+    for( int i=-1; i<=1; i++ )
+    {
+        vec2 b = vec2( i, j );
+        vec2 point = random2f( vec2(p + b) );
+        vec2  r = vec2( b ) - f + randomness*point;
+        float d = veronoi_metric( r, power, angle);
+        vec3 col = vec3(point,1.);
+
+        res_col = (d < res) ? col : res_col;
+        res = min( res, d );
+    }
+    return vec4(res_col, sqrt( res ));
+}
+
+
+vec4 voronoi_f2_colors( in vec2 x, float randomness, float power,float angle )
+{
+    vec2 p = floor( x );
+    vec2  f = fract( x );
+
+    float res2   = 8.0, res1   = 8.0;
+    float t_res2 = 8.0, t_res1 = 8.0;
+    vec3 res2_col = vec3(0.), res1_col = vec3(0.);
+    
+    for( int j=-1; j<=1; j++ )
+    for( int i=-1; i<=1; i++ )
+    {
+        vec2 b = vec2( i, j );
+        vec2 point = random2f( vec2(p + b) );
+        vec2  r = vec2( b ) - f + randomness*point;
+        float d = veronoi_metric( r, power, angle );
+        vec3 col = vec3(point,1.);
+        
+        
+        // https://stackoverflow.com/questions/1582356/fastest-way-of-finding-the-middle-value-of-a-triple
+        t_res1 = min(min(res1,res2), d);
+        t_res2 = max(min(res1,res2), min(max(res1,res2),d));
+        
+        res1_col = (t_res1 == res1) ? res1_col : ((t_res1 == res2) ? res2_col : col);
+        res2_col = (t_res2 == res1) ? res1_col : ((t_res2 == res2) ? res2_col : col);
+        
+        res1 = t_res1;
+        res2 = t_res2;
+
+        
+    }
+    return vec4(res2_col, sqrt( res2 ));
+}
+
+
+
+
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+
+    vec2 uv = fragCoord / iResolution.xy;
+
+    // marble
+    //float level = veronoi_3(uv, vec3(3.,10.,30.), vec3(3.,10.,10.), vec3(1., 2., 5.));
+    //fragColor = vec4(vec3(level/5.),1.);
+    
+    vec3 base = vec3(0.8,0.5,0.5);
+    
+    float randomness = uv.x;
+    float exponent   = 1.0+4.*uv.y;
+    float angle = 3.14159/4.;
+    
+    vec4 v_f1 = voronoi_f1_colors(10.*uv, randomness, exponent, angle);
+    vec4 v_f2 = voronoi_f2_colors(10.*uv, randomness, exponent, angle);
+    vec4 v = mod(iTime,10.) < 5. ? v_f1 : v_f2;
+    if (mod(iTime,5.)<2.5) {
+        fragColor = vec4(vec3(v.w),1.); // vec4((v_f1 + v_f2)/2.,1.);
+    }
+    else {
+        fragColor = vec4(v.xyz, 1.);
+    }
+    //float veronoi = voronoi_f1_colors(20.*uv, .5, 2.).w;
+    //fragColor = vec4(veronoi*base,1.);
+}
