@@ -2,21 +2,15 @@ const int AA = 2;
 
 const float pi = 3.14159;
 
-const mat3 noise_3d_rotator = mat3( 0.00,  0.80,  0.60,
-                    -0.80,  0.36, -0.48,
-                    -0.60, -0.48,  0.64 );
-                    
-mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
-
-float smoothlocal(float t, float I, float II, float eps) {
-    return smoothstep(I-eps, I+eps, t) * (1.-smoothstep(II-eps,II+eps, t));
-}
-
-
-
-const vec3 SKY_BASE_COLOR = vec3(0.7, 0.9, 1.0);
+const vec3 SKY_BASE_COLOR = vec3(0.9, 0.7, 1.0);
 
 const float PI = 3.14159;
+
+const float eps = 1e-4;
+
+const mat3 identityTransform = mat3( 1.0, 0.0, 0.0, 
+				 0.0, 1.0, 0.0, 
+				 0.0, 0.0, 1.0);
 
 // environment
 const vec3 SUNLIGHT_DIR = vec3(0.4, 0.7, 0.1);
@@ -26,7 +20,7 @@ const vec3 Y_AXIS = vec3(0.,1.,0.);
 const vec3 Z_AXIS = vec3(0.,0.,1.);
 
 // Procedural 3d noise from Inigo Quilez at https://www.shadertoy.com/view/4sfGzS
-float hash(vec3 p)  // replace this by something better
+float hash(in vec3 p)  // replace this by something better
 {
     p  = fract( p*0.3183099+.1 );
 	p *= 17.0;
@@ -62,55 +56,32 @@ struct QueryResult {
     float d;
     float obj_id;
     vec3 uvw;
-    //vec3 norm;
-    
+    //vec3 norm; 
 };
 
 
 
 
 // matrix math helper, ty inigo quilez
-mat4 rotationAxisAngle( vec3 v, float angle )
+mat3 rotationAxisAngle( in vec3 v, in float angle )
 {
     float s = sin( angle );
     float c = cos( angle );
     float ic = 1.0 - c;
 
-    return mat4( v.x*v.x*ic + c,     v.y*v.x*ic - s*v.z, v.z*v.x*ic + s*v.y, 0.0,
-                 v.x*v.y*ic + s*v.z, v.y*v.y*ic + c,     v.z*v.y*ic - s*v.x, 0.0,
-                 v.x*v.z*ic - s*v.y, v.y*v.z*ic + s*v.x, v.z*v.z*ic + c,     0.0,
-			     0.0,                0.0,                0.0,                1.0 );
+    return mat3( v.x*v.x*ic + c,     v.y*v.x*ic - s*v.z, v.z*v.x*ic + s*v.y,
+                 v.x*v.y*ic + s*v.z, v.y*v.y*ic + c,     v.z*v.y*ic - s*v.x,
+                 v.x*v.z*ic - s*v.y, v.y*v.z*ic + s*v.x, v.z*v.z*ic + c);
 }
 
-
-mat4 identityTransform() {
-    mat4 eye = mat4( 1.0, 0.0, 0.0, 0.0,
-				 0.0, 1.0, 0.0, 0.0,
-				 0.0, 0.0, 1.0, 0.0,
-				 0.0, 0.0, 0.0, 1.0 );
-                 
-    return eye;
-}
-
-// matrix math helper. ty inigo quilez
-mat4 translate( mat4 transform, vec3 t )
-{
-    mat4 forwards = mat4( 1.0, 0.0, 0.0, 0.0,
-				 0.0, 1.0, 0.0, 0.0,
-				 0.0, 0.0, 1.0, 0.0,
-				 t.x, t.y, t.z,   1.0 );
-   
-   return forwards * transform;
-}
-
-mat4 rotate( mat4 transform, vec3 v, float angle ) {
-    mat4 forwards = rotationAxisAngle(v, angle);
+mat3 rotate( in mat3 transform, in vec3 v, in float angle ) {
+    mat3 forwards = rotationAxisAngle(v, angle);
     
     return forwards * transform;
 }
 
 // Compute camera-to-world transformation.
-mat3 setCamera( in vec3 ro, in vec3 ta, float cr )
+mat3 setCamera( in vec3 ro, in vec3 ta, in float cr )
 {
 	vec3 cw = normalize(ta - ro);
 	vec3 cp = vec3(sin(cr), cos(cr),0.0);
@@ -120,24 +91,24 @@ mat3 setCamera( in vec3 ro, in vec3 ta, float cr )
 }
 
 // vec3(distance, material uv)
-QueryResult sdPlane( vec3 p, float time )
+QueryResult sdPlane(in vec3 p, in float time )
 {    
-    float d  = p.y;
+    float d  = return p.y;
     vec3 uvw  = p.xzy;
-
 	return QueryResult(d, PLANE, uvw); // vec4(p.y, p.xyz) maybe?
 }
 
 
 
-QueryResult sdCapsule( vec3 p, vec3 a, vec3 b, float r)
+float sdCapsule(in vec3 p, in vec3 a, in vec3 b, in float r)
 {
 
     vec3 pa = p - a, ba = b - a;
     float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
     float d = length( pa - ba*h ) - r;
-    vec3 uvw = vec3(0.);
-    return QueryResult(d, TREE, uvw);
+    //vec3 uvw = vec3(0.);
+    //return QueryResult(d, TREE, uvw);
+    return d;
 }
 
 // x, m, uv
@@ -172,98 +143,127 @@ QueryResult opU2(in QueryResult d1, in QueryResult d2 )
 
 struct Segment {
     vec3 pos;
-    mat4 orientation;
+    mat3 orientation;
     float length;
     float width;
 };
 
-struct Branch {
-    Segment A;
-    Segment B;
-    Segment C;
-    Segment D;
-};
 
-vec3 endOfSegment(Segment segment) {
-    return segment.pos + (segment.orientation * vec4(0.,segment.length,0.,0.)).xyz;
+
+vec3 endOfSegment(in Segment segment) {
+    return segment.pos + (segment.orientation * vec3(0.,segment.length,0.));
 }
 
-QueryResult sdSegment(vec3 p, Segment segment) {
+float sdSegment(in vec3 p, in Segment segment) {
     return sdCapsule(p, segment.pos, endOfSegment(segment), segment.width);
 }
 
-QueryResult sdBranch(vec3 p, in Branch branch)
-{
-    QueryResult a = sdSegment(p, branch.A);
-    QueryResult b = sdSegment(p, branch.B);
-    QueryResult c = sdSegment(p, branch.C);
-    QueryResult d = sdSegment(p, branch.D);
-    return opU2(opU2(a, b), opU2(c, d));
-}
 
-mat4 perturb(mat4 transform, vec3 seed, float scale) {
+
+mat3 perturb(in mat3 transform, in vec3 seed, in float scale) {
     float randAngle1 = scale * 2. * PI * (hash((1.*seed))-0.5);
     float randAngle2 = scale * 2. * PI * (hash((2.*seed))-0.5);
     float randAngle3 = scale * 2. * PI * (hash((3.*seed))-0.5);
     return rotate(rotate(rotate(transform, X_AXIS, randAngle1), Y_AXIS, randAngle2), Z_AXIS, randAngle3);
 }
 
-float grow(float t, float startT, float endT) {
+float grow(in float t, in float startT, in float endT) {
     return clamp(t - startT, 0., endT - startT) / (endT-startT);
 }
 
-Branch makeBranch(vec3 pos, mat4 transform, float scale, float time, float startTime, float endTime, vec3 seed) {
 
-    time = clamp(  (time - startTime) / (endTime - startTime), 0., 1.);
-
-    mat4 orientationA = transform;
-    Segment A = Segment(pos, orientationA, scale * grow(time, 0., 0.3), scale * 0.1);
-    
-    mat4 orientationB = perturb(orientationA, seed + vec3(0.,1.,0.), 0.08);
-    Segment B = Segment(endOfSegment(A), orientationB, scale * grow(time, 0.2, 0.5), scale * 0.08);
-    
-    mat4 orientationC = perturb(orientationB, seed + vec3(0.,2.,0.), 0.08);
-    Segment C = Segment(endOfSegment(B), orientationC, scale * grow(time, 0.4, 0.7), scale * 0.06);
-
-    mat4 orientationD = perturb(orientationC, seed + vec3(0.,3.,0.), 0.08);
-    Segment D = Segment(endOfSegment(C), orientationD, scale * grow(time, 0.6, 1.0), scale * 0.04);
-
-    return Branch(A, B, C, D);
+vec3 next(in vec3 start, mat3 angle, float length) {
+    return start + length * (angle * Y_AXIS);
 }
 
-QueryResult sdTree(vec3 p, vec3 pos, float scale, float time) {
-
-    Branch trunk = makeBranch(pos, identityTransform(), 0.5 *scale, time, 0., 8., pos + vec3(0.));
-    QueryResult trunkSD = sdBranch(p, trunk);
-
-    mat4 branch1Orientation = rotate(trunk.A.orientation, X_AXIS, PI/3.);
-    Branch branch1 = makeBranch(trunk.B.pos, branch1Orientation, 0.25 * scale, time, 2., 7., pos + vec3(1.,0.,0.));
-    QueryResult branchSD1 = sdBranch(p, branch1);
-
-    mat4 branch2Orientation = rotate(trunk.B.orientation, Z_AXIS, PI/3.);
-    Branch branch2 = makeBranch(trunk.C.pos, branch2Orientation, 0.25 * scale, time, 4., 9., pos + vec3(2.,0.,0.));
-    QueryResult branchSD2 = sdBranch(p, branch2);
-
-    mat4 branch3Orientation = rotate(trunk.C.orientation, X_AXIS, -PI/3.);
-    Branch branch3 = makeBranch(trunk.D.pos, branch3Orientation, 0.25 * scale, time, 6., 10., pos + vec3(3.,0.,0.));
-    QueryResult branchSD3 = sdBranch(p, branch3);  
-
-    return opU2( opU2(trunkSD, branchSD1), opU2(branchSD2, branchSD3));
-    
-
-    //return trunkSD;
+vec3 nextAngle(in mat3 angle, in vec3 seed) {
+    perturb()
 }
 
-QueryResult map( in vec3 p, in Params params, bool renderBox, bool renderBevel)
+
+float sdTree(in vec3 p, in vec3 pos, in float scale, in float time) {
+
+    //vec3 seed = floor(p.xxz / 2.);
+    //vec3 pMod = vec3( mod(p.xz, 2.).xy, p.y).xzy;
+    vec3 seed = pos;
+    vec3 pMod = p;
+    
+    vec3 t000 = pos;
+    vec3 t100 = next(pos, identityTransform, scale);
+
+    /*
+    float length1 = scale  * 0.5;
+    float width1  = length1 * 0.2;
+    mat3  angle1  = identityTransform;
+    vec3  start1  = pos; //  + vec3(0.5,0.,0.5)*(hash(pos) - 0.5)
+    
+    
+    float length2 = length1;
+    float width2 = width1;
+    mat3 angle2 = angle1;
+    vec3 start2 = start1;
+
+    float length3 = length1;
+    float width3 = width1;
+    mat3 angle3 = angle1;
+    vec3 start3 = start1;
+
+    */
+
+
+    /*
+
+    Segment segment1 = Segment(start1, angle1, scale, width1);
+    Segment segment2 = segment1;
+    
+    float d = sdSegment(pMod, segment1);
+
+    for (int i = 0; i < 5; i++) {
+    
+        length1  = length1 * 0.9;
+        width1   = width1 * 0.9;
+        angle1   = perturb(angle1, seed + vec3(float(i), 0., 0.),0.1);
+        start1   = endOfSegment(segment1);
+
+        segment1 = Segment(start1, angle1, length1, width1);
+        d = min(d, sdSegment(pMod, segment1));
+        
+        length2 = length1 * 0.9;
+        width2  = width1 * 0.9;
+        angle2  = perturb(angle1, seed + vec3(float(i),1.,0.),0.25);
+        start2 = start1;
+        
+        segment2 = segment1;
+        
+        for (int j = 0; j < 5; j++) {
+        
+            length2 = length2 * 0.9;
+            width2  = width2 * 0.9;
+            angle2  = perturb(angle2, seed + vec3(float(i),1.+float(j),0.), 0.1);
+            start2  = endOfSegment(segment2);
+            
+            segment2 = Segment(start2, angle2, length2, width2);
+            d = min(d, sdSegment(pMod, segment2));
+
+        }
+    }
+
+    return d;
+    */
+    
+    return d;
+}
+
+QueryResult map( in vec3 p, in Params params)
 {
-    vec3 treePos = vec3(0., 0., 2.);
-    
+
     // plane
-    QueryResult plane = sdPlane(p, params.time);
-    
-    QueryResult tree = sdTree( p, treePos, 1., params.time);
-    
-    QueryResult scene = opU2(plane, tree);
+    QueryResult scene = sdPlane(p, params.time);
+
+    vec3 treePos = vec3(1., 0., 1.);
+
+    QueryResult tree = QueryResult(sdTree( p, treePos, 0.6, params.time), TREE, vec3(1.));
+    scene = opU2(scene, tree);
 
     return scene;
 }
@@ -291,7 +291,7 @@ Query getQuery(in Params params)
 // Cast a ray from origin ro in direction rd until it hits an object.
 // Return (t,m,a) where t is distance traveled along the ray, and m
 // is the material of the object hit, and a is an auxilliary material channel
-QueryResult castRay( in Query query, in Params params, bool renderBox, bool renderBevel )
+QueryResult castRay( in Query query, in Params params)
 {
     float tmin = 1.0;
     float tmax = 20.0;
@@ -310,10 +310,10 @@ QueryResult castRay( in Query query, in Params params, bool renderBox, bool rend
     float obj_id = -1.0;
     vec3  uvw    = vec3(0.);
 
-    for( int i=0; i<64; i++ )
+    for( int i=0; i<200; i++ )
     {
 	    float precis = 0.0001*t;
-	    QueryResult res = map( ro+rd*t, params, renderBox, renderBevel);
+	    QueryResult res = map( ro+rd*t, params);
         if( res.d<precis || t>tmax ) break;
         t += 0.9*res.d;
 	    obj_id = res.obj_id;
@@ -333,13 +333,13 @@ QueryResult castRay( in Query query, in Params params, bool renderBox, bool rend
 // Cast a shadow ray from origin ro (an object surface) in direction rd
 // to compute soft shadow in that direction. Returns a lower value
 // (darker shadow) when there is more stuff nearby as we step along the shadow ray.
-float softshadow( in vec3 ro, in vec3 rd, in float mint, in float tmax, in Params params, bool renderBox, bool renderBevel)
+float softshadow( in vec3 ro, in vec3 rd, in float mint, in float tmax, in Params params)
 {
 	float res = 1.0;
     float t = mint;
     for( int i=0; i<16; i++ )
     {
-		float h = map( ro + rd*t, params, renderBox, renderBevel).d;
+		float h = map( ro + rd*t, params).d;
         res = min( res, 6.0*h/t );
         t += clamp( h, 0.02, 0.10 );
         if( h<0.001 || t>tmax ) break;
@@ -348,20 +348,20 @@ float softshadow( in vec3 ro, in vec3 rd, in float mint, in float tmax, in Param
 }
 
 // Compute normal vector to surface at pos, using central differences method?
-vec3 calcNormal( in vec3 pos, in Params params, bool renderBox, bool renderBevel )
+vec3 calcNormal( in vec3 pos, in Params params)
 {
     // epsilon = a small number
     vec2 e = vec2(1.0,-1.0)*0.5773*0.0005;
     
-    return normalize( e.xyy*map( pos + e.xyy, params, renderBox, renderBevel ).d + 
-					  e.yyx*map( pos + e.yyx, params, renderBox, renderBevel ).d + 
-					  e.yxy*map( pos + e.yxy, params, renderBox, renderBevel ).d + 
-					  e.xxx*map( pos + e.xxx, params, renderBox, renderBevel ).d );
+    return normalize( e.xyy*map( pos + e.xyy, params ).d + 
+					  e.yyx*map( pos + e.yyx, params ).d + 
+					  e.yxy*map( pos + e.yxy, params ).d + 
+					  e.xxx*map( pos + e.xxx, params ).d );
 
 }
 
 // compute ambient occlusion value at given position/normal
-float calcAO( in vec3 pos, in vec3 nor, in Params params, bool renderBox, bool renderBevel )
+float calcAO( in vec3 pos, in vec3 nor, in Params params)
 {
 	float occ = 0.0;
     float sca = 1.0;
@@ -369,22 +369,12 @@ float calcAO( in vec3 pos, in vec3 nor, in Params params, bool renderBox, bool r
     {
         float hr = 0.01 + 0.12*float(i)/4.0;
         vec3 aopos =  nor * hr + pos;
-        float dd = map( aopos, params, renderBox, renderBevel).d;
+        float dd = map( aopos, params).d;
         occ += -(dd-hr)*sca;
         sca *= 0.95;
     }
     return clamp( 1.0 - 3.0*occ, 0.0, 1.0 );    
 }
-
-
-
-// UE4's PseudoRandom function
-// https://github.com/EpicGames/UnrealEngine/blob/release/Engine/Shaders/Private/Random.ush
-float pseudo(vec2 v) {
-    v = fract(v/128.)*128. + vec2(-64.340622, -72.465622);
-    return fract(dot(v.xyx * v.xyy, vec3(20.390625, 60.703125, 2.4281209)));
-}
-
 
 vec3 Sky(in Params params, in vec3 uvw) {
     return clamp(SKY_BASE_COLOR + uvw.y*0.8, 0., 1.);
@@ -430,9 +420,9 @@ Material mat_col(in Params params, in QueryResult queryResult)
 vec3 render2(in vec2 fragCoord)
 {
 
-    Params params = Params(  fragCoord, iResolution.xy, mod(iTime,10.));
+    Params params = Params(  fragCoord, iResolution.xy, iTime); // mod(iTime,10.)
     Query query = getQuery(params);
-    QueryResult scene = castRay( query, params, true, true );
+    QueryResult scene = castRay( query, params );
 
     // Get the scene info from the scene buffer
     //vec4 scene = texelFetch(iChannel1, ivec2(fragCoord), 0);
@@ -463,11 +453,11 @@ vec3 render2(in vec2 fragCoord)
     // if not the sky, apply effects.
     if (obj_id > 0.)
     {
-        vec3 nor = calcNormal( pos, params, true, true );
+        vec3 nor = calcNormal( pos, params );
         vec3 ref = reflect( rd, nor ); // reflected ray
 
         // lighting        
-        float occ = calcAO( pos, nor, params, true, true ); // ambient occlusion
+        float occ = calcAO( pos, nor, params ); // ambient occlusion
 		vec3  lig = normalize( SUNLIGHT_DIR ); // sunlight
 		float amb = clamp( 0.5+0.5*nor.y, 0.0, 1.0 ); // ambient light
         float dif = clamp( dot( nor, lig ), 0.0, 1.0 ); // diffuse reflection from sunlight
@@ -477,8 +467,8 @@ vec3 render2(in vec2 fragCoord)
         float fre = pow( clamp(1.0+dot(nor,rd),0.0,1.0), 2.0 ); // fresnel
 		float spe = pow(clamp( dot( ref, lig ), 0.0, 1.0 ),16.0); // specular reflection
         
-        dif *= softshadow( pos, lig, 0.02, 2.5, params, true, true );
-        dom *= softshadow( pos, ref, 0.02, 2.5, params, true, true );
+        dif *= softshadow( pos, lig, 0.02, 2.5, params );
+        dom *= softshadow( pos, ref, 0.02, 2.5, params );
 
 		vec3 lin = vec3(0.0);
         lin += (1.30)*dif*vec3(1.00,0.80,0.55);

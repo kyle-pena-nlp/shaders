@@ -1,0 +1,9 @@
+chromedriver.exe
+**/*.png
+**/*.gif
+**/*.mp4
+__pycache__
+*.log
+EXAMPLE/
+.vscode
+.git
