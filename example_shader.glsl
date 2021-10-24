@@ -19,8 +19,8 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 // { "loop": ("-1.", 0.01), "blue": ("0.", 0.70), "red": ("1.", 0.10), "green":("2.", 0.10), "teal": ("3.", 0.09) }
 #define COLOR_MODE 2.
 
-// { "bloop": ("0", 0.33), "gloop": ("1", 0.33), "scoop": ("2", 0.34) }
-#define POLYNOMIAL 0
+
+#define BOUNCE 1
 
 // { "kalm": ("0.", 0.95), "jittery": ("1.", 0.05) }
 #define JITTERY 1.
@@ -31,41 +31,76 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define STATIC 1.
 
 // { "spinner": ("10.",0.05), "glass": ("1.", 0.05), "smooth": ("0.0", 0.90) }
-#define FRACTURE 10.
+#define FRACTURE 1.
 
 // { "liney": ("1.", 0.05), "noliney": ("0.", 0.95) }
 #define SCANLINE 1.
 
-// { "ghost": ("2.", 0.05), "plain": ("0.", 0.95) }
+// { "ghost": ("1.", 0.05), "plain": ("0.", 0.95) }
 #define TRAILS 1
 
 #define SHAPES 20
 
-const float WILD_B = (POLYNOMIAL == 0) ? 1. : 0.;
-const float WILD_C = (POLYNOMIAL == 1) ? 1. : 0.;
-const float WILD_D = (POLYNOMIAL == 2) ? 1. : 0.;
-
-
 const int MAX_ITER = SHAPES;
 
+struct Poly3 {
+    float A;
+    float B;
+    float C;
+    float D;
+};
 
-// Pattern 1
-float A(float time) {
-    return 1.;
+struct Z {
+    float real;
+    float imag;
+};
+
+// { "I": ("0", 0.33), "II": ("1", 0.33), "III": ("2", 0.34) }
+#define POLYNOMIAL 0
+
+Z _multiplier(float time) {
+    if (POLYNOMIAL == 0) {
+        return Z(-1.+0.9*sin(RATE_1*time),-0.1+0.9*cos(RATE_1*time));
+    }
+    else if (POLYNOMIAL == 1) {
+        return Z(-1.+0.9*sin(RATE_1*time),-0.1+0.9*cos(RATE_1*time));
+    }    
+    else if (POLYNOMIAL == 2) {
+        return Z(-2.+0.1*sin(iTime),-2.+0.1*cos(iTime));
+    }        
+    else if (POLYNOMIAL == 3) {
+        return Z(-1.+0.9*sin(RATE_1*time),-0.1+0.9*cos(RATE_1*time));
+    }        
+    else if (POLYNOMIAL == 4) {
+        return Z(-1.1 + 0.1*sin(RATE_1*time),-1.1);
+    }
+    else if (POLYNOMIAL == 5) {
+         return Z(0.0,-1.+0.9*sin(RATE_1*time));
+    }
 }
 
-float B(float time) {
-    return 0.0 + WILD_B * (sin(RATE_1 * time));
-}
+Poly3 getPoly(float time) {
+    Poly3 p = Poly3(0., 0., 0., 0.);
+    if (POLYNOMIAL == 0) {
+        p = Poly3(1.,0.,0.,-1.);
+    }
+    else if (POLYNOMIAL == 1) {
+        p = Poly3(0.,2.,0.,-2.);
+    }
+    else if (POLYNOMIAL == 2) {
+        p = Poly3(3.,0.0,0.0,-3.);
+    }
+    else if (POLYNOMIAL == 3) {
+        p = Poly3(7.,-0.5,-0.1,-1.);
+    }
+    else if (POLYNOMIAL == 4) {
+        p = Poly3(1.,0.,0.,-1.);
+    }
+    
+    float bounce =  (BOUNCE == 1) ? sin(RATE_1 * time) : 0.0;
 
-float C(float time) {
-    return 0.0 + WILD_C * (-1. + 0.5 * sin(RATE_1 * time));
+    return Poly3(p.A, p.B, p.C, p.D + bounce);
 }
-
-float D(float time) {
-    return -1.0 + WILD_D * sin(RATE_1 * time);
-}
-
 
 
 float HUE_SHIFT_FRAC(float time) {
@@ -107,10 +142,7 @@ vec3 HueShift (in vec3 Color, in float Shift)
 }
 
 
-struct Z {
-    float real;
-    float imag;
-};
+
 
 Z add(Z a, Z b, Z c, Z d) {
     return Z(a.real + b.real + c.real + d.real, a.imag + b.imag + c.imag + d.imag);
@@ -150,12 +182,6 @@ Z div(Z a, Z b) {
     return mult(1./denom, numerator);
 }
 
-struct Poly3 {
-    float A;
-    float B;
-    float C;
-    float D;
-};
 
 
 
@@ -216,8 +242,8 @@ vec3 render(in vec2 fragCoord, float time ) {
 
             Z z = Z(uv.x, uv.y);
             
-            Z a = Z(-1.+0.9*sin(RATE_1*time),-0.1+0.9*cos(RATE_1*time));
-            Result result = newtown_raphson(z, Poly3(A(time),B(time),C(time),D(time)), a);
+            Z a = _multiplier(time);
+            Result result = newtown_raphson(z, getPoly(time), a);
 
             float shade = clamp(float(result.iterations) / float(10), 0., 1.);
             
@@ -332,7 +358,7 @@ vec2 jitter(in vec2 fragCoord, float time) {
     vec2 jitter1 = getJitter(mod(time,LOOP_TIME));
     vec2 jitter2 =  getJitter(mod(time,LOOP_TIME) - LOOP_TIME);  
     vec2 jitter = mix(jitter1, jitter2, mod(time/LOOP_TIME,1.));
-    return 1000.*jitter;
+    return 500.*jitter;
 }
 
 vec2 random2f( vec2 p ) {
@@ -408,7 +434,7 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
     if (FRACTURE > 0.) {
         voronoi = voronoi_f1_colors( NUM_CELLS(time)*uv, 1., 2., PI/4. );
         voronoi_amt =  sin(5. * RATE_1 * time / LOOP_TIME);
-        float a = FRACTURE*(RATE_1 * time);
+        float a = mod(FRACTURE*(RATE_1 * time),2.*PI);
         vec2 center = (floor(NUM_CELLS(time)*uv) + voronoi.ij + vec2(0.5)) / NUM_CELLS(time);
         mat2 spin = mat2(cos(a), -sin(a), sin(a), cos(a));
         renderFragCoord = iResolution.xx*((spin * (uv - center)) + center);// + voronoi_amt * 50. * voronoi.xy;
@@ -420,8 +446,9 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
     
     
     if (FRACTURE > 0.) {
-        //color = mix(voronoi.col.xyz, color, 1.-voronoi_amt/2.);
+        color = mix(voronoi.col.xyz, color, 1.-voronoi_amt/4.);
         color = color + voronoi_amt * 0.25 * dot(vec2(cos(RATE_1*time), sin(RATE_1*time)), (voronoi.col.xy));
+        color = mix(color, vec3(1.), voronoi.res);
     }
     
     if (JITTERY == 1.) {
@@ -467,11 +494,11 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     }
     
     for (int i = 1; i <= TRAILS; i++) {
-        vec3 trail = renderMainImage(fragCoord, iTime-(1./float(TRAILS))*float(i));
+        vec3 trail = renderMainImage(fragCoord, iTime-0.35*(1./float(TRAILS))*float(i));
         //  HueShift(trail,0.1)
         // 0.1 * trail
         float coef = (1./float(1+TRAILS));//pow(2.,float(i));
-        color += coef * trail; // vec3(length(trail)/pow(3.,0.5))
+        color += coef * vec3(length(trail)/pow(3.,0.5));
     }
     
     fragColor = vec4(color,1.);
