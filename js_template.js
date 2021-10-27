@@ -2,6 +2,8 @@
 
 const external_code = `#SHADER_PLACEHOLDER#`;
 
+class ImportError extends Error {}
+
 const app = {
     mode: null, /* capture or animate */
     status : null, /* null or 'ready' */

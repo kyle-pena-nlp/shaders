@@ -4,40 +4,43 @@ const int AA = 1;
 const float EPS = 1e-8;
 const float PI = 3.1415962;
 
-
-const float RATE_1 = 2. * PI / 10.;
+#define LOOP_TIME 10.
+const float RATE_1 = 2. * PI / LOOP_TIME;
 const float PHASE_1 = PI / 2.;
-const float LOOP_TIME = 10.;
+const float NUM_CELLS = 10.;
 
-float NUM_CELLS(float time) {
-    return 10.;
-}
 
 mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 
-// { "loop": ("-1.", 0.01), "blue": ("0.", 0.70), "red": ("1.", 0.10), "green":("2.", 0.10), "teal": ("3.", 0.09) }
-#define COLOR_MODE 2.
+// { "loop": ("-1.", 0.10), "blue": ("0.", 0.23), "red": ("1.", 0.23), "green":("2.", 0.22), "teal": ("3.", 0.22) }
+#define COLOR_MODE 1.
 
 
 #define BOUNCE 1
 
-// { "kalm": ("0.", 0.95), "jittery": ("1.", 0.05) }
+// { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
 #define JITTERY 1.
 
 #define VIGNETTE 1.
 
-// { "glitched": ("1.", 0.05), "notglitched":, ("0.", 0.95) }
-#define STATIC 1.
+// { "glitched": ("1.", 0.30), "notglitched": ("0.", 0.70) }
+#define STATIC 0.
 
-// { "spinner": ("10.",0.05), "glass": ("1.", 0.05), "smooth": ("0.0", 0.90) }
-#define FRACTURE 1.
+// { "spinner": ("10.",0.15), "glass": ("1.", 0.15), "smooth": ("0.0", 0.70) }
+#define FRACTURE 0.
 
-// { "liney": ("1.", 0.05), "noliney": ("0.", 0.95) }
-#define SCANLINE 1.
+// { "liney": ("1.", 0.20), "noliney": ("0.", 0.80) }
+#define SCANLINE 0.
 
-// { "ghost": ("1.", 0.05), "plain": ("0.", 0.95) }
-#define TRAILS 1
+// { "ghost": ("1", 0.20), "plain": ("0", 0.80) }
+#define TRAILS 0
+
+// { "barrel": ("1", 0.20), "nobarrel": ("0", 0.80) }
+#define BARREL 0
+
+// { "I": ("0", 0.20), "II": ("1", 0.20), "III": ("2", 0.20), "IV": ("3", 0.20), "V": ("4", 0.20) }
+#define POLYNOMIAL 4
 
 #define SHAPES 20
 
@@ -55,8 +58,7 @@ struct Z {
     float imag;
 };
 
-// { "I": ("0", 0.33), "II": ("1", 0.33), "III": ("2", 0.34) }
-#define POLYNOMIAL 0
+
 
 Z _multiplier(float time) {
     if (POLYNOMIAL == 0) {
@@ -66,7 +68,7 @@ Z _multiplier(float time) {
         return Z(-1.+0.9*sin(RATE_1*time),-0.1+0.9*cos(RATE_1*time));
     }    
     else if (POLYNOMIAL == 2) {
-        return Z(-2.+0.1*sin(iTime),-2.+0.1*cos(iTime));
+        return Z(-2.+0.1*sin(RATE_1*time),-2.+0.1*cos(RATE_1*time));
     }        
     else if (POLYNOMIAL == 3) {
         return Z(-1.+0.9*sin(RATE_1*time),-0.1+0.9*cos(RATE_1*time));
@@ -105,7 +107,7 @@ Poly3 getPoly(float time) {
 
 float HUE_SHIFT_FRAC(float time) {
     if (COLOR_MODE == -1.) {
-        return time / 10.;
+        return time / LOOP_TIME;
     }
     else if (COLOR_MODE == 0.) {
         return 0.0;
@@ -259,10 +261,6 @@ vec3 render(in vec2 fragCoord, float time ) {
 
     tot /= float(AA * AA);
     
-    // central differences is ordinarily by 2.*h_i, but we are in a 3x3 box, so we divide by 6.=2.*3.
-    //dFdX *= 10.;
-    //dFdY *= 10.;
-    
     
     // compute lighting using normal
     //tot *= dot(normalize(vec3(dFdX,dFdY,1.)), LIGHT_DIR());
@@ -354,6 +352,8 @@ vec2 getJitter(float time)
     return 0.3*(distort2(vec2(time), 5, 1., 1., 0.) - vec2(time)); 
 }
 
+// this jitter implementatoin blends two jitters with 100% of A at t=0.0 and 100% of B at t=LOOP_TIME
+// The blends are offset by t = -LOOP_TIME, that way, you have seemless looping of length LOOP_TIME
 vec2 jitter(in vec2 fragCoord, float time) {
     vec2 jitter1 = getJitter(mod(time,LOOP_TIME));
     vec2 jitter2 =  getJitter(mod(time,LOOP_TIME) - LOOP_TIME);  
@@ -414,7 +414,19 @@ Voronoi voronoi_f1_colors( in vec2 x, float randomness, float power, float angle
     //return vec4(res_col, sqrt( res ));
 }
 
-
+vec3 barrelize(vec2 fragCoord) {
+    float a = -0.5;
+    vec2 uv = 2.*(fragCoord.xy / iResolution.xy) - 1.;
+    float ru = dot(uv,uv);
+    vec2 uvd = uv * (1. - a * ru);
+    vec2 coord = iResolution.xy*(uvd + 1.)/2.;
+    float mask = clamp(coord, 0., 1.) == coord ? 1. : 0.;
+    return vec3(coord, mask);
+    //float rd = ru*(1. + a * ru);
+    //float alpha = atan(uv.y, uv.x);
+    //vec2 uvd = (vec2(rd * cos(alpha), rd * sin(alpha)) + 1.)/2.;
+    //return uvd * iResolution.xy;
+}
 
 
 vec3 renderMainImage(in vec2 fragCoord, float time )
@@ -422,6 +434,11 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
 
 
     vec2 oFragCoord = fragCoord;
+    
+    if (BARREL == 1) {
+        vec3 barrel = barrelize(fragCoord);
+        fragCoord = barrel.xy;
+    }
     
     vec2 jitter_amt = jitter(fragCoord, time);
     fragCoord += JITTERY * jitter_amt;  
@@ -432,10 +449,10 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
     float voronoi_amt = 0.;
     vec2 renderFragCoord = fragCoord;
     if (FRACTURE > 0.) {
-        voronoi = voronoi_f1_colors( NUM_CELLS(time)*uv, 1., 2., PI/4. );
+        voronoi = voronoi_f1_colors( NUM_CELLS*uv, 1., 2., PI/4. );
         voronoi_amt =  sin(5. * RATE_1 * time / LOOP_TIME);
         float a = mod(FRACTURE*(RATE_1 * time),2.*PI);
-        vec2 center = (floor(NUM_CELLS(time)*uv) + voronoi.ij + vec2(0.5)) / NUM_CELLS(time);
+        vec2 center = (floor(NUM_CELLS*uv) + voronoi.ij + vec2(0.5)) / NUM_CELLS;
         mat2 spin = mat2(cos(a), -sin(a), sin(a), cos(a));
         renderFragCoord = iResolution.xx*((spin * (uv - center)) + center);// + voronoi_amt * 50. * voronoi.xy;
     }
@@ -452,7 +469,7 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
     }
     
     if (JITTERY == 1.) {
-        float fade = 10./length(jitter_amt);
+        //float fade = 10./length(jitter_amt);
         //color = fade * color; // "FLASH LOOKS DUMB" - bonk
     }
     
@@ -480,6 +497,8 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
         color = static_mask * mix(vec3(0.6,1.,0.6),color,0.9) + (1.-static_mask)*color;
     
     }
+    
+    
     
     //color = scanline_mask * mix(vec3(0.6,1.,0.6),color,0.1) + (1.-scanline_mask) * color;
     

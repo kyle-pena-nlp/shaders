@@ -7,10 +7,14 @@ import numpy as np
 import imageio
 from tqdm import tqdm
 import os
+from io import BytesIO
+from apng import APNG, PNG
 
 # For Windows, install gifsicle and add it to your PATH
 # Otherwise use apt-get or brew
 from pygifsicle import optimize
+
+COMPRESS = False
 
 def parse_args():
     parser = ArgumentParser()
@@ -31,15 +35,66 @@ def wait_until_ready(driver):
             print("Page is ready.")
             break
 
-def get_writer(frames_per_second, out, format):
+class APNGWriter:
+    """
+        A funny little wrapper around the APNG library
+    """
+
+    def __init__(self, fpath, fps):
+        self.fpath = fpath
+        self.fps = fps
+        self.apng = APNG(num_plays = 0)
+        self.saved = False
+
+    def append_data(self, data):
+        image_bytes = self._ensure_is_png_bytes(data)
+        png = PNG.from_bytes(image_bytes)
+        self.apng.append(png, delay = 1, delay_den = self.fps)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if exc_type is None:
+            self._maybe_save()
+        else:
+            raise exc_val
+
+    def close(self):
+        if not self.saved:
+            self._maybe_save()
+
+    def _maybe_save(self):
+        if not self.saved:
+            try:
+                self.apng.save(self.fpath)
+                self.saved = True
+            except Exception as e:
+                print("Saving apng failed.")
+                raise e
+
+    def _ensure_is_png_bytes(self, image):
+        if type(image) == bytes:
+            return image
+        elif type(image) == np.ndarray:
+            with BytesIO() as b:
+                imageio.imsave(b, image, format = "png")
+                b.seek(0)
+                return b.read()
+        else:
+            raise Exception("Not bytes or a numpy array")
+
+def get_writer(frames_per_second, out, out_format):
     fpath = out
     print("Writing to '{}'".format(fpath))
-    if format == "gif":
+    if out_format == "gif":
         return imageio.get_writer(fpath, mode='I', duration = (1/frames_per_second), subrectangles = True )
-    elif format == "mp4":
+    elif out_format == "mp4":
         return imageio.get_writer(fpath, fps=frames_per_second)
+    elif out_format == "png":
+        return APNGWriter(fpath, fps = frames_per_second)
     else:
-        raise Exception("unknown format: {}".format(format))
+        raise Exception("Unknown format: '{}'".format(out_format))
 
 def to_optimized_path(fpath):
     # assumes fpath has an extension
@@ -48,9 +103,40 @@ def to_optimized_path(fpath):
     name,ext = fname.rsplit(".")
     return os.path.join(dirname, ".".join(["-".join([name,"optimized"]), ext]))
 
-def export(url, x, y, frames_per_second, num_seconds, out, format):
+def get_img(time, x, y, out_format, driver):
+    # Interact with the HTML page to get the png bytes from it
+    capture_script = "capture({},{},{}); return app.capture;".format(time,x,y)
+    img_data = driver.execute_script(capture_script)
+    image_bytes  = base64.b64decode(img_data)
+    
+    if out_format in ("gif", "mp4"):
+        return imageio.imread(image_bytes, "png")
+    elif out_format in ("png",):
+        if COMPRESS:
+            # The native pngs from canvas' method are uncompressed, so we need to compress it here.
+            png_img = imageio.imread(image_bytes, "png")
+            # Discard alpha channel if it exists.
+            if png_img.shape[-1] == 4:
+                png_img = png_img[...,:3]
+            with BytesIO() as b:
+                # uncompressed: 30MB
+                # optimize = True, 25.3MB
+                # compress_level = 9, 25.3MB
+                # compress_level = 9, discard alpha: 22.9MB
+                imageio.imsave(b, png_img, compress_level = 9, format = "png")
+                b.seek(0)
+                return b.read()
+        else:
+            return image_bytes
+    else:
+        raise Exception("Unknown format: '{}'".format(out_format))
+
+def export(url, x, y, frames_per_second, num_seconds, out, out_format):
+    
     chrome_options = Options()
-    #chrome_options.add_argument("--window-size={},{}".format(x,y))
+
+    # Disable CORS so we can load the png compression shim for canvas toDataURI without bundling it into the main HTML file
+
     with webdriver.Chrome(chrome_options=chrome_options) as driver:
 
         driver.get(url)
@@ -61,15 +147,11 @@ def export(url, x, y, frames_per_second, num_seconds, out, format):
         # Stop the animation
         driver.execute_script("stop()")
 
-        out = replace_ext(out, format)
+        out = replace_ext(out, out_format)
 
-        with get_writer(frames_per_second=frames_per_second, out = out, format = format) as writer:
-            for time in tqdm(np.linspace(0, num_seconds, num = frames_per_second * num_seconds, endpoint = False)):
-                capture_script = "capture({},{},{}); return app.capture;".format(time,x,y)
-                img_data = driver.execute_script(capture_script)
-                #with open(r"canvas.png", 'wb') as f:
-                decoded =base64.b64decode(img_data)
-                png_img = imageio.imread(decoded, "png")
+        with get_writer(frames_per_second=frames_per_second, out = out, out_format = out_format) as writer:
+            for time in tqdm(np.linspace(0, num_seconds, num = frames_per_second * num_seconds, endpoint = False), leave = False):
+                png_img = get_img(time, x, y, out_format, driver)
                 writer.append_data(png_img)
 
             writer.close()
