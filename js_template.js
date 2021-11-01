@@ -179,6 +179,7 @@ function configureWebGLContext() {
       );
 
       if (app.mode == "capture") {
+        // TODO: proper DPI tricks if DPI != 96 desired.
         app.capture = app.canvas.toDataURL('image/png', 1).substring(22);
       }
       else if (app.mode == "animate") {

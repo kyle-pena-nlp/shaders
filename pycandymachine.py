@@ -9,6 +9,9 @@ from tqdm import tqdm
 import math
 
 from pyselenium import export
+from common import parse_freqs, parse_trait_name, \
+    parse_traits, templatize, wrap_in_html_shell, parse_num_seconds, to_url, \
+    get_shader_text, remove_ext
 
 # TODO: proper seeding for reproduciblity (will random.seed cut it for true repro?)
 # TODO: real parsing of loop time
@@ -17,52 +20,6 @@ from pyselenium import export
 # TODO: algorithm for unique trait combinations observing prob distribution
 # TODO: more shader traits
 
-def is_trait_line(line):
-    is_a_comment = line.strip().startswith("//")
-    line = line.strip().lstrip("//").strip()
-    return line.startswith("{") and line.endswith("}")
-
-def is_define_line(line):
-    return line.strip().lower().startswith("#define")
-
-def parse_trait_name(line):
-    return re.split(r"\s+", line.strip())[1]
-
-def parse_freqs(line):
-    line = line.strip().lstrip("//").strip()
-    trait_freqs = eval(line)
-    return trait_freqs
-
-def parse_traits(shader):
-    traits = {}
-    lines = shader.splitlines()
-    for (line,nextline) in zip(lines,lines[1:]):
-        if is_trait_line(line) and is_define_line(nextline):
-            name = parse_trait_name(nextline)
-            freqs = parse_freqs(line)
-            traits[name] = freqs
-    return traits
-
-
-def templatize(shader):
-    traits = parse_traits(shader)
-    template = shader.replace("{", "{{").replace("}", "}}")
-    for trait in traits:
-        pattern = r"#define\s+" + trait + "\s+.*"
-        replacement = "#define " + trait + " {" + trait + "}"
-        if template != re.sub(pattern, replacement, template):
-            print("!")
-        template = re.sub(pattern, replacement, template)
-    return template
-    
-def wrap_in_html_shell(shader_text):
-    with open("js_template.js", "r") as f:
-        js_template = f.read()
-    js = js_template.replace("#SHADER_PLACEHOLDER#", shader_text)
-    with open("html_template.html", "r") as f:
-        html_template = f.read()
-    html =html_template.replace("#JS_PLACEHOLDER#", js)
-    return html
 
 
 def _generate_random_trait_values(value_array, name_array, offset, N, traits, override_traits):
@@ -142,6 +99,8 @@ def generate_random_trait_values(N, traits, override_traits):
     # For each position in the array, select 'random' traits
     _generate_random_trait_values(value_array, name_array, 0, N, traits, override_traits)
 
+    # TODO: shuffle
+
     return value_array, name_array
 
 
@@ -175,51 +134,6 @@ def generate(N, shader, name, override_traits):
         yield html_fpath, shader_text
 
 
-    """
-    for i in range(N):
-
-        selected_values, selected_value_names = [], []
-        for trait in traits:
-
-            value_names = list(traits[trait])
-            value_probabilities = [ traits[trait][name][1] for name in value_names ]
-
-            selected_value_name = random.choices(value_names, weights = value_probabilities, k = 1)[0]
-            selected_value_names.append(selected_value_name)
-
-            if trait in override_traits:
-                selected_value = override_traits[trait]
-            else:
-                selected_value      = traits[trait][selected_value_name][0]
-            selected_values.append(selected_value)
-
-        out_dir = name
-
-        os.makedirs(os.path.join(".", out_dir), exist_ok = True)
-
-        template_parameters = dict(zip(list(traits), selected_values))
-        shader_text = string_template.format(**template_parameters)
-        with open(os.path.join(".", out_dir, "{}.glsl".format(i+1)), "w+") as f:
-            f.write(shader_text)
-
-        with open(os.path.join(".", out_dir, "{}.json".format(i+1)), "w+") as f:
-            f.write(json.dumps(selected_value_names, indent = 1))
-
-        html_text = wrap_in_html_shell(shader_text)
-        html_fpath = os.path.join(".", out_dir, "{}.html".format(i+1))
-        with open(html_fpath, "w+") as f:
-            f.write(html_text)
-
-        yield html_fpath, shader_text
-    """
-
-def _traits_to_dict(traits_arr):
-    results = {}
-    for i in range(len(traits_arr)):
-        if i % 2 == 0:
-            name = traits_arr[i].lstrip("-")
-            results[name] = traits_arr[i+1]
-    return results
 
 def parse_args():
     parser = ArgumentParser()
@@ -227,48 +141,23 @@ def parse_args():
     parser.add_argument("--N", type = int, required = False, default = 10)
     parser.add_argument("--seed", type = int, required = False, default = 42)
     parser.add_argument("--parallel", type = int, required = False, default = 1)
-    args, traits = parser.parse_known_args()
-    traits = _traits_to_dict(traits)
-    return args, traits
+    #parser.add_argument("--traits_file", type = str, required = False, default = None)
+    args = parser.parse_args()
+    override_traits = {}
+    #args, traits = parser.parse_known_args()
+    #traits = _traits_to_dict(traits)
+    return args, override_traits
 
-def get_shader_text(shader_fp):
-    if shader_fp is None:
-        return open("./example_shader.glsl", "r").read()
-    else:
-        return open(shader_fp, "r").read()
 
-def remove_ext(shader_fname):
-    root,*_ = shader_fname.rsplit(".",1)
-    return root
-
-def to_url(fpath):
-    return "file:///" + os.path.abspath(fpath)
-
-LOOP_TIME_PATTERN = r"#define\s+LOOP_TIME\s+(\d+\.)\s*"
-
-def parse_num_seconds(shader):
-    lines = shader.splitlines()
-    for line in lines:
-        pattern_match = re.match(LOOP_TIME_PATTERN, line)
-        if pattern_match:
-            loop_time = int(float(pattern_match.groups()[0]))
-            #print("Parsed loop time is {} seconds".format(loop_time))
-            return loop_time
-    raise Exception("LOOP_TIME definition not found.")
-
-def to_out_path(fpath, postfix):
-    first,*_ = fpath.rsplit(".",1)
-    return "-".join([first, postfix])
 
 def execute(args):
     html_fpath, genned_shader_text = args
     print("Generating from {}".format(html_fpath))
     
-    
-    export(url = to_url(html_fpath), x = 300, y = 300,
-        frames_per_second = 10, 
+    export(url = to_url(html_fpath), x = 800, y = 600,
+        frames_per_second = 20, 
         num_seconds = parse_num_seconds(genned_shader_text),
-        out = to_out_path(html_fpath, postfix = "twitter"),
+        out = html_fpath,
         out_format = "png")  
     
     """
@@ -278,6 +167,8 @@ def execute(args):
         out = to_out_path(html_fpath, postfix = "twitter"),
         out_format = "mp4") 
     """
+
+
 
 if __name__ == "__main__":
 

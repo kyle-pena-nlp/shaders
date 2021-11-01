@@ -49,6 +49,7 @@ class APNGWriter:
     def append_data(self, data):
         image_bytes = self._ensure_is_png_bytes(data)
         png = PNG.from_bytes(image_bytes)
+        
         self.apng.append(png, delay = 1, delay_den = self.fps)
 
     def __enter__(self):
@@ -116,14 +117,15 @@ def get_img(time, x, y, out_format, driver):
             # The native pngs from canvas' method are uncompressed, so we need to compress it here.
             png_img = imageio.imread(image_bytes, "png")
             # Discard alpha channel if it exists.
-            if png_img.shape[-1] == 4:
-                png_img = png_img[...,:3]
+            #if png_img.shape[-1] == 4:
+            #    png_img = png_img[...,:3]
+            
             with BytesIO() as b:
                 # uncompressed: 30MB
                 # optimize = True, 25.3MB
                 # compress_level = 9, 25.3MB
                 # compress_level = 9, discard alpha: 22.9MB
-                imageio.imsave(b, png_img, compress_level = 9, format = "png")
+                imageio.imsave(b, png_img, compress_level = 9, format = "png", bits = 8)
                 b.seek(0)
                 return b.read()
         else:
