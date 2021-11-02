@@ -9,12 +9,13 @@ from tqdm import tqdm
 import os
 from io import BytesIO
 from apng import APNG, PNG
+from PIL import Image
 
 # For Windows, install gifsicle and add it to your PATH
 # Otherwise use apt-get or brew
 from pygifsicle import optimize
 
-COMPRESS = False
+COMPRESS = True
 
 def parse_args():
     parser = ArgumentParser()
@@ -34,6 +35,9 @@ def wait_until_ready(driver):
         if status == "ready":
             print("Page is ready.")
             break
+
+
+# TODO: PIL APNG writer
 
 class APNGWriter:
     """
@@ -78,10 +82,7 @@ class APNGWriter:
         if type(image) == bytes:
             return image
         elif type(image) == np.ndarray:
-            with BytesIO() as b:
-                imageio.imsave(b, image, format = "png")
-                b.seek(0)
-                return b.read()
+            raise Exception("Was NDARRAY")
         else:
             raise Exception("Not bytes or a numpy array")
 
@@ -91,9 +92,10 @@ def get_writer(frames_per_second, out, out_format):
     if out_format == "gif":
         return imageio.get_writer(fpath, mode='I', duration = (1/frames_per_second), subrectangles = True )
     elif out_format == "mp4":
-        return imageio.get_writer(fpath, fps=frames_per_second)
+        return imageio.get_writer(fpath, mode='I', fps=frames_per_second, quality = 8)
     elif out_format == "png":
         return APNGWriter(fpath, fps = frames_per_second)
+        #return imageio.get_writer(fpath, mode = 'I', duration = (1/frames_per_second))
     else:
         raise Exception("Unknown format: '{}'".format(out_format))
 
@@ -104,28 +106,41 @@ def to_optimized_path(fpath):
     name,ext = fname.rsplit(".")
     return os.path.join(dirname, ".".join(["-".join([name,"optimized"]), ext]))
 
-def get_img(time, x, y, out_format, driver):
+def get_canvas_image_bytes(time, x, y, driver):
     # Interact with the HTML page to get the png bytes from it
     capture_script = "capture({},{},{}); return app.capture;".format(time,x,y)
     img_data = driver.execute_script(capture_script)
     image_bytes  = base64.b64decode(img_data)
+    return image_bytes
+
+def bytes_to_PIL(image_bytes):
+    png_img = imageio.imread(image_bytes, "png")
+    PIL_img = Image.fromarray(png_img, mode = "RGBA")
+    return PIL_img
+
+def get_palette(image_bytes):
+    PIL_img = bytes_to_PIL(image_bytes)
+    quantized = PIL_img.convert("RGB").quantize(colors = 256, dither = "FLOYDSTEINBERG")
+    return quantized.palette
+
+def palettize(PIL_img, palette):
+    return PIL_img.convert("RGB").quantize(colors = 256, dither = "FLOYDSTEINBERG").convert(palette = palette)
+
+
+def convert_img(image_bytes, out_format, palette):
     
-    if out_format in ("gif", "mp4"):
+    if out_format in ("gif",):
+        PIL_img = bytes_to_PIL(image_bytes)
+        palettized = palettize(PIL_img, palette)
+        return np.asarray(palettized) # todo: convert to PIL?
+    elif out_format in ("mp4",):
         return imageio.imread(image_bytes, "png")
     elif out_format in ("png",):
         if COMPRESS:
-            # The native pngs from canvas' method are uncompressed, so we need to compress it here.
-            png_img = imageio.imread(image_bytes, "png")
-            # Discard alpha channel if it exists.
-            #if png_img.shape[-1] == 4:
-            #    png_img = png_img[...,:3]
-            
+            PIL_img = bytes_to_PIL(image_bytes)
+            palettized = palettize(PIL_img, palette)
             with BytesIO() as b:
-                # uncompressed: 30MB
-                # optimize = True, 25.3MB
-                # compress_level = 9, 25.3MB
-                # compress_level = 9, discard alpha: 22.9MB
-                imageio.imsave(b, png_img, compress_level = 9, format = "png", bits = 8)
+                palettized.save(b, format = "png", optimize = True, quality = 85)
                 b.seek(0)
                 return b.read()
         else:
@@ -152,8 +167,20 @@ def export(url, x, y, frames_per_second, num_seconds, out, out_format):
         out = replace_ext(out, out_format)
 
         with get_writer(frames_per_second=frames_per_second, out = out, out_format = out_format) as writer:
-            for time in tqdm(np.linspace(0, num_seconds, num = frames_per_second * num_seconds, endpoint = False), leave = False):
-                png_img = get_img(time, x, y, out_format, driver)
+
+            times = np.linspace(0, num_seconds, num = frames_per_second * num_seconds, endpoint = False)
+            
+            palette = None
+
+            for i, time in enumerate(tqdm(times, leave = False)):
+
+                image_bytes = get_canvas_image_bytes(time, x, y, driver)
+
+                if i == 0:
+                    palette = get_palette(image_bytes)
+
+                png_img = convert_img(image_bytes, out_format, palette)
+
                 writer.append_data(png_img)
 
             writer.close()

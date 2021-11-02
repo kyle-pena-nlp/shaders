@@ -46,6 +46,8 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 const int MAX_ITER = SHAPES;
 
+// TODO: more terms  (like e^z or sin(z) or something like that)
+
 struct Poly3 {
     float A;
     float B;
@@ -505,7 +507,7 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
     return color;
 }
 
-void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+vec3 _mainImage(in vec2 fragCoord) {
     vec3 color = renderMainImage(fragCoord, iTime);
     
     if (TRAILS > 0) {
@@ -520,6 +522,30 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         color += coef * vec3(length(trail)/pow(3.,0.5));
     }
     
-    fragColor = vec4(color,1.);
+    return color;
     
+}
+
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+    //vec3 color = _mainImage(fragCoord);
+    //fragColor = vec4(color, 1.);
+    
+    vec3 tot = vec3(0.0);
+    float denom = 0.0;
+    float AA_scale = 0.5;
+    float coef = 0.;
+    
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            fragCoord += AA_scale * vec2(i,j);
+            coef = 3. - float(i+j);
+            tot += coef * _mainImage(fragCoord);
+            denom += coef;
+        }
+    }
+    
+    tot /= denom;
+    
+    fragColor = vec4(tot, 1.);
 }
