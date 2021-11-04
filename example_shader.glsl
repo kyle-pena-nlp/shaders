@@ -1,8 +1,9 @@
 
-const int AA = 1;
+#define AA 1
 
-const float EPS = 1e-8;
+const float EPS = 1e-16;
 const float PI = 3.1415962;
+const float e = 2.7182818284;
 
 #define LOOP_TIME 10.
 const float RATE_1 = 2. * PI / LOOP_TIME;
@@ -14,21 +15,23 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 
 // { "loop": ("-1.", 0.10), "blue": ("0.", 0.23), "red": ("1.", 0.23), "green":("2.", 0.22), "teal": ("3.", 0.22) }
-#define COLOR_MODE 1.
+#define COLOR_MODE 0.
 
-
-#define BOUNCE 1
+// { "twist": ("1": 0.33), "fritz": ("2": 0.33), "pulsar": ("3": 0.33) }
+#define ANIMATION_STYLE 3
 
 // { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
-#define JITTERY 1.
+#define JITTERY 0.
 
 #define VIGNETTE 1.
 
-// { "glitched": ("1.", 0.30), "notglitched": ("0.", 0.70) }
 #define STATIC 0.
 
 // { "spinner": ("10.",0.15), "glass": ("1.", 0.15), "smooth": ("0.0", 0.70) }
-#define FRACTURE 0.
+#define FRACTURE 1.
+
+// { "none: ("0", 0.70), "hyper": ("1", 0.10), "gems": ("2", 0.10), "cubist": ("3", 0.10)}
+#define FRACTURE_STYLE 0
 
 // { "liney": ("1.", 0.20), "noliney": ("0.", 0.80) }
 #define SCANLINE 0.
@@ -36,23 +39,49 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 // { "ghost": ("1", 0.20), "plain": ("0", 0.80) }
 #define TRAILS 0
 
-// { "barrel": ("1", 0.20), "nobarrel": ("0", 0.80) }
 #define BARREL 0
 
-// { "I": ("0", 0.20), "II": ("1", 0.20), "III": ("2", 0.20), "IV": ("3", 0.20), "V": ("4", 0.20) }
-#define POLYNOMIAL 4
+// { "slimy": ("1.", 0.50), "crisp": ("0.", 0.50) }
+#define TRIG_TERM 1.
+
+#define LEADING_TERM_COEF 10.
+
+// { "dragon": ("2.", 0.20), "tri": ("3.", 0.20), "quad": ("4.", 0.20), "quint": ("5.", 0.20), "sept": ("6.", 0.20) }
+#define LEADING_EXPONENT 2.
+
+// { "stripes": ("-1.", 0.50), "blobs": ("1.", 0.50) }
+#define LEADING_EXPONENT_SIGN 1.
+
+#define CONSTANT_TERM -1.
+
+#define LINEAR_TERM 0.
+
+#define QUADRATIC_TERM 0.
+
+float RANDOMNESS = 3.;
 
 #define SHAPES 20
+
+
 
 const int MAX_ITER = SHAPES;
 
 // TODO: more terms  (like e^z or sin(z) or something like that)
 
 struct Poly3 {
+
     float A;
+    float expA;
+
     float B;
+    float expB;
+
     float C;
+    float expC;
+
     float D;
+
+    float exp;
 };
 
 struct Z {
@@ -62,50 +91,132 @@ struct Z {
 
 
 
-Z _multiplier(float time) {
-    if (POLYNOMIAL == 0) {
-        return Z(-1.+0.9*sin(RATE_1*time),-0.1+0.9*cos(RATE_1*time));
-    }
-    else if (POLYNOMIAL == 1) {
-        return Z(-1.+0.9*sin(RATE_1*time),-0.1+0.9*cos(RATE_1*time));
-    }    
-    else if (POLYNOMIAL == 2) {
-        return Z(-2.+0.1*sin(RATE_1*time),-2.+0.1*cos(RATE_1*time));
-    }        
-    else if (POLYNOMIAL == 3) {
-        return Z(-1.+0.9*sin(RATE_1*time),-0.1+0.9*cos(RATE_1*time));
-    }        
-    else if (POLYNOMIAL == 4) {
-        return Z(-1.1 + 0.1*sin(RATE_1*time),-1.1);
-    }
-    else if (POLYNOMIAL == 5) {
-         return Z(0.0,-1.+0.9*sin(RATE_1*time));
-    }
-}
 
 Poly3 getPoly(float time) {
-    Poly3 p = Poly3(0., 0., 0., 0.);
-    if (POLYNOMIAL == 0) {
-        p = Poly3(1.,0.,0.,-1.);
-    }
-    else if (POLYNOMIAL == 1) {
-        p = Poly3(0.,2.,0.,-2.);
-    }
-    else if (POLYNOMIAL == 2) {
-        p = Poly3(3.,0.0,0.0,-3.);
-    }
-    else if (POLYNOMIAL == 3) {
-        p = Poly3(7.,-0.5,-0.1,-1.);
-    }
-    else if (POLYNOMIAL == 4) {
-        p = Poly3(1.,0.,0.,-1.);
-    }
-    
-    float bounce =  (BOUNCE == 1) ? sin(RATE_1 * time) : 0.0;
 
-    return Poly3(p.A, p.B, p.C, p.D + bounce);
+    float bounce =  (ANIMATION_STYLE == 1) ? sin(RATE_1 * time) : 0.0;
+
+    return Poly3(LEADING_TERM_COEF, LEADING_EXPONENT_SIGN * LEADING_EXPONENT, QUADRATIC_TERM, LEADING_EXPONENT_SIGN * 2., LINEAR_TERM, LEADING_EXPONENT_SIGN, CONSTANT_TERM + bounce, TRIG_TERM);
 }
 
+
+
+float _exp(float x) {
+    return pow(e, x);
+}
+
+
+Z add(Z a, Z b, Z c, Z d, Z e, Z f) {
+    return Z(a.real + b.real + c.real + d.real + e.real + f.real, a.imag + b.imag + c.imag + d.imag + e.imag + f.imag);
+}
+
+Z add(Z a, Z b, Z c, Z d, Z e) {
+    return Z(a.real + b.real + c.real + d.real + e.real, a.imag + b.imag + c.imag + d.imag + e.imag);
+}
+
+Z add(Z a, Z b, Z c, Z d) {
+    return Z(a.real + b.real + c.real + d.real, a.imag + b.imag + c.imag + d.imag);
+}
+
+Z add(Z a, Z b, Z c) {
+    return Z(a.real + b.real + c.real, a.imag + b.imag + c.imag);
+}
+
+Z add(Z a, Z b) {
+    return Z(a.real + b.real, a.imag + b.imag);
+}
+
+Z power(Z a, float exponent) {
+    float r = pow(length(vec2(a.real, a.imag)), float(exponent));
+    float cis = float(exponent) * atan(a.imag, a.real);
+    return Z(r * cos(cis), r * sin(cis));  
+}
+
+
+
+Z conj(Z a) {
+    return Z(a.real, -a.imag);
+}
+
+Z mult(float x, Z z) {
+    return Z(x * z.real, x * z.imag);
+}
+
+Z mult(Z a, Z b) {
+    return Z(a.real * b.real - a.imag * b.imag, a.real * b.imag + a.imag * b.real);
+}
+
+Z div(Z a, Z b) {
+    
+    Z numerator = mult(a, conj(b));
+    float denom = mult(b,conj(b)).real;
+    denom = denom == 0. ? 1. : denom;
+    return mult(1./denom, numerator);
+}
+
+
+Z _exp(Z a) {
+    return mult(_exp(a.real), Z(cos(a.imag), sin(a.imag)) );
+}
+
+Z _cos(Z x) {
+    float a = x.real;
+    float b = x.imag;
+    return Z(cos(a) * cosh(b), -1. * sin(a) * sinh(b));
+}
+
+Z _sin(Z x) {
+    float a = x.real;
+    float b = x.imag;
+    return Z(sin(a) * cosh(b), -1. * cos(a)* sinh(b));
+}
+
+
+
+float fx(float x, Poly3 poly) {
+    return poly.A*x*x*x + poly.B*x*x + poly.C*x + poly.D;
+}
+
+Z fz(Z z, Poly3 poly) {
+    return add(mult(poly.A, power(z, poly.expA)), mult(poly.B, power(z, poly.expB)), mult(poly.C, power(z, poly.expC)), Z(poly.D,0.), mult(poly.exp, _sin(z))); 
+}
+
+
+Z dfdx(Z z, Poly3 poly) {
+    Z t1 = mult(poly.expA*poly.A, power(z, poly.expA-1.));
+    Z t2 = mult(poly.expB*poly.B, power(z, poly.expB-1.));
+    Z t3 = mult(poly.expC*poly.C, power(z, poly.expC-1.));
+    Z t4 =  mult(poly.exp, _cos(z));
+    return add(t1, t2, t3, t4);
+}
+
+// TODO: handle divide by zero without branches or additive smoothing
+Z next(Z z, Poly3 poly, Z multiplier) {
+    return add(z, mult(multiplier,div(fz(z, poly), dfdx(z, poly))));
+}
+
+
+Z _multiplier(float time) {
+
+    Z multiplier = Z(1.,1.);
+
+    if (ANIMATION_STYLE == 1) {
+        multiplier = Z(-1.+0.9*sin(RATE_1*time),-0.1+0.9*cos(RATE_1*time));
+    }
+    else if (ANIMATION_STYLE == 2) {
+        multiplier = div( Z(-1. + cos(RATE_1*time), 1. + sin(RATE_1*time) ), Z( 1. + sin(RATE_1*time) , -1. + cos(RATE_1*time) ) );
+        //return Z(2., -3. + cos(RATE_1*time));
+    }
+    else if (ANIMATION_STYLE == 3) {
+      multiplier = mult(Z(-0.1,-0.1), Z(sin(RATE_1*time), cos(RATE_1*time)));   
+    }   
+    
+    if (ANIMATION_STYLE == 3 && LEADING_EXPONENT_SIGN == -1.) {
+         multiplier = add(multiplier, Z(-2.,0.));
+    }
+    
+    return multiplier;
+}
 
 float HUE_SHIFT_FRAC(float time) {
     if (COLOR_MODE == -1.) {
@@ -146,67 +257,6 @@ vec3 HueShift (in vec3 Color, in float Shift)
 }
 
 
-
-
-Z add(Z a, Z b, Z c, Z d) {
-    return Z(a.real + b.real + c.real + d.real, a.imag + b.imag + c.imag + d.imag);
-}
-
-Z add(Z a, Z b, Z c) {
-    return Z(a.real + b.real + c.real, a.imag + b.imag + c.imag);
-}
-
-Z add(Z a, Z b) {
-    return Z(a.real + b.real, a.imag + b.imag);
-}
-
-Z power(Z a, int exponent) {
-    float r = pow(length(vec2(a.real, a.imag)), float(exponent));
-    float cis = float(exponent) * atan(a.imag, a.real);
-    return Z(r * cos(cis), r * sin(cis));  
-}
-
-Z conj(Z a) {
-    return Z(a.real, -a.imag);
-}
-
-Z mult(float x, Z z) {
-    return Z(x * z.real, x * z.imag);
-}
-
-Z mult(Z a, Z b) {
-    return Z(a.real * b.real - a.imag * b.imag, a.real * b.imag + a.imag * b.real);
-}
-
-Z div(Z a, Z b) {
-    
-    Z numerator = mult(a, conj(b));
-    float denom = mult(b,conj(b)).real;
-    denom = denom == 0. ? 1. : denom;
-    return mult(1./denom, numerator);
-}
-
-
-
-
-float fx(float x, Poly3 poly) {
-    return poly.A*x*x*x + poly.B*x*x + poly.C*x + poly.D;
-}
-
-Z fz(Z z, Poly3 poly) {
-    return add(mult(poly.A, power(z, 3)), mult(poly.B, power(z, 2)), mult(poly.C, power(z, 1)), Z(poly.D,0.)); 
-}
-
-
-Z dfdx(Z z, Poly3 poly) {
-    return add(mult(3.*poly.A, power(z, 2)), mult(2.*poly.B, z), Z(poly.C,0.));
-}
-
-// TODO: handle divide by zero without branches or additive smoothing
-Z next(Z z, Poly3 poly, Z multiplier) {
-    return add(z, mult(multiplier,div(fz(z, poly), dfdx(z, poly))));
-}
-
 struct Result {
     int iterations;
     Z zero;
@@ -232,16 +282,13 @@ vec3 render(in vec2 fragCoord, float time ) {
 
     // AA accumulation
     vec3 tot = vec3(0.);
-    
-    // accumulation for finite differences
-    // (I'm computing the gradient *while* doing AA)
-    float dFdX  = 0.;
-    float dFdY  = 0.;
 
-    for (int i = -AA; i <= AA; i++) {
-        for (int j = -AA; j <= AA; j++) {
+    //for (int i = -AA; i <= AA; i++) {
+    //    for (int j = -AA; j <= AA; j++) {
 
-            vec2 uv = ((fragCoord+((1.)/(2.*float(AA)))*vec2(i,j))/iResolution.xx);
+            //vec2 uv = ((fragCoord+((1.)/(2.*float(AA)))*vec2(i,j))/iResolution.xx);
+            vec2 uv = fragCoord.xy/iResolution.xx;
+            
             uv -= 0.5 * (iResolution.xy/iResolution.xx);
 
             Z z = Z(uv.x, uv.y);
@@ -250,18 +297,15 @@ vec3 render(in vec2 fragCoord, float time ) {
             Result result = newtown_raphson(z, getPoly(time), a);
 
             float shade = clamp(float(result.iterations) / float(10), 0., 1.);
-            
-            dFdX += float(i) * shade;
-            dFdY += float(j) * shade;
 
             // Time varying pixel color
             vec3 color = shade * shade * shade * shade * 0.5*(1.+clamp(vec3(result.zero.real, result.zero.imag, 1.), -1., 1.));
             
-            tot += 0.15*(HueShift(color, HUE_SHIFT_FRAC(time)));
-        }
-    }
+            tot += (0.15*9.)*(HueShift(color, HUE_SHIFT_FRAC(time)));
+    //    }
+    //}
 
-    tot /= float(AA * AA);
+    //tot /= float(AA * AA);
     
     
     // compute lighting using normal
@@ -360,7 +404,7 @@ vec2 jitter(in vec2 fragCoord, float time) {
     vec2 jitter1 = getJitter(mod(time,LOOP_TIME));
     vec2 jitter2 =  getJitter(mod(time,LOOP_TIME) - LOOP_TIME);  
     vec2 jitter = mix(jitter1, jitter2, mod(time/LOOP_TIME,1.));
-    return 500.*jitter;
+    return jitter;
 }
 
 vec2 random2f( vec2 p ) {
@@ -442,7 +486,7 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
         fragCoord = barrel.xy;
     }
     
-    vec2 jitter_amt = jitter(fragCoord, time);
+    vec2 jitter_amt = 500.*jitter(fragCoord, time);
     fragCoord += JITTERY * jitter_amt;  
     
     vec2 uv = fragCoord.xy / iResolution.xx;    
@@ -451,7 +495,7 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
     float voronoi_amt = 0.;
     vec2 renderFragCoord = fragCoord;
     if (FRACTURE > 0.) {
-        voronoi = voronoi_f1_colors( NUM_CELLS*uv, 1., 2., PI/4. );
+        voronoi = voronoi_f1_colors( NUM_CELLS*uv, RANDOMNESS, 2., PI/4. );
         voronoi_amt =  sin(5. * RATE_1 * time / LOOP_TIME);
         float a = mod(FRACTURE*(RATE_1 * time),2.*PI);
         vec2 center = (floor(NUM_CELLS*uv) + voronoi.ij + vec2(0.5)) / NUM_CELLS;
@@ -495,11 +539,11 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
     
     if (STATIC == 1.) {
         vec2 uv = oFragCoord.xy / iResolution.xy;
-        float static_mask = grad2(100*ivec2(5.*LOOP_TIME*time) + ivec2(vec2(100.,100.)*uv.xy)).x > 0.35 ? 1. : 0.;
+        float intensity = 0.35 + jitter(vec2(0.), time).x;
+        float static_mask = grad2(100*ivec2(5.*LOOP_TIME*time) + ivec2(vec2(500.,500.)*uv.xy)).x > intensity ? 1. : 0.;
         color = static_mask * mix(vec3(0.6,1.,0.6),color,0.9) + (1.-static_mask)*color;
     
     }
-    
     
     
     //color = scanline_mask * mix(vec3(0.6,1.,0.6),color,0.1) + (1.-scanline_mask) * color;
@@ -516,8 +560,6 @@ vec3 _mainImage(in vec2 fragCoord) {
     
     for (int i = 1; i <= TRAILS; i++) {
         vec3 trail = renderMainImage(fragCoord, iTime-0.35*(1./float(TRAILS))*float(i));
-        //  HueShift(trail,0.1)
-        // 0.1 * trail
         float coef = (1./float(1+TRAILS));//pow(2.,float(i));
         color += coef * vec3(length(trail)/pow(3.,0.5));
     }
@@ -528,24 +570,34 @@ vec3 _mainImage(in vec2 fragCoord) {
 
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
-    //vec3 color = _mainImage(fragCoord);
-    //fragColor = vec4(color, 1.);
     
     vec3 tot = vec3(0.0);
-    float denom = 0.0;
+    
+    #if AA > 0
+    
     float AA_scale = 0.5;
     float coef = 0.;
+    float denom = 0.0;
+    float max_coef = float(1+2*AA);
     
-    for (int i = -1; i <= 1; i++) {
-        for (int j = -1; j <= 1; j++) {
+    for (int i = -1*AA; i <= 1*AA; i++) {
+        for (int j = -1*AA; j <= 1*AA; j++) {
             fragCoord += AA_scale * vec2(i,j);
-            coef = 3. - float(i+j);
+            coef = max_coef - float(i+j);
             tot += coef * _mainImage(fragCoord);
             denom += coef;
         }
     }
     
     tot /= denom;
+    
+    #else
+    
+    tot = _mainImage(fragCoord);
+    
+    #endif
+    
+
     
     fragColor = vec4(tot, 1.);
 }

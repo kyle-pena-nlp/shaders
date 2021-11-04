@@ -154,11 +154,11 @@ def execute(args):
     html_fpath, genned_shader_text = args
     print("Generating from {}".format(html_fpath))
     
-    export(url = to_url(html_fpath), x = 800, y = 600,
+    export(url = to_url(html_fpath), x = 300, y = 300,
         frames_per_second = 20, 
         num_seconds = parse_num_seconds(genned_shader_text),
         out = html_fpath,
-        out_format = "png")  
+        out_format = "mp4")  
     
     """
     export(url = to_url(html_fpath), x = 800, y = 600,
