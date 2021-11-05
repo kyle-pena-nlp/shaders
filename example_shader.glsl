@@ -1,7 +1,7 @@
 
 #define AA 1
 
-const float EPS = 1e-16;
+const float EPS = 1e-12;
 const float PI = 3.1415962;
 const float e = 2.7182818284;
 
@@ -17,8 +17,8 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 // { "loop": ("-1.", 0.10), "blue": ("0.", 0.23), "red": ("1.", 0.23), "green":("2.", 0.22), "teal": ("3.", 0.22) }
 #define COLOR_MODE 0.
 
-// { "twist": ("1": 0.33), "fritz": ("2": 0.33), "pulsar": ("3": 0.33) }
-#define ANIMATION_STYLE 3
+// { "twist": ("1", 0.33), "fritz": ("2", 0.33), "pulsar": ("3", 0.33) }
+#define ANIMATION_STYLE 1
 
 // { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
 #define JITTERY 0.
@@ -27,13 +27,9 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 #define STATIC 0.
 
-// { "spinner": ("10.",0.15), "glass": ("1.", 0.15), "smooth": ("0.0", 0.70) }
-#define FRACTURE 1.
+// { "none": ("-1", 0.70), "tiles": ("0", 0.10), "gems": ("1", 0.10), "cubist": ("3", 0.10)}
+#define FRACTURE_STYLE -1
 
-// { "none: ("0", 0.70), "hyper": ("1", 0.10), "gems": ("2", 0.10), "cubist": ("3", 0.10)}
-#define FRACTURE_STYLE 0
-
-// { "liney": ("1.", 0.20), "noliney": ("0.", 0.80) }
 #define SCANLINE 0.
 
 // { "ghost": ("1", 0.20), "plain": ("0", 0.80) }
@@ -41,26 +37,31 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 #define BARREL 0
 
-// { "slimy": ("1.", 0.50), "crisp": ("0.", 0.50) }
-#define TRIG_TERM 1.
+#define TRIG_TERM 0.
 
-#define LEADING_TERM_COEF 10.
+#define LEADING_TERM_COEF 5.
 
 // { "dragon": ("2.", 0.20), "tri": ("3.", 0.20), "quad": ("4.", 0.20), "quint": ("5.", 0.20), "sept": ("6.", 0.20) }
-#define LEADING_EXPONENT 2.
+#define LEADING_EXPONENT 3.
 
 // { "stripes": ("-1.", 0.50), "blobs": ("1.", 0.50) }
 #define LEADING_EXPONENT_SIGN 1.
 
-#define CONSTANT_TERM -1.
+// { "inverted_zoom": ("-1.", 0.50), "normal": ("1.",0.50)}
+#define CONSTANT_TERM 1.
 
-#define LINEAR_TERM 0.
+#define LINEAR_TERM 0.0
 
-#define QUADRATIC_TERM 0.
+#define QUADRATIC_TERM 0.0
 
-float RANDOMNESS = 3.;
+#define SHAPES 50
 
-#define SHAPES 20
+// { "polar": ("1",0.50), "cartesian": ("0",0.50) }
+#define POLAR 1
+
+
+// { "yes": ("1.", 0.50), "no": ("0.", 0.50) } 
+#define INVERT_SHADE 1.
 
 
 
@@ -171,6 +172,12 @@ Z _sin(Z x) {
     return Z(sin(a) * cosh(b), -1. * cos(a)* sinh(b));
 }
 
+Z polar(Z x) {
+    float a = length(vec2(x.real,x.imag));
+    float b= atan(x.imag,x.real);
+    return Z(a, b);
+}
+
 
 
 float fx(float x, Poly3 poly) {
@@ -265,15 +272,23 @@ struct Result {
 };
 
 Result newtown_raphson(Z z, Poly3 poly, Z multiplier) {
+    
+    if (POLAR == 1) {
+        z = div(Z(0.05,0.0),z);
+    }
+    
+    float tot_d = 0.;
+
     for (int i = 0; i < MAX_ITER; i++) {
         float d = z.real*z.real + z.imag*z.imag;
+        tot_d += d;
         if (d < EPS) {
-            return Result(i, z, 1., d);
+            return Result(i, z, 1., tot_d/float(i+1));
         }
         z = next(z, poly, multiplier);
     }
     float d =  z.real*z.real + z.imag*z.imag;
-    return Result(MAX_ITER, z, 0., d);
+    return Result(MAX_ITER, z, 0., tot_d/float(MAX_ITER));
 }
 
 
@@ -295,11 +310,14 @@ vec3 render(in vec2 fragCoord, float time ) {
             
             Z a = _multiplier(time);
             Result result = newtown_raphson(z, getPoly(time), a);
-
-            float shade = clamp(float(result.iterations) / float(10), 0., 1.);
+            
+            vec3 root_color = 0.5*(1.+clamp(vec3(result.zero.real, result.zero.imag, 1.), -1., 1.));
+            
+            
+            float shade = INVERT_SHADE * clamp(result.d, 0., 1.) + (1.-INVERT_SHADE) * clamp(float(result.iterations) / float(SHAPES), 0., 1.);
 
             // Time varying pixel color
-            vec3 color = shade * shade * shade * shade * 0.5*(1.+clamp(vec3(result.zero.real, result.zero.imag, 1.), -1., 1.));
+            vec3 color = shade * shade * shade * root_color;
             
             tot += (0.15*9.)*(HueShift(color, HUE_SHIFT_FRAC(time)));
     //    }
@@ -494,10 +512,10 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
     Voronoi voronoi = Voronoi(vec3(0.),0.,vec2(0));
     float voronoi_amt = 0.;
     vec2 renderFragCoord = fragCoord;
-    if (FRACTURE > 0.) {
-        voronoi = voronoi_f1_colors( NUM_CELLS*uv, RANDOMNESS, 2., PI/4. );
+    if (FRACTURE_STYLE >= 0) {
+        voronoi = voronoi_f1_colors( NUM_CELLS*uv, float(FRACTURE_STYLE), 2. + 0.2*sin(RATE_1*time), PI/4. );
         voronoi_amt =  sin(5. * RATE_1 * time / LOOP_TIME);
-        float a = mod(FRACTURE*(RATE_1 * time),2.*PI);
+        float a = mod(1.*(RATE_1 * time),2.*PI);
         vec2 center = (floor(NUM_CELLS*uv) + voronoi.ij + vec2(0.5)) / NUM_CELLS;
         mat2 spin = mat2(cos(a), -sin(a), sin(a), cos(a));
         renderFragCoord = iResolution.xx*((spin * (uv - center)) + center);// + voronoi_amt * 50. * voronoi.xy;
@@ -508,7 +526,7 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
 
     
     
-    if (FRACTURE > 0.) {
+    if (FRACTURE_STYLE >= 0) {
         color = mix(voronoi.col.xyz, color, 1.-voronoi_amt/4.);
         color = color + voronoi_amt * 0.25 * dot(vec2(cos(RATE_1*time), sin(RATE_1*time)), (voronoi.col.xy));
         color = mix(color, vec3(1.), voronoi.res);
