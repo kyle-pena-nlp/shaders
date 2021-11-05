@@ -18,7 +18,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define COLOR_MODE 0.
 
 // { "twist": ("1", 0.33), "fritz": ("2", 0.33), "pulsar": ("3", 0.33) }
-#define ANIMATION_STYLE 1
+#define ANIMATION_STYLE 3
 
 // { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
 #define JITTERY 0.
@@ -27,13 +27,13 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 #define STATIC 0.
 
-// { "none": ("-1", 0.70), "tiles": ("0", 0.10), "gems": ("1", 0.10), "cubist": ("3", 0.10)}
+// { "clearview": ("-1", 0.70), "tiles": ("0", 0.10), "gems": ("1", 0.10), "cubist": ("3", 0.10)}
 #define FRACTURE_STYLE -1
 
 #define SCANLINE 0.
 
-// { "ghost": ("1", 0.20), "plain": ("0", 0.80) }
-#define TRAILS 0
+// { "ghost": ("1", 0.20), "sharp": ("0", 0.80) }
+#define TRAILS 3
 
 #define BARREL 0
 
@@ -42,25 +42,25 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define LEADING_TERM_COEF 5.
 
 // { "dragon": ("2.", 0.20), "tri": ("3.", 0.20), "quad": ("4.", 0.20), "quint": ("5.", 0.20), "sept": ("6.", 0.20) }
-#define LEADING_EXPONENT 3.
+#define LEADING_EXPONENT 2.
 
-// { "stripes": ("-1.", 0.50), "blobs": ("1.", 0.50) }
-#define LEADING_EXPONENT_SIGN 1.
+// { "stripeworld": ("-1.", 0.50), "spiralworld": ("1.", 0.50) }
+#define LEADING_EXPONENT_SIGN -1.
 
-// { "inverted_zoom": ("-1.", 0.50), "normal": ("1.",0.50)}
-#define CONSTANT_TERM 1.
+// { "magnified": ("-10.", 0.25), "nakedeye": ("1.",0.75)}
+#define CONSTANT_TERM -10.
 
 #define LINEAR_TERM 0.0
 
 #define QUADRATIC_TERM 0.0
 
-#define SHAPES 50
+#define SHAPES 10
 
-// { "polar": ("1",0.50), "cartesian": ("0",0.50) }
+// { "polar": ("1",0.25), "cartesian": ("0",0.75) }
 #define POLAR 1
 
 
-// { "yes": ("1.", 0.50), "no": ("0.", 0.50) } 
+// { "darkness": ("1.", 0.25), "regularness": ("0.", 0.75) } 
 #define INVERT_SHADE 1.
 
 
