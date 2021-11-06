@@ -10,6 +10,7 @@ import os
 from io import BytesIO
 from apng import APNG, PNG
 from PIL import Image
+from PIL.Image import ADAPTIVE
 
 # For Windows, install gifsicle and add it to your PATH
 # Otherwise use apt-get or brew
@@ -119,20 +120,25 @@ def bytes_to_PIL(image_bytes):
     PIL_img = Image.fromarray(png_img, mode = "RGBA")
     return PIL_img
 
-def get_palette(image_bytes):
-    PIL_img = bytes_to_PIL(image_bytes)
-    quantized = PIL_img.convert("RGB").quantize(colors = 256, dither = "FLOYDSTEINBERG")
+def get_palette(img):
+    if type(img) == bytes:
+        PIL_img = bytes_to_PIL(img)
+    else:
+        PIL_img = img
+    quantized = PIL_img.convert("RGB").convert(palette = ADAPTIVE, colors = 256)
     return quantized.palette
 
-def palettize(PIL_img, palette):
-    return PIL_img.convert("RGB").quantize(colors = 256, dither = "FLOYDSTEINBERG").convert(palette = palette)
+def palettize(PIL_img, palette, adaptive = False):
+    if adaptive:
+        palette = get_palette(PIL_img)
+    return PIL_img.convert("RGB").convert(palette = palette, dither = "FLOYDSTEINBERG")
 
 
 def convert_img(image_bytes, out_format, palette, compress):
     
     if out_format in ("gif",):
         PIL_img = bytes_to_PIL(image_bytes)
-        palettized = palettize(PIL_img, palette)
+        palettized = palettize(PIL_img, palette, adaptive= True)
         return np.asarray(palettized) # todo: convert to PIL?
     elif out_format in ("mp4",):
         return imageio.imread(image_bytes, "png")
