@@ -7,6 +7,8 @@ from PIL import ImageChops
 from pyselenium import get_writer
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+from PIL import ImageDraw, ImageFont
+import math
 
 DEBUG = False
 
@@ -20,6 +22,8 @@ def create_promo_animation(args):
 
     image_dims = args.image_dims + [3]
     promo_image = Image.fromarray(np.zeros(image_dims, dtype=int), mode = "RGB")
+    fade_color = Image.fromarray(np.zeros(image_dims, dtype=int), mode = "RGB")
+
 
     with get_writer(frames_per_second = args.fps, out = out, out_format = "mp4", compress = False) as writer:
 
@@ -29,13 +33,52 @@ def create_promo_animation(args):
             images_holder = request_images(images_holder, worldspace_viewport, fn_grid)
             fill_promo_image(args, images_holder, promo_image, worldspace_viewport, t)
 
+            #paint_text(promo_image, t)
+            promo_image = create_fade(args, promo_image, fade_color, t)
+
             if DEBUG:
                 plt.imshow(promo_image)
                 plt.show()
+                break
 
             writer.append_data(np.asarray(promo_image))
-            #paint_text(image, t)
-            #create_fade(image, t)
+
+# https://www.fontspace.com/collection/my-font-selections-cnrdeoe
+fnt_outline = ImageFont.truetype("./RademosRegular-9YGrK.ttf", 110)
+
+msg = "TRIPTOGRAMS"
+
+def create_fade(args, promo_image, fade_color, t):
+    intro_fade = 1.0 - smoothstep(0.00 * args.anim_seconds, 0.1 * args.anim_seconds, t)
+    outro_fade = smoothstep(0.95 * args.anim_seconds, 1.00 * args.anim_seconds, t)
+    fade = max(intro_fade,outro_fade)
+    return Image.blend(promo_image, fade_color, fade)
+
+
+def paint_text(promo_image, t):
+    d = ImageDraw.Draw(promo_image)
+
+    r = 5
+    for angle in np.linspace(0,2*math.pi,30):
+        off_x = r * math.cos(angle)
+        off_y = r * math.cos(angle)
+        paint_text_color_size(d, promo_image, size = 100, offset = ( off_x, off_y), color = (0,0,0))      
+    paint_text_color_size(d, promo_image, size = 100, color = (125,0,0))
+
+
+def paint_text_color_size(d, promo_image, size, color, offset = (0,0)):
+
+    fnt = ImageFont.truetype("./RademosRegular-9YGrK.ttf", size)
+
+    w, h = d.textsize(msg, font = fnt)
+    c = promo_image.size[0] // 2
+
+    x,y = int(c - w/2), (promo_image.size[1] * 0.2) - h/2
+
+    x += offset[0]
+    y += offset[1]
+
+    d.text((x, y), msg, font = fnt, fill = color)
 
 def fill_promo_image(args, images_holder, promo_image, worldspace_viewport, t):
     
@@ -85,9 +128,22 @@ def get_origin(args, t):
     y = args.img_grid[1] // 2 
     return (x,y)
 
+STARTING_TILES = 2
+FINAL_TILES = 10
+
+def smoothstep(start, end, t):
+    if t < start:
+        return 0.0
+    elif t > end:
+        return 1.0
+    else:
+        t = (t - start) / (end - start)
+        #return 3 * (t**2.0) - 2 * (t**3.0) # smoothstep
+        return 6*(t**5.0) - 15*(t**4.0) + 10*(t**3.0) # Ken Perlin's smootherstep
+
 def get_zoom(args, t):
     # TODO: pathing
-    return 2.0 + 8.0 * (t / args.anim_seconds)
+    return STARTING_TILES + (FINAL_TILES - STARTING_TILES) * smoothstep(0.0, 0.6*args.anim_seconds, t)
 
 def request_images(images_holder, worldspace_viewport, fn_grid):
     #print("worldspace_viewport", worldspace_viewport)
