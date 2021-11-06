@@ -124,7 +124,7 @@ def get_viewport(args, t):
 
 def get_origin(args, t):
     # TODO: pathing
-    x = args.img_grid[0] // 2 
+    x = args.img_grid[0] // 2 + 5.0*(t/args.anim_seconds)
     y = args.img_grid[1] // 2 
     return (x,y)
 
