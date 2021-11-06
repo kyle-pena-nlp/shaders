@@ -7,6 +7,7 @@ import multiprocessing
 import shutil
 from tqdm import tqdm
 import math
+from collections import defaultdict
 
 from pyselenium import export
 from common import parse_freqs, parse_trait_name, \
@@ -104,7 +105,7 @@ def generate_random_trait_values(N, traits, override_traits):
     return value_array, name_array
 
 
-def generate(N, shader, name, override_traits):
+def generate(N, shader, name, override_traits, x, y, fps, format, compress):
 
     traits          = parse_traits(shader)      # { TRAIT : { NAME: (OPTION, FREQUENCY) } }
     string_template = templatize(shader)        # string with template args
@@ -114,6 +115,14 @@ def generate(N, shader, name, override_traits):
     os.makedirs(os.path.join(".", out_dir), exist_ok = True)
 
     trait_values_array, trait_names_array = generate_random_trait_values(N, traits, override_traits)
+
+    N = len(trait_values_array)
+    TRAIT_COUNTS = defaultdict(lambda: defaultdict(lambda: 0))
+    trait_keys = list(trait_names_array[0])
+    for trait_name in trait_keys:
+        for trait_name_set in trait_names_array:
+            TRAIT_COUNTS[trait_name][trait_name_set[trait_name]] += (1/N)
+    print(json.dumps(TRAIT_COUNTS, indent = 1))
 
     for i, trait_values in enumerate(trait_values_array):
 
@@ -131,7 +140,7 @@ def generate(N, shader, name, override_traits):
         with open(html_fpath, "w+") as f:
             f.write(html_text)
 
-        yield html_fpath, shader_text
+        yield html_fpath, shader_text, x, y, fps, format, compress
 
 
 
@@ -141,6 +150,11 @@ def parse_args():
     parser.add_argument("--N", type = int, required = False, default = 10)
     parser.add_argument("--seed", type = int, required = False, default = 42)
     parser.add_argument("--parallel", type = int, required = False, default = 1)
+    parser.add_argument("--x", type = int, default = 300)
+    parser.add_argument("--y", type = int, default = 300)
+    parser.add_argument("--fps", type = int, default = 30)
+    parser.add_argument("--format", default = "mp4", choices = ["mp4","gif","png"])
+    parser.add_argument("--compress", default = False, type = bool)
     #parser.add_argument("--traits_file", type = str, required = False, default = None)
     args = parser.parse_args()
     override_traits = {}
@@ -151,14 +165,15 @@ def parse_args():
 
 
 def execute(args):
-    html_fpath, genned_shader_text = args
+    html_fpath, genned_shader_text, x, y, fps, format, compress = args
     print("Generating from {}".format(html_fpath))
     
-    export(url = to_url(html_fpath), x = 300, y = 300,
-        frames_per_second = 20, 
+    export(url = to_url(html_fpath), x = x, y = y,
+        frames_per_second = fps, 
         num_seconds = parse_num_seconds(genned_shader_text),
         out = html_fpath,
-        out_format = "mp4")  
+        out_format = format,
+        compress = compress)  
     
     """
     export(url = to_url(html_fpath), x = 800, y = 600,
@@ -180,7 +195,7 @@ if __name__ == "__main__":
 
     random.seed(args.seed)
     
-    results = generate(args.N, shader_text, name, traits)
+    results = generate(args.N, shader_text, name, traits, args.x, args.y, args.fps, args.format, args.compress)
 
     if args.parallel > 0:
         pool = multiprocessing.Pool()

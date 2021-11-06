@@ -86,13 +86,14 @@ class APNGWriter:
         else:
             raise Exception("Not bytes or a numpy array")
 
-def get_writer(frames_per_second, out, out_format):
+def get_writer(frames_per_second, out, out_format, compress):
     fpath = out
     print("Writing to '{}'".format(fpath))
     if out_format == "gif":
         return imageio.get_writer(fpath, mode='I', duration = (1/frames_per_second), subrectangles = True )
     elif out_format == "mp4":
-        return imageio.get_writer(fpath, mode='I', fps=frames_per_second, quality = 8)
+        quality = 8 if compress else 10
+        return imageio.get_writer(fpath, mode='I', fps=frames_per_second, quality = quality)
     elif out_format == "png":
         return APNGWriter(fpath, fps = frames_per_second)
         #return imageio.get_writer(fpath, mode = 'I', duration = (1/frames_per_second))
@@ -127,7 +128,7 @@ def palettize(PIL_img, palette):
     return PIL_img.convert("RGB").quantize(colors = 256, dither = "FLOYDSTEINBERG").convert(palette = palette)
 
 
-def convert_img(image_bytes, out_format, palette):
+def convert_img(image_bytes, out_format, palette, compress):
     
     if out_format in ("gif",):
         PIL_img = bytes_to_PIL(image_bytes)
@@ -136,7 +137,7 @@ def convert_img(image_bytes, out_format, palette):
     elif out_format in ("mp4",):
         return imageio.imread(image_bytes, "png")
     elif out_format in ("png",):
-        if COMPRESS:
+        if compress:
             PIL_img = bytes_to_PIL(image_bytes)
             palettized = palettize(PIL_img, palette)
             with BytesIO() as b:
@@ -148,7 +149,7 @@ def convert_img(image_bytes, out_format, palette):
     else:
         raise Exception("Unknown format: '{}'".format(out_format))
 
-def export(url, x, y, frames_per_second, num_seconds, out, out_format):
+def export(url, x, y, frames_per_second, num_seconds, out, out_format, compress):
     
     chrome_options = Options()
 
@@ -166,7 +167,7 @@ def export(url, x, y, frames_per_second, num_seconds, out, out_format):
 
         out = replace_ext(out, out_format)
 
-        with get_writer(frames_per_second=frames_per_second, out = out, out_format = out_format) as writer:
+        with get_writer(frames_per_second=frames_per_second, out = out, out_format = out_format, compress = compress) as writer:
 
             times = np.linspace(0, num_seconds, num = frames_per_second * num_seconds, endpoint = False)
             
@@ -179,13 +180,13 @@ def export(url, x, y, frames_per_second, num_seconds, out, out_format):
                 if i == 0:
                     palette = get_palette(image_bytes)
 
-                png_img = convert_img(image_bytes, out_format, palette)
+                png_img = convert_img(image_bytes, out_format, palette, compress)
 
                 writer.append_data(png_img)
 
             writer.close()
         
-        if format == "gif":
+        if format == "gif" and compress:
             print("Optimizing gif.")
             optimized_out = to_optimized_path(out)
             pygifsicle.optimize(out, destination = optimized_out, colors = 256)
