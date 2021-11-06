@@ -135,9 +135,9 @@ def fill_image_fn_grid(args):
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument("--dir", required = False, default = "./EXAMPLE")
-    parser.add_argument("--img_range", nargs=2, default = [1,1000], type = int)
+    parser.add_argument("--img_range", nargs=2, default = [1,100], type = int)
     parser.add_argument("--img_format", type= str, default = "png")
-    parser.add_argument("--img_grid", nargs = 2, default = [30,30], type = int)
+    parser.add_argument("--img_grid", nargs = 2, default = [20,20], type = int)
     parser.add_argument("--anim_seconds", type = int, default = 20)
     parser.add_argument("--fps", type = int, default = 30)
     parser.add_argument("--image_dims", nargs=2, type = int, default = [800,800])

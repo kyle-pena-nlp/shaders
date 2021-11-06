@@ -1,6 +1,9 @@
 
 #define AA 1
 
+// set programmatically at generaiton time
+#define JITTER_SALT 0.
+
 const float EPS = 1e-12;
 const float PI = 3.1415962;
 const float e = 2.7182818284;
@@ -41,7 +44,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 #define LEADING_TERM_COEF 5.
 
-// { "dragon": ("2.", 0.20), "tri": ("3.", 0.20), "quad": ("4.", 0.20), "quint": ("5.", 0.20), "sept": ("6.", 0.20) }
+// { "dragon": ("2.", 0.34), "tri": ("3.", 0.33),  "sept": ("6.", 0.33) }
 #define LEADING_EXPONENT 2.
 
 // { "stripeworld": ("-1.", 0.50), "spiralworld": ("1.", 0.50) }
@@ -413,7 +416,7 @@ vec2 distort2(in vec2 u, int iters, float scale, float intensity, float time) {
 
 vec2 getJitter(float time)
 {
-    return 0.3*(distort2(vec2(time), 5, 1., 1., 0.) - vec2(time)); 
+    return 0.3*(distort2(vec2(JITTER_SALT + time), 5, 1., 1., 0.) - vec2(JITTER_SALT + time)); 
 }
 
 // this jitter implementatoin blends two jitters with 100% of A at t=0.0 and 100% of B at t=LOOP_TIME

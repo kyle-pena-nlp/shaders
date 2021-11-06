@@ -50,6 +50,16 @@ def parse_traits(shader):
             traits[name] = freqs
     return traits
 
+def is_define_directive_line(line, directive):
+    line = line.strip()
+    return re.match(r"^#define\s+" + re.escape(directive) + "\s+.*$", line)
+
+def set_preprocessor_directive(shader, directive, value):
+    lines = shader.splitlines()
+    for i,line in enumerate(lines):
+        if is_define_directive_line(line, directive):
+            lines[i] = "#define {} {}".format(directive, value)
+    return "\n".join(lines)
 
 def templatize(shader):
     traits = parse_traits(shader)

@@ -12,7 +12,7 @@ from collections import defaultdict
 from pyselenium import export
 from common import parse_freqs, parse_trait_name, \
     parse_traits, templatize, wrap_in_html_shell, parse_num_seconds, to_url, \
-    get_shader_text, remove_ext
+    get_shader_text, remove_ext, set_preprocessor_directive
 
 # TODO: proper seeding for reproduciblity (will random.seed cut it for true repro?)
 # TODO: real parsing of loop time
@@ -126,8 +126,12 @@ def generate(N, shader, name, override_traits, x, y, fps, format, compress):
 
     for i, trait_values in enumerate(trait_values_array):
 
+        
+
         template_parameters = trait_values
         shader_text = string_template.format(**template_parameters)
+        shader_text = set_preprocessor_directive(shader_text, "JITTER_SALT",  "{:.1f}".format(i))
+        
         with open(os.path.join(".", out_dir, "{}.glsl".format(i+1)), "w+") as f:
             f.write(shader_text)
 
