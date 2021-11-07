@@ -1,6 +1,6 @@
 {
  "name": "Triptograms",
- "symbol": "TRIPTOGRAMS",
+ "symbol": "TRIPT",
  "image": "38.png",
  "external_url": "https://www.bonkworld.art/",
  "properties": {
@@ -47,19 +47,19 @@
   },
   {
    "trait_type": "JITTERY",
-   "value": "jittery"
+   "value": "kalm"
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "sept"
+   "value": "tri"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "spiralworld"
+   "value": "stripeworld"
   },
   {
    "trait_type": "POLAR",
-   "value": "cartesian"
+   "value": "polar"
   },
   {
    "trait_type": "TRAILS",
@@ -68,6 +68,6 @@
  ],
  "collection": {
   "name": "Triptograms",
-  "family": "Triptograms"
+  "family": "Bonk World"
  }
 }

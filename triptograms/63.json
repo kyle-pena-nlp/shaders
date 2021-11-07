@@ -1,6 +1,6 @@
 {
  "name": "Triptograms",
- "symbol": "TRIPTOGRAMS",
+ "symbol": "TRIPT",
  "image": "63.png",
  "external_url": "https://www.bonkworld.art/",
  "properties": {
@@ -31,31 +31,31 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "green"
+   "value": "blue"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "magnified"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FRACTURE_STYLE",
-   "value": "clearview"
+   "value": "cubist"
   },
   {
    "trait_type": "INVERT_SHADE",
-   "value": "regularness"
+   "value": "velvet"
   },
   {
    "trait_type": "JITTERY",
-   "value": "jittery"
+   "value": "kalm"
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "dragon"
+   "value": "tri"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "stripeworld"
+   "value": "spiralworld"
   },
   {
    "trait_type": "POLAR",
@@ -68,6 +68,6 @@
  ],
  "collection": {
   "name": "Triptograms",
-  "family": "Triptograms"
+  "family": "Bonk World"
  }
 }

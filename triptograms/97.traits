@@ -8,5 +8,5 @@
  "POLAR": "cartesian",
  "JITTERY": "jittery",
  "FRACTURE_STYLE": "clearview",
- "CONSTANT_REAL_TERM": "nakedeye"
+ "CONSTANT_REAL_TERM": "zoomout"
 }

@@ -6,7 +6,7 @@
  "LEADING_EXPONENT_SIGN": "spiralworld",
  "LEADING_EXPONENT": "tri",
  "POLAR": "cartesian",
- "JITTERY": "kalm",
+ "JITTERY": "jittery",
  "FRACTURE_STYLE": "clearview",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

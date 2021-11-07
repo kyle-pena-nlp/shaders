@@ -2,11 +2,11 @@
  "ANIMATION_STYLE": "twist",
  "COLOR_MODE": "loop",
  "TRAILS": "ghost",
- "INVERT_SHADE": "darkness",
+ "INVERT_SHADE": "neons",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "tri",
+ "LEADING_EXPONENT": "dragon",
  "POLAR": "cartesian",
- "JITTERY": "kalm",
- "FRACTURE_STYLE": "clearview",
+ "JITTERY": "jittery",
+ "FRACTURE_STYLE": "tiles",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

@@ -1,6 +1,6 @@
 {
  "name": "Triptograms",
- "symbol": "TRIPTOGRAMS",
+ "symbol": "TRIPT",
  "image": "11.png",
  "external_url": "https://www.bonkworld.art/",
  "properties": {
@@ -47,7 +47,7 @@
   },
   {
    "trait_type": "JITTERY",
-   "value": "kalm"
+   "value": "jittery"
   },
   {
    "trait_type": "LEADING_EXPONENT",
@@ -68,6 +68,6 @@
  ],
  "collection": {
   "name": "Triptograms",
-  "family": "Triptograms"
+  "family": "Bonk World"
  }
 }

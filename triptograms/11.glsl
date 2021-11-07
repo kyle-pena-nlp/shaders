@@ -27,7 +27,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define ANIMATION_STYLE 1
 
 // { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
-#define JITTERY 0.
+#define JITTERY 1.
 
 #define VIGNETTE 1.
 
@@ -47,14 +47,14 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 #define LEADING_TERM_COEF 5.
 
-// { "dragon": ("2.", 0.34), "tri": ("3.", 0.33),  "sept": ("6.", 0.33) }
+// { "dragon": ("2.", 0.25), "tri": ("3.", 0.25), "quad": ("4.", 0.25),  "sept": ("6.", 0.25) }
 #define LEADING_EXPONENT 3.
 
 // { "stripeworld": ("-1.", 0.50), "spiralworld": ("1.", 0.50) }
 #define LEADING_EXPONENT_SIGN 1.
 
-// { "magnified": ("-10.", 0.25), "nakedeye": ("1.",0.75)}
-#define CONSTANT_REAL_TERM 1.
+// { "zoomout": ("-0.1", 0.25), "nakedeye": ("-1.",0.75)}
+#define CONSTANT_REAL_TERM -1.
 
 #define CONSTANT_IMAG_TERM 0.
 
@@ -67,9 +67,9 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 // { "polar": ("1",0.25), "cartesian": ("0",0.75) }
 #define POLAR 0
 
+// {  "regularness": ("0", 0.625), "velvet": ("1", 0.125), "neons": ("2", 0.125), "fantasy": ("3", 0.125) } 
+#define INVERT_SHADE 0
 
-// { "darkness": ("1.", 0.25), "regularness": ("0.", 0.75) } 
-#define INVERT_SHADE 0.
 
 
 #define Gx 0
@@ -191,6 +191,13 @@ Z _sin(Z x) {
     return Z(sin(a) * cosh(b), -1. * cos(a)* sinh(b));
 }
 
+float _length(Z x) {
+    return length(vec2(x.real, x.imag));
+}
+
+float _length_squared(Z x) {
+    return x.real*x.real + x.imag*x.imag;
+}
 
 // Inner implementation - not to be called directly
 Z _fz(Z z, Poly3 poly) {
@@ -324,24 +331,45 @@ struct Result {
     float d;
 };
 
+
+
 Result newtown_raphson(Z z, Poly3 poly, Z multiplier) {
     
     if (POLAR == 1) {
         z = div(Z(0.05,0.0),z);
     }
     
+    #if INVERT_SHADE == 3
+    float tot_d = 1.;
+    #else
     float tot_d = 0.;
+    #endif
 
     for (int i = 0; i < MAX_ITER; i++) {
         float d = z.real*z.real + z.imag*z.imag;
-        tot_d += d;
+        
+        #if INVERT_SHADE == 1
+            tot_d = min(abs(atan(z.real,z.imag)), abs(atan(z.imag, z.real)));
+        #elif INVERT_SHADE ==2
+            //tot_d = max(tot_d, d);
+            tot_d = (z.real + z.imag) / 2.;
+        #elif INVERT_SHADE == 3
+            tot_d *= (((z.real / z.imag)));
+        #endif
+        
         if (d < EPS) {
-            return Result(i, z, 1., tot_d/float(i+1));
+            return Result(i, z, 1., tot_d);
         }
         z = next(z, poly, multiplier);
+        
+
+                
+        
     }
     float d =  z.real*z.real + z.imag*z.imag;
-    return Result(MAX_ITER, z, 0., tot_d/float(MAX_ITER));
+    
+    
+    return Result(MAX_ITER, z, 0., tot_d);
 }
 
 
@@ -366,8 +394,13 @@ vec3 render(in vec2 fragCoord, float time ) {
             
             vec3 root_color = 0.5*(1.+clamp(vec3(result.zero.real, result.zero.imag, 1.), -1., 1.));
             
-            
-            float shade = INVERT_SHADE * clamp(result.d, 0., 1.) + (1.-INVERT_SHADE) * clamp(float(result.iterations) / float(SHAPES), 0., 1.);
+            #if INVERT_SHADE == 0
+                float shade = clamp(float(result.iterations) / float(SHAPES), 0., 1.);                
+            #elif INVERT_SHADE > 0
+                float shade = clamp(result.d, 0., 1.);
+            #else
+                float shade = vec2(0.); // DELIBERATE COMPILER ERROR
+            #endif
 
             // Time varying pixel color
             vec3 color = shade * shade * shade * root_color;

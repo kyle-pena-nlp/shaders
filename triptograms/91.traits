@@ -1,12 +1,12 @@
 {
  "ANIMATION_STYLE": "pulsar",
- "COLOR_MODE": "red",
- "TRAILS": "ghost",
- "INVERT_SHADE": "regularness",
+ "COLOR_MODE": "blue",
+ "TRAILS": "sharp",
+ "INVERT_SHADE": "neons",
  "LEADING_EXPONENT_SIGN": "stripeworld",
- "LEADING_EXPONENT": "sept",
+ "LEADING_EXPONENT": "tri",
  "POLAR": "cartesian",
  "JITTERY": "kalm",
  "FRACTURE_STYLE": "clearview",
- "CONSTANT_REAL_TERM": "magnified"
+ "CONSTANT_REAL_TERM": "zoomout"
 }

@@ -2,11 +2,11 @@
  "ANIMATION_STYLE": "twist",
  "COLOR_MODE": "green",
  "TRAILS": "sharp",
- "INVERT_SHADE": "darkness",
+ "INVERT_SHADE": "regularness",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "sept",
- "POLAR": "cartesian",
+ "LEADING_EXPONENT": "tri",
+ "POLAR": "polar",
  "JITTERY": "kalm",
- "FRACTURE_STYLE": "cubist",
- "CONSTANT_REAL_TERM": "nakedeye"
+ "FRACTURE_STYLE": "clearview",
+ "CONSTANT_REAL_TERM": "zoomout"
 }

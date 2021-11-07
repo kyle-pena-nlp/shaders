@@ -3,10 +3,10 @@
  "COLOR_MODE": "teal",
  "TRAILS": "sharp",
  "INVERT_SHADE": "regularness",
- "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "sept",
- "POLAR": "cartesian",
- "JITTERY": "kalm",
- "FRACTURE_STYLE": "tiles",
+ "LEADING_EXPONENT_SIGN": "stripeworld",
+ "LEADING_EXPONENT": "tri",
+ "POLAR": "polar",
+ "JITTERY": "jittery",
+ "FRACTURE_STYLE": "clearview",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

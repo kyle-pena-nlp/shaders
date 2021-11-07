@@ -2,7 +2,7 @@
  "ANIMATION_STYLE": "twist",
  "COLOR_MODE": "teal",
  "TRAILS": "sharp",
- "INVERT_SHADE": "regularness",
+ "INVERT_SHADE": "neons",
  "LEADING_EXPONENT_SIGN": "stripeworld",
  "LEADING_EXPONENT": "tri",
  "POLAR": "cartesian",

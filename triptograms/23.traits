@@ -1,7 +1,7 @@
 {
  "ANIMATION_STYLE": "twist",
  "COLOR_MODE": "blue",
- "TRAILS": "ghost",
+ "TRAILS": "sharp",
  "INVERT_SHADE": "regularness",
  "LEADING_EXPONENT_SIGN": "stripeworld",
  "LEADING_EXPONENT": "tri",

@@ -3,10 +3,10 @@
  "COLOR_MODE": "loop",
  "TRAILS": "sharp",
  "INVERT_SHADE": "regularness",
- "LEADING_EXPONENT_SIGN": "stripeworld",
- "LEADING_EXPONENT": "dragon",
+ "LEADING_EXPONENT_SIGN": "spiralworld",
+ "LEADING_EXPONENT": "sept",
  "POLAR": "cartesian",
  "JITTERY": "jittery",
- "FRACTURE_STYLE": "tiles",
- "CONSTANT_REAL_TERM": "nakedeye"
+ "FRACTURE_STYLE": "clearview",
+ "CONSTANT_REAL_TERM": "zoomout"
 }

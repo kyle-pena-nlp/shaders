@@ -2,11 +2,11 @@
  "ANIMATION_STYLE": "twist",
  "COLOR_MODE": "red",
  "TRAILS": "sharp",
- "INVERT_SHADE": "regularness",
+ "INVERT_SHADE": "fantasy",
  "LEADING_EXPONENT_SIGN": "stripeworld",
- "LEADING_EXPONENT": "dragon",
+ "LEADING_EXPONENT": "sept",
  "POLAR": "cartesian",
- "JITTERY": "jittery",
- "FRACTURE_STYLE": "tiles",
- "CONSTANT_REAL_TERM": "magnified"
+ "JITTERY": "kalm",
+ "FRACTURE_STYLE": "clearview",
+ "CONSTANT_REAL_TERM": "nakedeye"
 }

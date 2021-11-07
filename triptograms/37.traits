@@ -4,9 +4,9 @@
  "TRAILS": "sharp",
  "INVERT_SHADE": "regularness",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "dragon",
+ "LEADING_EXPONENT": "sept",
  "POLAR": "cartesian",
- "JITTERY": "jittery",
- "FRACTURE_STYLE": "clearview",
+ "JITTERY": "kalm",
+ "FRACTURE_STYLE": "gems",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

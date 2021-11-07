@@ -1,6 +1,6 @@
 {
  "name": "Triptograms",
- "symbol": "TRIPTOGRAMS",
+ "symbol": "TRIPT",
  "image": "23.png",
  "external_url": "https://www.bonkworld.art/",
  "properties": {
@@ -63,11 +63,11 @@
   },
   {
    "trait_type": "TRAILS",
-   "value": "ghost"
+   "value": "sharp"
   }
  ],
  "collection": {
   "name": "Triptograms",
-  "family": "Triptograms"
+  "family": "Bonk World"
  }
 }
