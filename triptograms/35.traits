@@ -1,0 +1,12 @@
+{
+ "ANIMATION_STYLE": "fritz",
+ "COLOR_MODE": "red",
+ "TRAILS": "sharp",
+ "INVERT_SHADE": "darkness",
+ "LEADING_EXPONENT_SIGN": "spiralworld",
+ "LEADING_EXPONENT": "dragon",
+ "POLAR": "cartesian",
+ "JITTERY": "jittery",
+ "FRACTURE_STYLE": "cubist",
+ "CONSTANT_REAL_TERM": "nakedeye"
+}

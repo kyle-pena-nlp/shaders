@@ -1,0 +1,12 @@
+{
+ "ANIMATION_STYLE": "twist",
+ "COLOR_MODE": "loop",
+ "TRAILS": "ghost",
+ "INVERT_SHADE": "darkness",
+ "LEADING_EXPONENT_SIGN": "spiralworld",
+ "LEADING_EXPONENT": "tri",
+ "POLAR": "cartesian",
+ "JITTERY": "kalm",
+ "FRACTURE_STYLE": "clearview",
+ "CONSTANT_REAL_TERM": "nakedeye"
+}

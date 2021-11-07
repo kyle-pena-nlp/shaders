@@ -1,0 +1,12 @@
+{
+ "ANIMATION_STYLE": "twist",
+ "COLOR_MODE": "red",
+ "TRAILS": "ghost",
+ "INVERT_SHADE": "regularness",
+ "LEADING_EXPONENT_SIGN": "spiralworld",
+ "LEADING_EXPONENT": "tri",
+ "POLAR": "cartesian",
+ "JITTERY": "kalm",
+ "FRACTURE_STYLE": "gems",
+ "CONSTANT_REAL_TERM": "nakedeye"
+}

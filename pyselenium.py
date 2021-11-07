@@ -93,8 +93,9 @@ def get_writer(frames_per_second, out, out_format, compress):
     if out_format == "gif":
         return imageio.get_writer(fpath, mode='I', duration = (1/frames_per_second), subrectangles = True )
     elif out_format == "mp4":
-        quality = 8 if compress else 10
-        return imageio.get_writer(fpath, mode='I', fps=frames_per_second, quality = quality)
+        #quality = 8 if compress else 10
+        # bitrate set for compatibility with twitter
+        return imageio.get_writer(fpath, mode='I', fps=frames_per_second, quality = 9) # codec="H264", 
     elif out_format == "png":
         return APNGWriter(fpath, fps = frames_per_second)
         #return imageio.get_writer(fpath, mode = 'I', duration = (1/frames_per_second))

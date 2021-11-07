@@ -105,7 +105,9 @@ def generate_random_trait_values(N, traits, override_traits):
     return value_array, name_array
 
 
-def generate(N, shader, name, override_traits, x, y, fps, format, compress):
+def generate(args, shader, name, override_traits):
+
+    N = args.N; x = args.x; y = args.y; fps = args.fps; format = args.format; compress = args.compress
 
     traits          = parse_traits(shader)      # { TRAIT : { NAME: (OPTION, FREQUENCY) } }
     string_template = templatize(shader)        # string with template args
@@ -124,29 +126,70 @@ def generate(N, shader, name, override_traits, x, y, fps, format, compress):
             TRAIT_COUNTS[trait_name][trait_name_set[trait_name]] += (1/N)
     print(json.dumps(TRAIT_COUNTS, indent = 1))
 
-    for i, trait_values in enumerate(trait_values_array):
-
-        
+    for i, trait_values in enumerate(trait_values_array):      
 
         template_parameters = trait_values
         shader_text = string_template.format(**template_parameters)
         shader_text = set_preprocessor_directive(shader_text, "JITTER_SALT",  "{:.1f}".format(i))
         
-        with open(os.path.join(".", out_dir, "{}.glsl".format(i+1)), "w+") as f:
+        with open(os.path.join(".", out_dir, "{}.glsl".format(i)), "w+") as f:
             f.write(shader_text)
 
         trait_value_names = trait_names_array[i]
-        with open(os.path.join(".", out_dir, "{}.json".format(i+1)), "w+") as f:
+        with open(os.path.join(".", out_dir, "{}.traits".format(i)), "w+") as f:
             f.write(json.dumps(trait_value_names, indent = 1))
 
+        with open(os.path.join(".", out_dir, "{}.json".format(i)), "w+") as f:
+            f.write(json.dumps(gen_metaplex_metadata(args, index = i, traits_dict = trait_value_names), indent = 1))
+
         html_text = wrap_in_html_shell(shader_text)
-        html_fpath = os.path.join(".", out_dir, "{}.html".format(i+1))
+        html_fpath = os.path.join(".", out_dir, "{}.html".format(i))
         with open(html_fpath, "w+") as f:
             f.write(html_text)
 
         yield html_fpath, shader_text, x, y, fps, format, compress
 
+def gen_metaplex_metadata(args, index, traits_dict):
 
+    format = args.format
+
+    shader_name = args.shader
+    image_filename = "{}.{}".format(index, format)
+    titleized_name = shader_name.title()
+    symbol_name = re.sub(r"\s+", "", shader_name.upper())[:5]
+    mime_type = "image/{}".format(format)
+
+    attributes = []
+    for trait_name in sorted(traits_dict):
+        trait_value = traits_dict[trait_name]
+        attributes.append({ "trait_type": trait_name, "value": trait_value })
+
+    data = {
+        "name": titleized_name,
+        "symbol": symbol_name,
+        "image": image_filename,
+        "external_url": "https://www.bonkworld.art/",
+        "properties": {
+            "files": [{ "uri": image_filename, "type": mime_type }],
+            "category": "image",
+            "creators": [
+                {
+                    "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
+                    "share": 50
+                }, 
+                {
+                    "address": "udhne2o5r2wFKKt4uCAF4LH3mX2LwmczuaAQw9PrJJr",
+                    "share": 50
+                },                            
+            ]
+        },
+        "description": "Perfectly looping, color-rich math art for gazing deep and thinking big thoughts.",
+        "seller_fee_basis_points": 500,
+        "attributes": attributes,
+        "collection": { "name": titleized_name, "family": "Bonk World" }
+    }
+
+    return data
 
 def parse_args():
     parser = ArgumentParser()
@@ -159,6 +202,7 @@ def parse_args():
     parser.add_argument("--fps", type = int, default = 30)
     parser.add_argument("--format", default = "mp4", choices = ["mp4","gif","png"])
     parser.add_argument("--compress", default = False, type = bool)
+    parser.add_argument("--wallet_address", type = str, default = None)
     #parser.add_argument("--traits_file", type = str, required = False, default = None)
     args = parser.parse_args()
     override_traits = {}
@@ -199,7 +243,7 @@ if __name__ == "__main__":
 
     random.seed(args.seed)
     
-    results = generate(args.N, shader_text, name, traits, args.x, args.y, args.fps, args.format, args.compress)
+    results = generate(args, shader_text, name, traits)
 
     if args.parallel > 0:
         pool = multiprocessing.Pool()

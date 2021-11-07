@@ -1,14 +1,21 @@
+<html>
+    <body></body>
+    <script src="https://webglfundamentals.org/webgl/resources/webgl-utils.js"></script>
+    <script type="text/javascript">"use strict";
 
+const external_code = `
 #define AA 1
 
+#define LOOP_TIME 10.
+
 // set programmatically at generaiton time
-#define JITTER_SALT 0.
+#define JITTER_SALT 80.0
 
 const float EPS = 1e-12;
 const float PI = 3.1415962;
 const float e = 2.7182818284;
 
-#define LOOP_TIME 10.
+
 const float RATE_1 = 2. * PI / LOOP_TIME;
 const float PHASE_1 = PI / 2.;
 const float NUM_CELLS = 10.;
@@ -18,8 +25,9 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 
 // { "loop": ("-1.", 0.10), "blue": ("0.", 0.23), "red": ("1.", 0.23), "green":("2.", 0.22), "teal": ("3.", 0.22) }
-#define COLOR_MODE 0.
+#define COLOR_MODE 3.
 
+// undocumented value: 0: none
 // { "twist": ("1", 0.33), "fritz": ("2", 0.33), "pulsar": ("3", 0.33) }
 #define ANIMATION_STYLE 3
 
@@ -35,8 +43,8 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 #define SCANLINE 0.
 
-// { "ghost": ("1", 0.20), "sharp": ("0", 0.80) }
-#define TRAILS 3
+// { "ghost": ("3", 0.20), "sharp": ("0", 0.80) }
+#define TRAILS 0
 
 #define BARREL 0
 
@@ -45,13 +53,15 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define LEADING_TERM_COEF 5.
 
 // { "dragon": ("2.", 0.34), "tri": ("3.", 0.33),  "sept": ("6.", 0.33) }
-#define LEADING_EXPONENT 2.
+#define LEADING_EXPONENT 6.
 
 // { "stripeworld": ("-1.", 0.50), "spiralworld": ("1.", 0.50) }
 #define LEADING_EXPONENT_SIGN -1.
 
 // { "magnified": ("-10.", 0.25), "nakedeye": ("1.",0.75)}
-#define CONSTANT_TERM -10.
+#define CONSTANT_REAL_TERM 1.
+
+#define CONSTANT_IMAG_TERM 0.
 
 #define LINEAR_TERM 0.0
 
@@ -64,9 +74,13 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 
 // { "darkness": ("1.", 0.25), "regularness": ("0.", 0.75) } 
-#define INVERT_SHADE 1.
+#define INVERT_SHADE 0.
 
 
+#define Gx 0
+
+
+// TODO: // { "identity": ("0", 0.50), "cos": ("1", 0.10), "exp": ("2", 0.10), "log": ("3", 0.10) }
 
 const int MAX_ITER = SHAPES;
 
@@ -85,7 +99,7 @@ struct Poly3 {
 
     float D;
 
-    float exp;
+    float E;
 };
 
 struct Z {
@@ -100,7 +114,11 @@ Poly3 getPoly(float time) {
 
     float bounce =  (ANIMATION_STYLE == 1) ? sin(RATE_1 * time) : 0.0;
 
-    return Poly3(LEADING_TERM_COEF, LEADING_EXPONENT_SIGN * LEADING_EXPONENT, QUADRATIC_TERM, LEADING_EXPONENT_SIGN * 2., LINEAR_TERM, LEADING_EXPONENT_SIGN, CONSTANT_TERM + bounce, TRIG_TERM);
+    //float constant_radius = CONSTANT_REAL_TERM + bounce;
+    //float constant_real = constant_radius*cos(time);
+    //float constant_imag = constant_radius*sin(time);
+
+    return Poly3(LEADING_TERM_COEF, LEADING_EXPONENT_SIGN * LEADING_EXPONENT, QUADRATIC_TERM, LEADING_EXPONENT_SIGN * 2., LINEAR_TERM, LEADING_EXPONENT_SIGN, CONSTANT_REAL_TERM + bounce, CONSTANT_IMAG_TERM);
 }
 
 
@@ -158,6 +176,9 @@ Z div(Z a, Z b) {
     return mult(1./denom, numerator);
 }
 
+Z _ln(Z a) {
+    return Z(length(vec2(a.real, a.imag)),  atan(a.imag, a.real));
+}
 
 Z _exp(Z a) {
     return mult(_exp(a.real), Z(cos(a.imag), sin(a.imag)) );
@@ -175,30 +196,64 @@ Z _sin(Z x) {
     return Z(sin(a) * cosh(b), -1. * cos(a)* sinh(b));
 }
 
-Z polar(Z x) {
-    float a = length(vec2(x.real,x.imag));
-    float b= atan(x.imag,x.real);
-    return Z(a, b);
+
+// Inner implementation - not to be called directly
+Z _fz(Z z, Poly3 poly) {
+    return add(mult(poly.A, power(z, poly.expA)), mult(poly.B, power(z, poly.expB)), mult(poly.C, power(z, poly.expC)), Z(poly.D,poly.E)); 
 }
 
-
-
-float fx(float x, Poly3 poly) {
-    return poly.A*x*x*x + poly.B*x*x + poly.C*x + poly.D;
-}
-
-Z fz(Z z, Poly3 poly) {
-    return add(mult(poly.A, power(z, poly.expA)), mult(poly.B, power(z, poly.expB)), mult(poly.C, power(z, poly.expC)), Z(poly.D,0.), mult(poly.exp, _sin(z))); 
-}
-
-
-Z dfdx(Z z, Poly3 poly) {
+// Inner implementation - not to be called directly
+Z _dfdx(Z z, Poly3 poly) {
     Z t1 = mult(poly.expA*poly.A, power(z, poly.expA-1.));
     Z t2 = mult(poly.expB*poly.B, power(z, poly.expB-1.));
     Z t3 = mult(poly.expC*poly.C, power(z, poly.expC-1.));
-    Z t4 =  mult(poly.exp, _cos(z));
-    return add(t1, t2, t3, t4);
+    return add(t1, t2, t3);
 }
+
+// F(z) = f(p(z)) = f(az^m-b)
+Z fz(Z z, Poly3 poly) {
+    Z a = _fz(z, poly);
+    #if Gx == 0
+        // identity
+        return a;
+    #elif Gx == 1
+        // sin
+        return _sin(a);
+    #elif Gx == 2
+        // exp
+        return _exp(a);
+    #elif Gx == 3
+        // (1+f(x))/f(x)
+        return div(add(Z(1.,0.), a), a);
+    #else
+        return 0.; // deliberate compiler error
+    #endif
+}
+
+// F'(z) = F'(p(z))*p'(z)
+Z dfdx(Z z, Poly3 poly) {
+    Z a = _dfdx(z, poly);
+    #if Gx == 0
+        // chain rule applied to identity function
+        return a;
+    #elif Gx == 1
+        // chain rule applied to sin
+        return mult(_cos(_fz(z, poly)), a);
+    #elif Gx == 2
+        // chain rule applied to exp
+        return mult(_exp(_fz(z, poly)), a);
+    #elif Gx == 3
+        // chain rule applied to (1+f(x))/f(x)
+        Z numerator = a;
+        Z denominator = power(_fz(z, poly), 2.); 
+        return div(numerator,denominator);
+        
+    #else
+        return 0.; // deliberate compiler error
+    #endif 
+}
+
+
 
 // TODO: handle divide by zero without branches or additive smoothing
 Z next(Z z, Poly3 poly, Z multiplier) {
@@ -217,12 +272,12 @@ Z _multiplier(float time) {
         multiplier = div( Z(-1. + cos(RATE_1*time), 1. + sin(RATE_1*time) ), Z( 1. + sin(RATE_1*time) , -1. + cos(RATE_1*time) ) );
         //return Z(2., -3. + cos(RATE_1*time));
     }
-    else if (ANIMATION_STYLE == 3) {
-      multiplier = mult(Z(-0.1,-0.1), Z(sin(RATE_1*time), cos(RATE_1*time)));   
+    else if (ANIMATION_STYLE == 3 && LEADING_EXPONENT_SIGN == 1.) {
+        multiplier = mult(Z(-0.1,-0.1), Z(sin(RATE_1*time), cos(RATE_1*time)));   
     }   
-    
-    if (ANIMATION_STYLE == 3 && LEADING_EXPONENT_SIGN == -1.) {
-         multiplier = add(multiplier, Z(-2.,0.));
+    else if (ANIMATION_STYLE == 3 && LEADING_EXPONENT_SIGN == -1.) {
+        multiplier = mult(Z(-0.1,-0.1), Z(sin(RATE_1*time), cos(RATE_1*time))); 
+        multiplier = add(multiplier, Z(-2.,0.));
     }
     
     return multiplier;
@@ -621,4 +676,264 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
     
     fragColor = vec4(tot, 1.);
+}`;
+
+class ImportError extends Error {}
+
+const app = {
+    mode: null, /* capture or animate */
+    status : null, /* null or 'ready' */
+    capture: null, /* base64 capture */
+    render: null, /* capture or animation callback */
+    canvas: null,
+    gl: null,
+    mouseX: 0,
+    mouseY: 0,
+    program: null,
+    addresses: {
+        position: null,
+        resolution: null,
+        mouse: null,
+        time: null
+    }
+};
+
+function resizeCanvasToWindow() {
+    const canvas = app.canvas;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
+
+function setMousePosition(e) {
+    const canvas = app.canvas;
+    const rect = canvas.getBoundingClientRect();
+    app.mouseX = e.clientX - rect.left;
+    app.mouseY = rect.height - (e.clientY - rect.top) - 1;  // bottom is 0 in WebGL
+}
+
+// create a canvas element the size of the screen, that also automatically resizes and updates mouse positions
+function createCanvasIfNotExists() {
+
+    // lazy create the canvas
+    if (!app.canvas) {
+        const canvas = document.createElement('canvas')
+        canvas.setAttribute("id", "canvas")
+        document.body.appendChild(canvas)
+        app.canvas = canvas;
+    }
+
+    // size the canvas to the entire window
+    resizeCanvasToWindow();
+
+    window.addEventListener('resize', resizeCanvasToWindow);
+    app.canvas.addEventListener('mousemove', setMousePosition);
+}
+
+function createWebGLContextIfNotExists() {
+    // lazy load the web gl context
+    if (!app.gl) {
+        app.gl = app.canvas.getContext("webgl2");
+    }
+}
+
+function init() {
+    createCanvasIfNotExists();
+    createWebGLContextIfNotExists();
+    createShaderProgram();
+    configureWebGLContext();
+    app.status = "ready";
+}
+
+function createShader(gl, shaderCode, shaderType) {
+  
+  var shader = gl.createShader(shaderType);
+  gl.shaderSource(shader, shaderCode);
+  gl.compileShader(shader);
+
+  var message = gl.getShaderInfoLog(shader);
+  if (message.length > 0) {
+    /* message may be an error or a warning */
+    throw message; 
+  }
+
+  return shader;
+}
+
+function createShaderProgram() {
+    if (app.program) {
+        return;
+    }
+    const gl = app.gl;
+    const vertexShader = createShader(gl, getVertexShaderCode(), gl.VERTEX_SHADER);
+    const fragmentShader = createShader(gl, getFragmentShaderCode(), gl.FRAGMENT_SHADER);
+    const program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    app.program = program;
+}
+
+// TODO: create frame rendering API
+
+function configureWebGLContext() {
+    
+    const gl = app.gl;    
+
+    const program = app.program;
+
+    // look up where the vertex data needs to go.
+    const positionAttributeLocation = gl.getAttribLocation(program, "position");
+
+    // look up uniform locations
+    const resolutionLocation = gl.getUniformLocation(program, "iResolution");
+    const mouseLocation      = gl.getUniformLocation(program, "iMouse");
+    const timeLocation       = gl.getUniformLocation(program, "iTime");
+
+    // Create a buffer to put three 2d clip space points in
+    const positionBuffer = gl.createBuffer();
+
+    // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+    // fill it with a 2 triangles that cover clipspace
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+    -1, -1,  // first triangle
+     1, -1,
+    -1,  1,
+    -1,  1,  // second triangle
+     1, -1,
+     1,  1,
+    ]), gl.STATIC_DRAW);
+
+    let then = 0;
+    let time = 0;
+    
+    function render(now) {
+
+      let gl = app.gl;
+
+      if (app.mode == "animate") {
+        now *= 0.001;  // convert to seconds
+        const elapsedTime = Math.min(now - then, 0.1);
+        time += elapsedTime;
+        then = now;
+      }
+      else if (app.mode == "capture") {
+        time = now;
+      }
+  
+      // Tell WebGL how to convert from clip space to pixels
+      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  
+      // Tell it to use our program (pair of shaders)
+      gl.useProgram(program);
+  
+      // Turn on the attribute
+      gl.enableVertexAttribArray(positionAttributeLocation);
+  
+      // Bind the position buffer.
+      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  
+      // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+      gl.vertexAttribPointer(
+          positionAttributeLocation,
+          2,          // 2 components per iteration
+          gl.FLOAT,   // the data is 32bit floats
+          false,      // don't normalize the data
+          0,          // 0 = move forward size * sizeof(type) each iteration to get the next position
+          0,          // start at the beginning of the buffer
+      );
+  
+      gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+      gl.uniform2f(mouseLocation, app.mouseX, app.mouseY);
+      gl.uniform1f(timeLocation, time);
+  
+      gl.drawArrays(
+          gl.TRIANGLES,
+          0,     // offset
+          6,     // num vertices to process
+      );
+
+      if (app.mode == "capture") {
+        // TODO: proper DPI tricks if DPI != 96 desired.
+        app.capture = app.canvas.toDataURL('image/png', 1).substring(22);
+      }
+      else if (app.mode == "animate") {
+         requestAnimationFrame(app.render);
+      }
+
+    }
+
+    app.render = render;
+}
+
+
+
+function getVertexShaderCode() {
+    const vs = `#version 300 es
+
+    // an attribute will receive data from a buffer
+    in vec4 position;
+
+    // all shaders have a main function
+    void main() {
+
+      // gl_Position is a special variable a vertex shader
+      // is responsible for setting
+      gl_Position = position;
+    }`;
+    return vs;
+}
+
+
+function getFragmentShaderCode() {
+  // build the fragment shader by prepending / postpending other code
+  const fs = `#version 300 es
+
+    precision mediump float;
+
+    out vec4 myOutputColor;
+
+    uniform vec2 iResolution;
+    uniform vec2 iMouse;
+    uniform float iTime;`
+
+    
+
+    +
+
+    external_code
+
+    +
+
+    `void main() {
+      mainImage(myOutputColor, gl_FragCoord.xy);
+    }
+  `;
+
+  return fs;
+
+}
+
+function capture(time, x, y) {
+    app.canvas.width = x;
+    app.canvas.height = y;
+    app.mode = "capture";
+    app.render(time);
+}
+
+function animate() {
+    resizeCanvasToWindow();
+    app.mode = "animate";
+    requestAnimationFrame(app.render);
+}
+
+function stop() {
+    app.mode = "capture";
+}
+
+
+init();
+animate();
+</script>
+</html>

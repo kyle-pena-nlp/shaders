@@ -1,0 +1,12 @@
+{
+ "ANIMATION_STYLE": "pulsar",
+ "COLOR_MODE": "loop",
+ "TRAILS": "ghost",
+ "INVERT_SHADE": "regularness",
+ "LEADING_EXPONENT_SIGN": "stripeworld",
+ "LEADING_EXPONENT": "dragon",
+ "POLAR": "polar",
+ "JITTERY": "kalm",
+ "FRACTURE_STYLE": "clearview",
+ "CONSTANT_REAL_TERM": "nakedeye"
+}

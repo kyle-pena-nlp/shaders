@@ -1,9 +1,10 @@
 import os, re, json
 
-def get_shader_text(shader_fp):
-    if shader_fp is None:
+def get_shader_text(shader_name):
+    if shader_name is None:
         return open("./example_shader.glsl", "r").read()
     else:
+        shader_fp = os.path.join(".", ensure_ext(shader_name, "glsl"))
         return open(shader_fp, "r").read()
 
 def remove_ext(shader_fname):
