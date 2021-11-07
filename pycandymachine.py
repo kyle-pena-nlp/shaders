@@ -104,6 +104,24 @@ def generate_random_trait_values(N, traits, override_traits):
 
     return value_array, name_array
 
+def check_for_trait_uniqueness(trait_values_array):
+
+    trait_uniqueness_set = set()
+
+    non_unique_count = 0
+
+    for trait_dict in trait_values_array:
+        # put keys in trait_dict in canonical order
+        trait_dict = { key: trait_dict[key] for key in sorted(trait_dict) }
+        trait_dict_string = json.dumps(trait_dict)
+        if trait_dict_string in trait_uniqueness_set:
+            non_unique_count += 1
+        else:
+            trait_uniqueness_set.add(trait_dict_string)
+    
+    if non_unique_count:
+        raise Exception("Generated images not unique - {} duplicates".format(non_unique_count))
+
 
 def generate(args, shader, name, override_traits):
 
@@ -125,6 +143,8 @@ def generate(args, shader, name, override_traits):
         for trait_name_set in trait_names_array:
             TRAIT_COUNTS[trait_name][trait_name_set[trait_name]] += (1/N)
     print(json.dumps(TRAIT_COUNTS, indent = 1))
+
+    check_for_trait_uniqueness(trait_values_array)
 
     for i, trait_values in enumerate(trait_values_array):      
 

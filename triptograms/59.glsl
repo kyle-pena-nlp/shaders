@@ -24,10 +24,10 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 // undocumented value: 0: none
 // { "twist": ("1", 0.33), "fritz": ("2", 0.33), "pulsar": ("3", 0.33) }
-#define ANIMATION_STYLE 2
+#define ANIMATION_STYLE 1
 
 // { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
-#define JITTERY 0.
+#define JITTERY 1.
 
 #define VIGNETTE 1.
 
@@ -54,7 +54,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define LEADING_EXPONENT_SIGN -1.
 
 // { "zoomout": ("-0.1", 0.25), "nakedeye": ("-1.",0.75)}
-#define CONSTANT_REAL_TERM -1.
+#define CONSTANT_REAL_TERM -0.1
 
 #define CONSTANT_IMAG_TERM 0.
 
@@ -68,7 +68,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define POLAR 1
 
 // {  "regularness": ("0", 0.625), "velvet": ("1", 0.125), "neons": ("2", 0.125), "fantasy": ("3", 0.125) } 
-#define INVERT_SHADE 0
+#define INVERT_SHADE 3
 
 
 

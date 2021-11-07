@@ -1,9 +1,9 @@
 {
- "ANIMATION_STYLE": "fritz",
- "COLOR_MODE": "green",
- "TRAILS": "sharp",
+ "ANIMATION_STYLE": "twist",
+ "COLOR_MODE": "teal",
+ "TRAILS": "ghost",
  "INVERT_SHADE": "regularness",
- "LEADING_EXPONENT_SIGN": "stripeworld",
+ "LEADING_EXPONENT_SIGN": "spiralworld",
  "LEADING_EXPONENT": "sept",
  "POLAR": "cartesian",
  "JITTERY": "kalm",

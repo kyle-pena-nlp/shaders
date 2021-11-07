@@ -1,12 +1,12 @@
 {
- "ANIMATION_STYLE": "pulsar",
- "COLOR_MODE": "green",
+ "ANIMATION_STYLE": "fritz",
+ "COLOR_MODE": "blue",
  "TRAILS": "sharp",
- "INVERT_SHADE": "regularness",
+ "INVERT_SHADE": "fantasy",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "sept",
+ "LEADING_EXPONENT": "dragon",
  "POLAR": "cartesian",
  "JITTERY": "kalm",
- "FRACTURE_STYLE": "tiles",
- "CONSTANT_REAL_TERM": "zoomout"
+ "FRACTURE_STYLE": "clearview",
+ "CONSTANT_REAL_TERM": "nakedeye"
 }

@@ -27,11 +27,11 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "fritz"
+   "value": "twist"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "green"
+   "value": "blue"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -51,7 +51,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "dragon"
+   "value": "quad"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
@@ -59,11 +59,11 @@
   },
   {
    "trait_type": "POLAR",
-   "value": "cartesian"
+   "value": "polar"
   },
   {
    "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "ghost"
   }
  ],
  "collection": {

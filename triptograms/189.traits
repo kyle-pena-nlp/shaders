@@ -1,0 +1,12 @@
+{
+ "ANIMATION_STYLE": "pulsar",
+ "COLOR_MODE": "red",
+ "TRAILS": "sharp",
+ "INVERT_SHADE": "fantasy",
+ "LEADING_EXPONENT_SIGN": "spiralworld",
+ "LEADING_EXPONENT": "quad",
+ "POLAR": "cartesian",
+ "JITTERY": "kalm",
+ "FRACTURE_STYLE": "clearview",
+ "CONSTANT_REAL_TERM": "nakedeye"
+}

@@ -1,12 +1,12 @@
 {
- "ANIMATION_STYLE": "fritz",
- "COLOR_MODE": "loop",
+ "ANIMATION_STYLE": "twist",
+ "COLOR_MODE": "blue",
  "TRAILS": "sharp",
- "INVERT_SHADE": "regularness",
+ "INVERT_SHADE": "velvet",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "sept",
+ "LEADING_EXPONENT": "tri",
  "POLAR": "cartesian",
- "JITTERY": "jittery",
- "FRACTURE_STYLE": "tiles",
+ "JITTERY": "kalm",
+ "FRACTURE_STYLE": "clearview",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

@@ -1,12 +1,12 @@
 {
  "ANIMATION_STYLE": "twist",
- "COLOR_MODE": "red",
+ "COLOR_MODE": "green",
  "TRAILS": "sharp",
- "INVERT_SHADE": "regularness",
+ "INVERT_SHADE": "fantasy",
  "LEADING_EXPONENT_SIGN": "stripeworld",
- "LEADING_EXPONENT": "sept",
+ "LEADING_EXPONENT": "quad",
  "POLAR": "cartesian",
  "JITTERY": "kalm",
- "FRACTURE_STYLE": "tiles",
+ "FRACTURE_STYLE": "gems",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

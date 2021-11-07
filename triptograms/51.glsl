@@ -20,11 +20,11 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 
 // { "loop": ("-1.", 0.10), "blue": ("0.", 0.23), "red": ("1.", 0.23), "green":("2.", 0.22), "teal": ("3.", 0.22) }
-#define COLOR_MODE 3.
+#define COLOR_MODE 0.
 
 // undocumented value: 0: none
 // { "twist": ("1", 0.33), "fritz": ("2", 0.33), "pulsar": ("3", 0.33) }
-#define ANIMATION_STYLE 2
+#define ANIMATION_STYLE 1
 
 // { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
 #define JITTERY 0.
@@ -39,7 +39,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define SCANLINE 0.
 
 // { "ghost": ("3", 0.20), "sharp": ("0", 0.80) }
-#define TRAILS 3
+#define TRAILS 0
 
 #define BARREL 0
 

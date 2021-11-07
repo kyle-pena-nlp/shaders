@@ -27,7 +27,7 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "pulsar"
+   "value": "fritz"
   },
   {
    "trait_type": "COLOR_MODE",
@@ -51,7 +51,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "tri"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",

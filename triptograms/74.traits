@@ -1,10 +1,10 @@
 {
- "ANIMATION_STYLE": "pulsar",
- "COLOR_MODE": "teal",
+ "ANIMATION_STYLE": "fritz",
+ "COLOR_MODE": "green",
  "TRAILS": "sharp",
  "INVERT_SHADE": "regularness",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "dragon",
+ "LEADING_EXPONENT": "quad",
  "POLAR": "polar",
  "JITTERY": "kalm",
  "FRACTURE_STYLE": "clearview",

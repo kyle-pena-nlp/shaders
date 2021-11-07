@@ -1,0 +1,12 @@
+{
+ "ANIMATION_STYLE": "fritz",
+ "COLOR_MODE": "red",
+ "TRAILS": "ghost",
+ "INVERT_SHADE": "regularness",
+ "LEADING_EXPONENT_SIGN": "spiralworld",
+ "LEADING_EXPONENT": "sept",
+ "POLAR": "polar",
+ "JITTERY": "jittery",
+ "FRACTURE_STYLE": "clearview",
+ "CONSTANT_REAL_TERM": "zoomout"
+}

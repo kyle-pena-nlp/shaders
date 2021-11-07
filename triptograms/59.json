@@ -27,7 +27,7 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "fritz"
+   "value": "twist"
   },
   {
    "trait_type": "COLOR_MODE",
@@ -35,7 +35,7 @@
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "nakedeye"
+   "value": "zoomout"
   },
   {
    "trait_type": "FRACTURE_STYLE",
@@ -43,11 +43,11 @@
   },
   {
    "trait_type": "INVERT_SHADE",
-   "value": "regularness"
+   "value": "fantasy"
   },
   {
    "trait_type": "JITTERY",
-   "value": "kalm"
+   "value": "jittery"
   },
   {
    "trait_type": "LEADING_EXPONENT",

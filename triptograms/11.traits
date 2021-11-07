@@ -1,10 +1,10 @@
 {
  "ANIMATION_STYLE": "twist",
- "COLOR_MODE": "red",
+ "COLOR_MODE": "green",
  "TRAILS": "sharp",
  "INVERT_SHADE": "regularness",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "tri",
+ "LEADING_EXPONENT": "dragon",
  "POLAR": "cartesian",
  "JITTERY": "jittery",
  "FRACTURE_STYLE": "clearview",

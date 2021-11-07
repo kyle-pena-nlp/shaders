@@ -31,11 +31,11 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "red"
+   "value": "green"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "zoomout"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FRACTURE_STYLE",
@@ -43,11 +43,11 @@
   },
   {
    "trait_type": "INVERT_SHADE",
-   "value": "regularness"
+   "value": "neons"
   },
   {
    "trait_type": "JITTERY",
-   "value": "kalm"
+   "value": "jittery"
   },
   {
    "trait_type": "LEADING_EXPONENT",
@@ -59,7 +59,7 @@
   },
   {
    "trait_type": "POLAR",
-   "value": "polar"
+   "value": "cartesian"
   },
   {
    "trait_type": "TRAILS",

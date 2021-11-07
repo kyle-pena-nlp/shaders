@@ -1,10 +1,10 @@
 {
  "ANIMATION_STYLE": "twist",
- "COLOR_MODE": "teal",
+ "COLOR_MODE": "red",
  "TRAILS": "sharp",
- "INVERT_SHADE": "velvet",
+ "INVERT_SHADE": "regularness",
  "LEADING_EXPONENT_SIGN": "stripeworld",
- "LEADING_EXPONENT": "quad",
+ "LEADING_EXPONENT": "dragon",
  "POLAR": "cartesian",
  "JITTERY": "kalm",
  "FRACTURE_STYLE": "clearview",

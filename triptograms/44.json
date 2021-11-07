@@ -27,11 +27,11 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "fritz"
+   "value": "twist"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "green"
+   "value": "teal"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -55,7 +55,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "stripeworld"
+   "value": "spiralworld"
   },
   {
    "trait_type": "POLAR",
@@ -63,7 +63,7 @@
   },
   {
    "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "ghost"
   }
  ],
  "collection": {

@@ -31,7 +31,7 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "teal"
+   "value": "red"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -43,7 +43,7 @@
   },
   {
    "trait_type": "INVERT_SHADE",
-   "value": "velvet"
+   "value": "regularness"
   },
   {
    "trait_type": "JITTERY",
@@ -51,7 +51,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "dragon"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",

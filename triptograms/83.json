@@ -27,11 +27,11 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "pulsar"
+   "value": "fritz"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "red"
+   "value": "loop"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -43,7 +43,7 @@
   },
   {
    "trait_type": "INVERT_SHADE",
-   "value": "velvet"
+   "value": "fantasy"
   },
   {
    "trait_type": "JITTERY",
@@ -51,11 +51,11 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "sept"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "stripeworld"
+   "value": "spiralworld"
   },
   {
    "trait_type": "POLAR",
@@ -63,7 +63,7 @@
   },
   {
    "trait_type": "TRAILS",
-   "value": "ghost"
+   "value": "sharp"
   }
  ],
  "collection": {

@@ -35,7 +35,7 @@
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "zoomout"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FRACTURE_STYLE",
@@ -55,7 +55,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "spiralworld"
+   "value": "stripeworld"
   },
   {
    "trait_type": "POLAR",

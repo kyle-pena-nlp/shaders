@@ -1,11 +1,11 @@
 {
  "ANIMATION_STYLE": "twist",
- "COLOR_MODE": "teal",
+ "COLOR_MODE": "red",
  "TRAILS": "sharp",
- "INVERT_SHADE": "neons",
+ "INVERT_SHADE": "regularness",
  "LEADING_EXPONENT_SIGN": "stripeworld",
  "LEADING_EXPONENT": "tri",
- "POLAR": "cartesian",
+ "POLAR": "polar",
  "JITTERY": "kalm",
  "FRACTURE_STYLE": "clearview",
  "CONSTANT_REAL_TERM": "nakedeye"

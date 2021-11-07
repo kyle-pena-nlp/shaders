@@ -1,12 +1,12 @@
 {
  "ANIMATION_STYLE": "twist",
- "COLOR_MODE": "loop",
+ "COLOR_MODE": "teal",
  "TRAILS": "sharp",
  "INVERT_SHADE": "fantasy",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "dragon",
- "POLAR": "polar",
+ "LEADING_EXPONENT": "sept",
+ "POLAR": "cartesian",
  "JITTERY": "kalm",
  "FRACTURE_STYLE": "gems",
- "CONSTANT_REAL_TERM": "nakedeye"
+ "CONSTANT_REAL_TERM": "zoomout"
 }

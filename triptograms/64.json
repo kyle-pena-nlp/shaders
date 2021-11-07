@@ -27,19 +27,19 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "fritz"
+   "value": "twist"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "blue"
+   "value": "loop"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "zoomout"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FRACTURE_STYLE",
-   "value": "clearview"
+   "value": "cubist"
   },
   {
    "trait_type": "INVERT_SHADE",
@@ -51,11 +51,11 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "tri"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "spiralworld"
+   "value": "stripeworld"
   },
   {
    "trait_type": "POLAR",

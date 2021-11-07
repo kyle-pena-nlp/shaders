@@ -1,12 +1,12 @@
 {
  "ANIMATION_STYLE": "twist",
- "COLOR_MODE": "blue",
+ "COLOR_MODE": "red",
  "TRAILS": "ghost",
- "INVERT_SHADE": "regularness",
+ "INVERT_SHADE": "fantasy",
  "LEADING_EXPONENT_SIGN": "stripeworld",
- "LEADING_EXPONENT": "tri",
+ "LEADING_EXPONENT": "sept",
  "POLAR": "cartesian",
- "JITTERY": "kalm",
+ "JITTERY": "jittery",
  "FRACTURE_STYLE": "clearview",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

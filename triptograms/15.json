@@ -31,7 +31,7 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "teal"
+   "value": "red"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -51,19 +51,19 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "dragon"
+   "value": "quad"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "spiralworld"
+   "value": "stripeworld"
   },
   {
    "trait_type": "POLAR",
-   "value": "cartesian"
+   "value": "polar"
   },
   {
    "trait_type": "TRAILS",
-   "value": "ghost"
+   "value": "sharp"
   }
  ],
  "collection": {
