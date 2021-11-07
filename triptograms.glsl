@@ -24,7 +24,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 // undocumented value: 0: none
 // { "twist": ("1", 0.33), "fritz": ("2", 0.33), "pulsar": ("3", 0.33) }
-#define ANIMATION_STYLE 1
+#define ANIMATION_STYLE 2
 
 // { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
 #define JITTERY 0.
@@ -41,10 +41,10 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 
 // { "dragon": ("2.", 0.25), "tri": ("3.", 0.25), "quad": ("4.", 0.25),  "sept": ("6.", 0.25) }
-#define LEADING_EXPONENT 4.
+#define LEADING_EXPONENT 3.
 
 // { "stripeworld": ("-1.", 0.50), "spiralworld": ("1.", 0.50) }
-#define LEADING_EXPONENT_SIGN -1.
+#define LEADING_EXPONENT_SIGN 1.
 
 // { "zoomout": ("-0.1", 0.25), "nakedeye": ("-1.",0.75)}
 #define CONSTANT_REAL_TERM -1.0
@@ -56,7 +56,10 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define SHADE_STYLE 0
 
 // { "no": ("0", 0.50), "yes": ("1", 0.50) }
-#define INVERT_COLORS 1
+#define INVERT_COLORS 0
+
+// { "yes": ("1", 0.70), "no": ("0", 0.30) }
+#define FBM 1
 
 #define VIGNETTE 1.
 
@@ -473,6 +476,19 @@ vec2 distort2(in vec2 u, int iters, float scale, float intensity, float time) {
     return u+intensity*p;
 }
 
+vec2 getFBM(in vec2 uv, float time) {
+    float UV_SCALE = 4./iResolution.x;
+    float STRENGTH = (1./8.)*iResolution.x;
+    return STRENGTH*(distort2(vec2(UV_SCALE*uv + JITTER_SALT + time), 2, 1., 1., 0.) - vec2(UV_SCALE*uv + JITTER_SALT + time));
+}
+
+vec2 fbm(in vec2 fragCoord, float time) {
+    vec2 _fbm1 = getFBM(fragCoord, mod(time,LOOP_TIME));
+    vec2 _fbm2 = getFBM(fragCoord, mod(time,LOOP_TIME) - LOOP_TIME);
+    vec2 _fbm = mix(_fbm1, _fbm2, mod(time/LOOP_TIME,1.));
+    return _fbm + fragCoord;
+}
+
 vec2 getJitter(float time)
 {
     return 0.3*(distort2(vec2(JITTER_SALT + time), 5, 1., 1., 0.) - vec2(JITTER_SALT + time)); 
@@ -540,19 +556,6 @@ Voronoi voronoi_f1_colors( in vec2 x, float randomness, float power, float angle
     //return vec4(res_col, sqrt( res ));
 }
 
-vec3 barrelize(vec2 fragCoord) {
-    float a = -0.5;
-    vec2 uv = 2.*(fragCoord.xy / iResolution.xy) - 1.;
-    float ru = dot(uv,uv);
-    vec2 uvd = uv * (1. - a * ru);
-    vec2 coord = iResolution.xy*(uvd + 1.)/2.;
-    float mask = clamp(coord, 0., 1.) == coord ? 1. : 0.;
-    return vec3(coord, mask);
-    //float rd = ru*(1. + a * ru);
-    //float alpha = atan(uv.y, uv.x);
-    //vec2 uvd = (vec2(rd * cos(alpha), rd * sin(alpha)) + 1.)/2.;
-    //return uvd * iResolution.xy;
-}
 
 
 vec3 renderMainImage(in vec2 fragCoord, float time )
@@ -575,6 +578,10 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
         mat2 spin = mat2(cos(a), -sin(a), sin(a), cos(a));
         renderFragCoord = iResolution.xx*((spin * (uv - center)) + center);// + voronoi_amt * 50. * voronoi.xy;
     }
+
+    #if FBM > 0
+    renderFragCoord = fbm(renderFragCoord, time);
+    #endif
 
     vec3 color = render(renderFragCoord, time);
     
