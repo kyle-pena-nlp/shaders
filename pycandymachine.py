@@ -106,6 +106,8 @@ def generate_random_trait_values(N, traits, override_traits):
 
 def check_for_trait_uniqueness(trait_values_array):
 
+    print("Testing for uniqueness...")
+
     trait_uniqueness_set = set()
 
     non_unique_count = 0
@@ -122,18 +124,12 @@ def check_for_trait_uniqueness(trait_values_array):
     if non_unique_count:
         raise Exception("Generated images not unique - {} duplicates".format(non_unique_count))
 
+    print("All unique!")
 
-def generate(args, shader, name, override_traits):
+def generate_trait_combos(args, shader, override_traits):
 
-    N = args.N; x = args.x; y = args.y; fps = args.fps; format = args.format; compress = args.compress
-
+    N = args.N
     traits          = parse_traits(shader)      # { TRAIT : { NAME: (OPTION, FREQUENCY) } }
-    string_template = templatize(shader)        # string with template args
-
-    out_dir = name
-
-    os.makedirs(os.path.join(".", out_dir), exist_ok = True)
-
     trait_values_array, trait_names_array = generate_random_trait_values(N, traits, override_traits)
 
     N = len(trait_values_array)
@@ -145,6 +141,24 @@ def generate(args, shader, name, override_traits):
     print(json.dumps(TRAIT_COUNTS, indent = 1))
 
     check_for_trait_uniqueness(trait_values_array)
+
+    return trait_values_array, trait_names_array
+
+def generate(args, shader, name, trait_values_array, trait_names_array):
+
+    N = args.N; x = args.x; y = args.y; fps = args.fps; format = args.format; compress = args.compress
+
+    string_template = templatize(shader)        # string with template args
+
+    out_dir = name
+    os.makedirs(os.path.join(".", out_dir), exist_ok = True)
+
+    
+
+
+
+    if args.test:
+        return
 
     for i, trait_values in enumerate(trait_values_array):      
 
@@ -222,7 +236,7 @@ def parse_args():
     parser.add_argument("--fps", type = int, default = 30)
     parser.add_argument("--format", default = "mp4", choices = ["mp4","gif","png"])
     parser.add_argument("--compress", default = False, type = bool)
-    parser.add_argument("--wallet_address", type = str, default = None)
+    parser.add_argument("--test", type = bool, default = False)
     #parser.add_argument("--traits_file", type = str, required = False, default = None)
     args = parser.parse_args()
     override_traits = {}
@@ -262,9 +276,14 @@ if __name__ == "__main__":
     shader_text = get_shader_text(args.shader)
 
     random.seed(args.seed)
-    
-    results = generate(args, shader_text, name, traits)
 
+    trait_values_array, trait_names_array = generate_trait_combos(args, shader_text, traits)
+    
+    if args.test:
+        print("Test mode. Not generating.")
+
+    results = generate(args, shader_text, name, trait_values_array, trait_names_array)
+    
     if args.parallel > 0:
         pool = multiprocessing.Pool()
         pool.map(execute, results)
