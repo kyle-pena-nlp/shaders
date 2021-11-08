@@ -1,12 +1,14 @@
 {
+ "INVERT_COLORS": "yes",
  "ANIMATION_STYLE": "fritz",
- "COLOR_MODE": "red",
- "TRAILS": "ghost",
- "INVERT_SHADE": "velvet",
+ "COLOR_MODE": "blue",
+ "TRAILS": "sharp",
+ "FRACTURE_STYLE": "clearview",
+ "FBM": "no",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "quad",
+ "SHADE_STYLE": "neons",
  "POLAR": "cartesian",
  "JITTERY": "kalm",
- "FRACTURE_STYLE": "tiles",
+ "LEADING_EXPONENT": "dragon",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

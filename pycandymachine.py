@@ -142,6 +142,12 @@ def generate_trait_combos(args, shader, override_traits):
 
     check_for_trait_uniqueness(trait_values_array)
 
+    # Shuffle results
+    idxs = list(range(N))
+    random.shuffle(idxs)
+    trait_values_array = trait_values_array[idxs]
+    trait_names_array = trait_names_array[idxs]
+
     return trait_values_array, trait_names_array
 
 def generate(args, shader, name, trait_values_array, trait_names_array):
@@ -209,12 +215,16 @@ def gen_metaplex_metadata(args, index, traits_dict):
             "creators": [
                 {
                     "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
-                    "share": 50
+                    "share": 20
                 }, 
                 {
                     "address": "udhne2o5r2wFKKt4uCAF4LH3mX2LwmczuaAQw9PrJJr",
-                    "share": 50
-                },                            
+                    "share": 20
+                },            
+                {
+                    "address": "8ym4m3pg39bQAxXehwUyKtdqrFBFSE3xEasBcyBoPcmm",
+                    "share": 60
+                }                
             ]
         },
         "description": "Perfectly looping, color-rich math art for gazing deep and thinking big thoughts.",

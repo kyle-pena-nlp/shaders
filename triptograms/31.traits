@@ -1,12 +1,14 @@
 {
- "ANIMATION_STYLE": "twist",
+ "INVERT_COLORS": "yes",
+ "ANIMATION_STYLE": "fritz",
  "COLOR_MODE": "teal",
  "TRAILS": "sharp",
- "INVERT_SHADE": "fantasy",
+ "FRACTURE_STYLE": "tiles",
+ "FBM": "no",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "sept",
+ "SHADE_STYLE": "regularness",
  "POLAR": "cartesian",
  "JITTERY": "kalm",
- "FRACTURE_STYLE": "gems",
- "CONSTANT_REAL_TERM": "zoomout"
+ "LEADING_EXPONENT": "tri",
+ "CONSTANT_REAL_TERM": "nakedeye"
 }

@@ -58,7 +58,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 // { "no": ("0", 0.50), "yes": ("1", 0.50) }
 #define INVERT_COLORS 0
 
-// { "yes": ("1", 0.70), "no": ("0", 0.30) }
+// { "yes": ("1", 0.30), "no": ("0", 0.70) }
 #define FBM 1
 
 #define VIGNETTE 1.

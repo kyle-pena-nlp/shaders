@@ -32,11 +32,9 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define ANIMATION_STYLE 3
 
 // { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
-#define JITTERY 0.
+#define JITTERY 1.
 
-#define VIGNETTE 1.
 
-#define STATIC 0.
 
 // { "clearview": ("-1", 0.70), "tiles": ("0", 0.10), "gems": ("1", 0.10), "cubist": ("3", 0.10)}
 #define FRACTURE_STYLE -1
@@ -46,20 +44,31 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 // { "ghost": ("3", 0.20), "sharp": ("0", 0.80) }
 #define TRAILS 0
 
-#define BARREL 0
-
-#define TRIG_TERM 0.
-
-#define LEADING_TERM_COEF 5.
 
 // { "dragon": ("2.", 0.25), "tri": ("3.", 0.25), "quad": ("4.", 0.25),  "sept": ("6.", 0.25) }
-#define LEADING_EXPONENT 6.
+#define LEADING_EXPONENT 3.
 
 // { "stripeworld": ("-1.", 0.50), "spiralworld": ("1.", 0.50) }
-#define LEADING_EXPONENT_SIGN 1.
+#define LEADING_EXPONENT_SIGN -1.
 
 // { "zoomout": ("-0.1", 0.25), "nakedeye": ("-1.",0.75)}
 #define CONSTANT_REAL_TERM -1.
+
+// { "polar": ("1",0.25), "cartesian": ("0",0.75) }
+#define POLAR 1
+
+// {  "regularness": ("0", 0.625), "velvet": ("1", 0.125), "neons": ("2", 0.125), "fantasy": ("3", 0.125) } 
+#define SHADE_STYLE 0
+
+// { "no": ("0", 0.50), "yes": ("1", 0.50) }
+#define INVERT_COLORS 1
+
+// { "yes": ("1", 0.70), "no": ("0", 0.30) }
+#define FBM 1
+
+#define VIGNETTE 1.
+
+#define LEADING_TERM_COEF 5.
 
 #define CONSTANT_IMAG_TERM 0.
 
@@ -69,22 +78,9 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 #define SHAPES 10
 
-// { "polar": ("1",0.25), "cartesian": ("0",0.75) }
-#define POLAR 1
-
-// {  "regularness": ("0", 0.625), "velvet": ("1", 0.125), "neons": ("2", 0.125), "fantasy": ("3", 0.125) } 
-#define INVERT_SHADE 0
-
-
-
 #define Gx 0
 
-
-// TODO: // { "identity": ("0", 0.50), "cos": ("1", 0.10), "exp": ("2", 0.10), "log": ("3", 0.10) }
-
 const int MAX_ITER = SHAPES;
-
-// TODO: more terms  (like e^z or sin(z) or something like that)
 
 struct Poly3 {
 
@@ -153,8 +149,6 @@ Z power(Z a, float exponent) {
     float cis = float(exponent) * atan(a.imag, a.real);
     return Z(r * cos(cis), r * sin(cis));  
 }
-
-
 
 Z conj(Z a) {
     return Z(a.real, -a.imag);
@@ -254,13 +248,10 @@ Z dfdx(Z z, Poly3 poly) {
         Z numerator = a;
         Z denominator = power(_fz(z, poly), 2.); 
         return div(numerator,denominator);
-        
     #else
         return 0.; // deliberate compiler error
     #endif 
 }
-
-
 
 // TODO: handle divide by zero without branches or additive smoothing
 Z next(Z z, Poly3 poly, Z multiplier) {
@@ -344,7 +335,7 @@ Result newtown_raphson(Z z, Poly3 poly, Z multiplier) {
         z = div(Z(0.05,0.0),z);
     }
     
-    #if INVERT_SHADE == 3
+    #if SHADE_STYLE == 3
     float tot_d = 1.;
     #else
     float tot_d = 0.;
@@ -353,22 +344,19 @@ Result newtown_raphson(Z z, Poly3 poly, Z multiplier) {
     for (int i = 0; i < MAX_ITER; i++) {
         float d = z.real*z.real + z.imag*z.imag;
         
-        #if INVERT_SHADE == 1
+        #if SHADE_STYLE == 1
             tot_d = min(abs(atan(z.real,z.imag)), abs(atan(z.imag, z.real)));
-        #elif INVERT_SHADE ==2
+        #elif SHADE_STYLE ==2
             //tot_d = max(tot_d, d);
             tot_d = (z.real + z.imag) / 2.;
-        #elif INVERT_SHADE == 3
+        #elif SHADE_STYLE == 3
             tot_d *= (((z.real / z.imag)));
         #endif
         
         if (d < EPS) {
             return Result(i, z, 1., tot_d);
         }
-        z = next(z, poly, multiplier);
-        
-
-                
+        z = next(z, poly, multiplier);           
         
     }
     float d =  z.real*z.real + z.imag*z.imag;
@@ -384,42 +372,33 @@ vec3 render(in vec2 fragCoord, float time ) {
     // AA accumulation
     vec3 tot = vec3(0.);
 
-    //for (int i = -AA; i <= AA; i++) {
-    //    for (int j = -AA; j <= AA; j++) {
-
-            //vec2 uv = ((fragCoord+((1.)/(2.*float(AA)))*vec2(i,j))/iResolution.xx);
-            vec2 uv = fragCoord.xy/iResolution.xx;
-            
-            uv -= 0.5 * (iResolution.xy/iResolution.xx);
-
-            Z z = Z(uv.x, uv.y);
-            
-            Z a = _multiplier(time);
-            Result result = newtown_raphson(z, getPoly(time), a);
-            
-            vec3 root_color = 0.5*(1.+clamp(vec3(result.zero.real, result.zero.imag, 1.), -1., 1.));
-            
-            #if INVERT_SHADE == 0
-                float shade = clamp(float(result.iterations) / float(SHAPES), 0., 1.);                
-            #elif INVERT_SHADE > 0
-                float shade = clamp(result.d, 0., 1.);
-            #else
-                float shade = vec2(0.); // DELIBERATE COMPILER ERROR
-            #endif
-
-            // Time varying pixel color
-            vec3 color = shade * shade * shade * root_color;
-            
-            tot += (0.15*9.)*(HueShift(color, HUE_SHIFT_FRAC(time)));
-    //    }
-    //}
-
-    //tot /= float(AA * AA);
+    vec2 uv = fragCoord.xy/iResolution.xx;
     
-    
-    // compute lighting using normal
-    //tot *= dot(normalize(vec3(dFdX,dFdY,1.)), LIGHT_DIR());
+    uv -= 0.5 * (iResolution.xy/iResolution.xx);
 
+    Z z = Z(uv.x, uv.y);
+    
+    Z a = _multiplier(time);
+    Result result = newtown_raphson(z, getPoly(time), a);
+    
+    vec3 root_color = 0.5*(1.+clamp(vec3(result.zero.real, result.zero.imag, 1.), -1., 1.));
+
+    #if SHADE_STYLE == 0
+        float shade = clamp(float(result.iterations) / float(SHAPES), 0., 1.);                
+    #elif SHADE_STYLE > 0
+        float shade = clamp(result.d, 0., 1.);
+    #else
+        float shade = vec2(0.); // DELIBERATE COMPILER ERROR
+    #endif
+
+    // Time varying pixel color
+    vec3 color = shade * shade * shade * root_color;
+
+    tot += (0.15*9.)*(HueShift(color, HUE_SHIFT_FRAC(time)));
+    
+    #if INVERT_COLORS == 1
+    tot = (1. - tot);
+    #endif
 
     // Output to screen
     return tot;
@@ -502,6 +481,19 @@ vec2 distort2(in vec2 u, int iters, float scale, float intensity, float time) {
     return u+intensity*p;
 }
 
+vec2 getFBM(in vec2 uv, float time) {
+    float UV_SCALE = 4./iResolution.x;
+    float STRENGTH = (1./8.)*iResolution.x;
+    return STRENGTH*(distort2(vec2(UV_SCALE*uv + JITTER_SALT + time), 2, 1., 1., 0.) - vec2(UV_SCALE*uv + JITTER_SALT + time));
+}
+
+vec2 fbm(in vec2 fragCoord, float time) {
+    vec2 _fbm1 = getFBM(fragCoord, mod(time,LOOP_TIME));
+    vec2 _fbm2 = getFBM(fragCoord, mod(time,LOOP_TIME) - LOOP_TIME);
+    vec2 _fbm = mix(_fbm1, _fbm2, mod(time/LOOP_TIME,1.));
+    return _fbm + fragCoord;
+}
+
 vec2 getJitter(float time)
 {
     return 0.3*(distort2(vec2(JITTER_SALT + time), 5, 1., 1., 0.) - vec2(JITTER_SALT + time)); 
@@ -569,31 +561,11 @@ Voronoi voronoi_f1_colors( in vec2 x, float randomness, float power, float angle
     //return vec4(res_col, sqrt( res ));
 }
 
-vec3 barrelize(vec2 fragCoord) {
-    float a = -0.5;
-    vec2 uv = 2.*(fragCoord.xy / iResolution.xy) - 1.;
-    float ru = dot(uv,uv);
-    vec2 uvd = uv * (1. - a * ru);
-    vec2 coord = iResolution.xy*(uvd + 1.)/2.;
-    float mask = clamp(coord, 0., 1.) == coord ? 1. : 0.;
-    return vec3(coord, mask);
-    //float rd = ru*(1. + a * ru);
-    //float alpha = atan(uv.y, uv.x);
-    //vec2 uvd = (vec2(rd * cos(alpha), rd * sin(alpha)) + 1.)/2.;
-    //return uvd * iResolution.xy;
-}
 
 
 vec3 renderMainImage(in vec2 fragCoord, float time )
 {
-
-
     vec2 oFragCoord = fragCoord;
-    
-    if (BARREL == 1) {
-        vec3 barrel = barrelize(fragCoord);
-        fragCoord = barrel.xy;
-    }
     
     vec2 jitter_amt = 500.*jitter(fragCoord, time);
     fragCoord += JITTERY * jitter_amt;  
@@ -612,48 +584,24 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
         renderFragCoord = iResolution.xx*((spin * (uv - center)) + center);// + voronoi_amt * 50. * voronoi.xy;
     }
 
-    vec3 color = render(renderFragCoord, time);
-    
+    #if FBM > 0
+    renderFragCoord = fbm(renderFragCoord, time);
+    #endif
 
-    
+    vec3 color = render(renderFragCoord, time);
     
     if (FRACTURE_STYLE >= 0) {
         color = mix(voronoi.col.xyz, color, 1.-voronoi_amt/4.);
         color = color + voronoi_amt * 0.25 * dot(vec2(cos(RATE_1*time), sin(RATE_1*time)), (voronoi.col.xy));
         color = mix(color, vec3(1.), voronoi.res);
     }
-    
-    if (JITTERY == 1.) {
-        //float fade = 10./length(jitter_amt);
-        //color = fade * color; // "FLASH LOOKS DUMB" - bonk
-    }
-    
 
-    if (SCANLINE == 1.) {
-        float animate = 10.*time/LOOP_TIME;
-        float y = 50.*(fragCoord.y/iResolution.y);
-        float x = 2.*PI*(y + animate);
-        float scanline = abs(sin(x));
-        scanline = clamp(0.2 + scanline, 0., 1.);
-        color = scanline * color;
-    }
 
-    
     if (VIGNETTE == 1.) {
         float d= length(oFragCoord.xy / iResolution.xy - vec2(0.5));
         float vignette = abs(1. - pow(d,1.));
         color = vignette * color;
     }
-    
-    
-    if (STATIC == 1.) {
-        vec2 uv = oFragCoord.xy / iResolution.xy;
-        float intensity = 0.35 + jitter(vec2(0.), time).x;
-        float static_mask = grad2(100*ivec2(5.*LOOP_TIME*time) + ivec2(vec2(500.,500.)*uv.xy)).x > intensity ? 1. : 0.;
-        color = static_mask * mix(vec3(0.6,1.,0.6),color,0.9) + (1.-static_mask)*color;
-    
-    }
-    
     
     //color = scanline_mask * mix(vec3(0.6,1.,0.6),color,0.1) + (1.-scanline_mask) * color;
     
@@ -662,6 +610,10 @@ vec3 renderMainImage(in vec2 fragCoord, float time )
 
 vec3 _mainImage(in vec2 fragCoord) {
     vec3 color = renderMainImage(fragCoord, iTime);
+    
+    
+
+    
     
     if (TRAILS > 0) {
         color = (1./float(1+TRAILS)) * color;

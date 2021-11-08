@@ -1,0 +1,14 @@
+{
+ "INVERT_COLORS": "no",
+ "ANIMATION_STYLE": "twist",
+ "COLOR_MODE": "loop",
+ "TRAILS": "sharp",
+ "FRACTURE_STYLE": "gems",
+ "FBM": "no",
+ "LEADING_EXPONENT_SIGN": "stripeworld",
+ "SHADE_STYLE": "neons",
+ "POLAR": "cartesian",
+ "JITTERY": "jittery",
+ "LEADING_EXPONENT": "tri",
+ "CONSTANT_REAL_TERM": "nakedeye"
+}

@@ -1,0 +1,14 @@
+{
+ "INVERT_COLORS": "yes",
+ "ANIMATION_STYLE": "pulsar",
+ "COLOR_MODE": "loop",
+ "TRAILS": "sharp",
+ "FRACTURE_STYLE": "clearview",
+ "FBM": "yes",
+ "LEADING_EXPONENT_SIGN": "stripeworld",
+ "SHADE_STYLE": "velvet",
+ "POLAR": "cartesian",
+ "JITTERY": "jittery",
+ "LEADING_EXPONENT": "quad",
+ "CONSTANT_REAL_TERM": "nakedeye"
+}

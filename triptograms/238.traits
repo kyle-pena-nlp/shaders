@@ -1,0 +1,14 @@
+{
+ "INVERT_COLORS": "yes",
+ "ANIMATION_STYLE": "pulsar",
+ "COLOR_MODE": "blue",
+ "TRAILS": "ghost",
+ "FRACTURE_STYLE": "gems",
+ "FBM": "no",
+ "LEADING_EXPONENT_SIGN": "stripeworld",
+ "SHADE_STYLE": "neons",
+ "POLAR": "cartesian",
+ "JITTERY": "kalm",
+ "LEADING_EXPONENT": "quad",
+ "CONSTANT_REAL_TERM": "nakedeye"
+}

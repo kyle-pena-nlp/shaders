@@ -1,12 +1,14 @@
 {
- "ANIMATION_STYLE": "twist",
- "COLOR_MODE": "teal",
- "TRAILS": "ghost",
- "INVERT_SHADE": "fantasy",
+ "INVERT_COLORS": "yes",
+ "ANIMATION_STYLE": "fritz",
+ "COLOR_MODE": "green",
+ "TRAILS": "sharp",
+ "FRACTURE_STYLE": "clearview",
+ "FBM": "no",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "dragon",
+ "SHADE_STYLE": "neons",
  "POLAR": "polar",
  "JITTERY": "kalm",
- "FRACTURE_STYLE": "gems",
+ "LEADING_EXPONENT": "quad",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

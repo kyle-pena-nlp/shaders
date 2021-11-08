@@ -31,19 +31,23 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "loop"
+   "value": "red"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
    "value": "nakedeye"
   },
   {
-   "trait_type": "FRACTURE_STYLE",
-   "value": "gems"
+   "trait_type": "FBM",
+   "value": "no"
   },
   {
-   "trait_type": "INVERT_SHADE",
-   "value": "regularness"
+   "trait_type": "FRACTURE_STYLE",
+   "value": "cubist"
+  },
+  {
+   "trait_type": "INVERT_COLORS",
+   "value": "yes"
   },
   {
    "trait_type": "JITTERY",
@@ -51,19 +55,23 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "tri"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "stripeworld"
+   "value": "spiralworld"
   },
   {
    "trait_type": "POLAR",
-   "value": "polar"
+   "value": "cartesian"
+  },
+  {
+   "trait_type": "SHADE_STYLE",
+   "value": "velvet"
   },
   {
    "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "ghost"
   }
  ],
  "collection": {

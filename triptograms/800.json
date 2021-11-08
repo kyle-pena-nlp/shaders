@@ -1,0 +1,81 @@
+{
+ "name": "Triptograms",
+ "symbol": "TRIPT",
+ "image": "800.png",
+ "external_url": "https://www.bonkworld.art/",
+ "properties": {
+  "files": [
+   {
+    "uri": "800.png",
+    "type": "image/png"
+   }
+  ],
+  "category": "image",
+  "creators": [
+   {
+    "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
+    "share": 50
+   },
+   {
+    "address": "udhne2o5r2wFKKt4uCAF4LH3mX2LwmczuaAQw9PrJJr",
+    "share": 50
+   }
+  ]
+ },
+ "description": "Perfectly looping, color-rich math art for gazing deep and thinking big thoughts.",
+ "seller_fee_basis_points": 500,
+ "attributes": [
+  {
+   "trait_type": "ANIMATION_STYLE",
+   "value": "twist"
+  },
+  {
+   "trait_type": "COLOR_MODE",
+   "value": "teal"
+  },
+  {
+   "trait_type": "CONSTANT_REAL_TERM",
+   "value": "nakedeye"
+  },
+  {
+   "trait_type": "FBM",
+   "value": "yes"
+  },
+  {
+   "trait_type": "FRACTURE_STYLE",
+   "value": "cubist"
+  },
+  {
+   "trait_type": "INVERT_COLORS",
+   "value": "no"
+  },
+  {
+   "trait_type": "JITTERY",
+   "value": "jittery"
+  },
+  {
+   "trait_type": "LEADING_EXPONENT",
+   "value": "tri"
+  },
+  {
+   "trait_type": "LEADING_EXPONENT_SIGN",
+   "value": "spiralworld"
+  },
+  {
+   "trait_type": "POLAR",
+   "value": "polar"
+  },
+  {
+   "trait_type": "SHADE_STYLE",
+   "value": "velvet"
+  },
+  {
+   "trait_type": "TRAILS",
+   "value": "sharp"
+  }
+ ],
+ "collection": {
+  "name": "Triptograms",
+  "family": "Bonk World"
+ }
+}

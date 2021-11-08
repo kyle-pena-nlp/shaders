@@ -1,0 +1,14 @@
+{
+ "INVERT_COLORS": "yes",
+ "ANIMATION_STYLE": "twist",
+ "COLOR_MODE": "teal",
+ "TRAILS": "sharp",
+ "FRACTURE_STYLE": "clearview",
+ "FBM": "yes",
+ "LEADING_EXPONENT_SIGN": "spiralworld",
+ "SHADE_STYLE": "regularness",
+ "POLAR": "polar",
+ "JITTERY": "jittery",
+ "LEADING_EXPONENT": "quad",
+ "CONSTANT_REAL_TERM": "nakedeye"
+}

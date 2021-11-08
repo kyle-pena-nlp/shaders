@@ -1,0 +1,14 @@
+{
+ "INVERT_COLORS": "no",
+ "ANIMATION_STYLE": "fritz",
+ "COLOR_MODE": "red",
+ "TRAILS": "sharp",
+ "FRACTURE_STYLE": "clearview",
+ "FBM": "yes",
+ "LEADING_EXPONENT_SIGN": "stripeworld",
+ "SHADE_STYLE": "regularness",
+ "POLAR": "cartesian",
+ "JITTERY": "jittery",
+ "LEADING_EXPONENT": "dragon",
+ "CONSTANT_REAL_TERM": "zoomout"
+}

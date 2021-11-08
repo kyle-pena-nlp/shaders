@@ -38,12 +38,16 @@
    "value": "nakedeye"
   },
   {
+   "trait_type": "FBM",
+   "value": "yes"
+  },
+  {
    "trait_type": "FRACTURE_STYLE",
    "value": "clearview"
   },
   {
-   "trait_type": "INVERT_SHADE",
-   "value": "regularness"
+   "trait_type": "INVERT_COLORS",
+   "value": "yes"
   },
   {
    "trait_type": "JITTERY",
@@ -51,7 +55,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "dragon"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
@@ -60,6 +64,10 @@
   {
    "trait_type": "POLAR",
    "value": "cartesian"
+  },
+  {
+   "trait_type": "SHADE_STYLE",
+   "value": "regularness"
   },
   {
    "trait_type": "TRAILS",

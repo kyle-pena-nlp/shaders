@@ -1,0 +1,14 @@
+{
+ "INVERT_COLORS": "no",
+ "ANIMATION_STYLE": "twist",
+ "COLOR_MODE": "red",
+ "TRAILS": "ghost",
+ "FRACTURE_STYLE": "clearview",
+ "FBM": "yes",
+ "LEADING_EXPONENT_SIGN": "spiralworld",
+ "SHADE_STYLE": "regularness",
+ "POLAR": "cartesian",
+ "JITTERY": "kalm",
+ "LEADING_EXPONENT": "dragon",
+ "CONSTANT_REAL_TERM": "nakedeye"
+}

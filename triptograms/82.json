@@ -31,35 +31,43 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "loop"
+   "value": "red"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
    "value": "nakedeye"
   },
   {
+   "trait_type": "FBM",
+   "value": "yes"
+  },
+  {
    "trait_type": "FRACTURE_STYLE",
    "value": "clearview"
   },
   {
-   "trait_type": "INVERT_SHADE",
-   "value": "neons"
+   "trait_type": "INVERT_COLORS",
+   "value": "yes"
   },
   {
    "trait_type": "JITTERY",
-   "value": "kalm"
+   "value": "jittery"
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "dragon"
+   "value": "quad"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "spiralworld"
+   "value": "stripeworld"
   },
   {
    "trait_type": "POLAR",
    "value": "cartesian"
+  },
+  {
+   "trait_type": "SHADE_STYLE",
+   "value": "fantasy"
   },
   {
    "trait_type": "TRAILS",

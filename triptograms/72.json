@@ -38,12 +38,16 @@
    "value": "nakedeye"
   },
   {
-   "trait_type": "FRACTURE_STYLE",
-   "value": "cubist"
+   "trait_type": "FBM",
+   "value": "yes"
   },
   {
-   "trait_type": "INVERT_SHADE",
-   "value": "fantasy"
+   "trait_type": "FRACTURE_STYLE",
+   "value": "gems"
+  },
+  {
+   "trait_type": "INVERT_COLORS",
+   "value": "yes"
   },
   {
    "trait_type": "JITTERY",
@@ -51,19 +55,23 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "sept"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "spiralworld"
+   "value": "stripeworld"
   },
   {
    "trait_type": "POLAR",
    "value": "cartesian"
   },
   {
+   "trait_type": "SHADE_STYLE",
+   "value": "fantasy"
+  },
+  {
    "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "ghost"
   }
  ],
  "collection": {

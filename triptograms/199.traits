@@ -1,12 +1,14 @@
 {
+ "INVERT_COLORS": "yes",
  "ANIMATION_STYLE": "pulsar",
- "COLOR_MODE": "loop",
- "TRAILS": "sharp",
- "INVERT_SHADE": "velvet",
+ "COLOR_MODE": "red",
+ "TRAILS": "ghost",
+ "FRACTURE_STYLE": "gems",
+ "FBM": "yes",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "LEADING_EXPONENT": "quad",
+ "SHADE_STYLE": "regularness",
  "POLAR": "cartesian",
  "JITTERY": "kalm",
- "FRACTURE_STYLE": "cubist",
+ "LEADING_EXPONENT": "dragon",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

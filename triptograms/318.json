@@ -1,0 +1,81 @@
+{
+ "name": "Triptograms",
+ "symbol": "TRIPT",
+ "image": "318.png",
+ "external_url": "https://www.bonkworld.art/",
+ "properties": {
+  "files": [
+   {
+    "uri": "318.png",
+    "type": "image/png"
+   }
+  ],
+  "category": "image",
+  "creators": [
+   {
+    "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
+    "share": 50
+   },
+   {
+    "address": "udhne2o5r2wFKKt4uCAF4LH3mX2LwmczuaAQw9PrJJr",
+    "share": 50
+   }
+  ]
+ },
+ "description": "Perfectly looping, color-rich math art for gazing deep and thinking big thoughts.",
+ "seller_fee_basis_points": 500,
+ "attributes": [
+  {
+   "trait_type": "ANIMATION_STYLE",
+   "value": "pulsar"
+  },
+  {
+   "trait_type": "COLOR_MODE",
+   "value": "teal"
+  },
+  {
+   "trait_type": "CONSTANT_REAL_TERM",
+   "value": "zoomout"
+  },
+  {
+   "trait_type": "FBM",
+   "value": "no"
+  },
+  {
+   "trait_type": "FRACTURE_STYLE",
+   "value": "clearview"
+  },
+  {
+   "trait_type": "INVERT_COLORS",
+   "value": "yes"
+  },
+  {
+   "trait_type": "JITTERY",
+   "value": "kalm"
+  },
+  {
+   "trait_type": "LEADING_EXPONENT",
+   "value": "dragon"
+  },
+  {
+   "trait_type": "LEADING_EXPONENT_SIGN",
+   "value": "stripeworld"
+  },
+  {
+   "trait_type": "POLAR",
+   "value": "cartesian"
+  },
+  {
+   "trait_type": "SHADE_STYLE",
+   "value": "regularness"
+  },
+  {
+   "trait_type": "TRAILS",
+   "value": "sharp"
+  }
+ ],
+ "collection": {
+  "name": "Triptograms",
+  "family": "Bonk World"
+ }
+}
