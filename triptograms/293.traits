@@ -1,14 +1,14 @@
 {
  "INVERT_COLORS": "yes",
- "ANIMATION_STYLE": "pulsar",
+ "ANIMATION_STYLE": "fritz",
  "COLOR_MODE": "green",
- "TRAILS": "sharp",
- "FRACTURE_STYLE": "gems",
+ "TRAILS": "ghost",
+ "FRACTURE_STYLE": "clearview",
  "FBM": "yes",
- "LEADING_EXPONENT_SIGN": "spiralworld",
+ "LEADING_EXPONENT_SIGN": "stripeworld",
  "SHADE_STYLE": "regularness",
- "POLAR": "cartesian",
- "JITTERY": "jittery",
- "LEADING_EXPONENT": "tri",
- "CONSTANT_REAL_TERM": "zoomout"
+ "POLAR": "polar",
+ "JITTERY": "kalm",
+ "LEADING_EXPONENT": "dragon",
+ "CONSTANT_REAL_TERM": "nakedeye"
 }

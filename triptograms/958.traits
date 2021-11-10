@@ -1,9 +1,9 @@
 {
  "INVERT_COLORS": "no",
- "ANIMATION_STYLE": "fritz",
- "COLOR_MODE": "green",
+ "ANIMATION_STYLE": "pulsar",
+ "COLOR_MODE": "teal",
  "TRAILS": "sharp",
- "FRACTURE_STYLE": "cubist",
+ "FRACTURE_STYLE": "clearview",
  "FBM": "no",
  "LEADING_EXPONENT_SIGN": "spiralworld",
  "SHADE_STYLE": "regularness",

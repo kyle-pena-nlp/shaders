@@ -1,14 +1,14 @@
 {
  "INVERT_COLORS": "yes",
  "ANIMATION_STYLE": "fritz",
- "COLOR_MODE": "teal",
+ "COLOR_MODE": "green",
  "TRAILS": "sharp",
- "FRACTURE_STYLE": "clearview",
+ "FRACTURE_STYLE": "tiles",
  "FBM": "yes",
  "LEADING_EXPONENT_SIGN": "stripeworld",
  "SHADE_STYLE": "regularness",
- "POLAR": "cartesian",
- "JITTERY": "jittery",
- "LEADING_EXPONENT": "dragon",
+ "POLAR": "polar",
+ "JITTERY": "kalm",
+ "LEADING_EXPONENT": "tri",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

@@ -1,14 +1,14 @@
 {
- "INVERT_COLORS": "no",
- "ANIMATION_STYLE": "fritz",
- "COLOR_MODE": "green",
- "TRAILS": "sharp",
+ "INVERT_COLORS": "yes",
+ "ANIMATION_STYLE": "pulsar",
+ "COLOR_MODE": "teal",
+ "TRAILS": "ghost",
  "FRACTURE_STYLE": "clearview",
  "FBM": "no",
  "LEADING_EXPONENT_SIGN": "stripeworld",
  "SHADE_STYLE": "regularness",
- "POLAR": "polar",
+ "POLAR": "cartesian",
  "JITTERY": "kalm",
- "LEADING_EXPONENT": "sept",
+ "LEADING_EXPONENT": "tri",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

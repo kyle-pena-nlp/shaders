@@ -1,0 +1,72 @@
+<html>
+    <head>
+        <style>
+            img.grid {
+                float: left;
+                height: 200px;
+                width: 200px;
+            }
+        </style>
+
+        <script type="text/javascript">
+        
+        app = {
+            "img_idx": 0,
+            "MAX_IMAGES": 20
+        }
+
+        
+
+        window.onload = function() {
+            
+            const label = document.getElementById("label");
+            
+            for (var i = 0; i < app.MAX_IMAGES; i++) {
+
+                const img = document.createElement("img");
+                img.setAttribute("id", "img" + i);
+                img.classList.add("grid");
+                document.body.append(img);
+                img.onload = function() {
+                    img.style = "filter: brightness(100%)";
+                };
+            }
+
+            const render = function() {
+                for (let i = 0; i < app.MAX_IMAGES; i++) {
+                    let img = document.getElementById("img" + i);
+                    img.style = "filter: brightness(0%)";
+                    img.src = "http://localhost:8000/triptograms/" + (parseInt(app.img_idx,10) + i) + ".png";
+                }
+            };
+
+            const updateIdx = function(key) {
+
+                if (key == "ArrowLeft") {
+                    app.img_idx -= app.MAX_IMAGES;
+                }
+                else if (key == "ArrowRight") {
+                    app.img_idx += app.MAX_IMAGES;
+                }
+
+                app.img_idx = Math.min(1000 - app.MAX_IMAGES, Math.max(0, app.img_idx));
+            };
+
+            window.onkeyup = function(e) {
+
+                const key = e.code;
+
+                updateIdx(key);
+
+                
+                render();
+            }
+
+            render();
+        };
+        
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

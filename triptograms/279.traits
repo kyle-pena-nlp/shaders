@@ -1,14 +1,14 @@
 {
  "INVERT_COLORS": "yes",
- "ANIMATION_STYLE": "pulsar",
- "COLOR_MODE": "green",
+ "ANIMATION_STYLE": "twist",
+ "COLOR_MODE": "teal",
  "TRAILS": "sharp",
  "FRACTURE_STYLE": "clearview",
- "FBM": "yes",
+ "FBM": "no",
  "LEADING_EXPONENT_SIGN": "stripeworld",
  "SHADE_STYLE": "regularness",
- "POLAR": "polar",
+ "POLAR": "cartesian",
  "JITTERY": "kalm",
- "LEADING_EXPONENT": "sept",
- "CONSTANT_REAL_TERM": "zoomout"
+ "LEADING_EXPONENT": "quad",
+ "CONSTANT_REAL_TERM": "nakedeye"
 }

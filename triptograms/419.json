@@ -14,11 +14,15 @@
   "creators": [
    {
     "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
-    "share": 50
+    "share": 20
    },
    {
     "address": "udhne2o5r2wFKKt4uCAF4LH3mX2LwmczuaAQw9PrJJr",
-    "share": 50
+    "share": 20
+   },
+   {
+    "address": "8ym4m3pg39bQAxXehwUyKtdqrFBFSE3xEasBcyBoPcmm",
+    "share": 60
    }
   ]
  },
@@ -27,15 +31,15 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "twist"
+   "value": "fritz"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "blue"
+   "value": "red"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "nakedeye"
+   "value": "zoomout"
   },
   {
    "trait_type": "FBM",
@@ -55,7 +59,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "sept"
+   "value": "quad"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
@@ -63,11 +67,11 @@
   },
   {
    "trait_type": "POLAR",
-   "value": "cartesian"
+   "value": "polar"
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "velvet"
+   "value": "regularness"
   },
   {
    "trait_type": "TRAILS",

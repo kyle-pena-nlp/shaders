@@ -14,11 +14,15 @@
   "creators": [
    {
     "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
-    "share": 50
+    "share": 20
    },
    {
     "address": "udhne2o5r2wFKKt4uCAF4LH3mX2LwmczuaAQw9PrJJr",
-    "share": 50
+    "share": 20
+   },
+   {
+    "address": "8ym4m3pg39bQAxXehwUyKtdqrFBFSE3xEasBcyBoPcmm",
+    "share": 60
    }
   ]
  },
@@ -27,35 +31,35 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "fritz"
+   "value": "pulsar"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "red"
+   "value": "loop"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "zoomout"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FBM",
-   "value": "yes"
+   "value": "no"
   },
   {
    "trait_type": "FRACTURE_STYLE",
-   "value": "gems"
+   "value": "clearview"
   },
   {
    "trait_type": "INVERT_COLORS",
-   "value": "yes"
+   "value": "no"
   },
   {
    "trait_type": "JITTERY",
-   "value": "kalm"
+   "value": "jittery"
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "dragon"
+   "value": "tri"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
@@ -67,7 +71,7 @@
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "regularness"
+   "value": "neons"
   },
   {
    "trait_type": "TRAILS",

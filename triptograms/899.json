@@ -14,11 +14,15 @@
   "creators": [
    {
     "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
-    "share": 50
+    "share": 20
    },
    {
     "address": "udhne2o5r2wFKKt4uCAF4LH3mX2LwmczuaAQw9PrJJr",
-    "share": 50
+    "share": 20
+   },
+   {
+    "address": "8ym4m3pg39bQAxXehwUyKtdqrFBFSE3xEasBcyBoPcmm",
+    "share": 60
    }
   ]
  },
@@ -31,11 +35,11 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "teal"
+   "value": "green"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "zoomout"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FBM",
@@ -51,11 +55,11 @@
   },
   {
    "trait_type": "JITTERY",
-   "value": "jittery"
+   "value": "kalm"
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "tri"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
@@ -67,7 +71,7 @@
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "neons"
+   "value": "regularness"
   },
   {
    "trait_type": "TRAILS",

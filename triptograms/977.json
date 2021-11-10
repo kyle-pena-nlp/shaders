@@ -14,11 +14,15 @@
   "creators": [
    {
     "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
-    "share": 50
+    "share": 20
    },
    {
     "address": "udhne2o5r2wFKKt4uCAF4LH3mX2LwmczuaAQw9PrJJr",
-    "share": 50
+    "share": 20
+   },
+   {
+    "address": "8ym4m3pg39bQAxXehwUyKtdqrFBFSE3xEasBcyBoPcmm",
+    "share": 60
    }
   ]
  },
@@ -27,15 +31,15 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "fritz"
+   "value": "twist"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "red"
+   "value": "green"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "zoomout"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FBM",
@@ -43,11 +47,11 @@
   },
   {
    "trait_type": "FRACTURE_STYLE",
-   "value": "clearview"
+   "value": "cubist"
   },
   {
    "trait_type": "INVERT_COLORS",
-   "value": "no"
+   "value": "yes"
   },
   {
    "trait_type": "JITTERY",
@@ -59,7 +63,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "spiralworld"
+   "value": "stripeworld"
   },
   {
    "trait_type": "POLAR",
@@ -67,7 +71,7 @@
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "regularness"
+   "value": "velvet"
   },
   {
    "trait_type": "TRAILS",

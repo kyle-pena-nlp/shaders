@@ -7,3 +7,5 @@ __pycache__
 EXAMPLE/
 .vscode
 .git
+*_promo/
+triptograms/

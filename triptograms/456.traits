@@ -2,13 +2,13 @@
  "INVERT_COLORS": "yes",
  "ANIMATION_STYLE": "twist",
  "COLOR_MODE": "green",
- "TRAILS": "sharp",
- "FRACTURE_STYLE": "clearview",
+ "TRAILS": "ghost",
+ "FRACTURE_STYLE": "cubist",
  "FBM": "no",
  "LEADING_EXPONENT_SIGN": "stripeworld",
  "SHADE_STYLE": "regularness",
  "POLAR": "cartesian",
  "JITTERY": "kalm",
- "LEADING_EXPONENT": "quad",
- "CONSTANT_REAL_TERM": "nakedeye"
+ "LEADING_EXPONENT": "dragon",
+ "CONSTANT_REAL_TERM": "zoomout"
 }

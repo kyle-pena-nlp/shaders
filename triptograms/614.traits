@@ -1,14 +1,14 @@
 {
  "INVERT_COLORS": "no",
- "ANIMATION_STYLE": "pulsar",
- "COLOR_MODE": "red",
+ "ANIMATION_STYLE": "twist",
+ "COLOR_MODE": "blue",
  "TRAILS": "sharp",
  "FRACTURE_STYLE": "tiles",
  "FBM": "yes",
- "LEADING_EXPONENT_SIGN": "spiralworld",
+ "LEADING_EXPONENT_SIGN": "stripeworld",
  "SHADE_STYLE": "regularness",
- "POLAR": "polar",
- "JITTERY": "jittery",
+ "POLAR": "cartesian",
+ "JITTERY": "kalm",
  "LEADING_EXPONENT": "sept",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

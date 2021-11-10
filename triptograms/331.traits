@@ -2,13 +2,13 @@
  "INVERT_COLORS": "yes",
  "ANIMATION_STYLE": "pulsar",
  "COLOR_MODE": "teal",
- "TRAILS": "ghost",
+ "TRAILS": "sharp",
  "FRACTURE_STYLE": "clearview",
- "FBM": "yes",
+ "FBM": "no",
  "LEADING_EXPONENT_SIGN": "spiralworld",
- "SHADE_STYLE": "regularness",
- "POLAR": "polar",
+ "SHADE_STYLE": "neons",
+ "POLAR": "cartesian",
  "JITTERY": "kalm",
- "LEADING_EXPONENT": "quad",
- "CONSTANT_REAL_TERM": "zoomout"
+ "LEADING_EXPONENT": "tri",
+ "CONSTANT_REAL_TERM": "nakedeye"
 }

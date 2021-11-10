@@ -14,11 +14,15 @@
   "creators": [
    {
     "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
-    "share": 50
+    "share": 20
    },
    {
     "address": "udhne2o5r2wFKKt4uCAF4LH3mX2LwmczuaAQw9PrJJr",
-    "share": 50
+    "share": 20
+   },
+   {
+    "address": "8ym4m3pg39bQAxXehwUyKtdqrFBFSE3xEasBcyBoPcmm",
+    "share": 60
    }
   ]
  },
@@ -31,7 +35,7 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "red"
+   "value": "blue"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -39,7 +43,7 @@
   },
   {
    "trait_type": "FBM",
-   "value": "no"
+   "value": "yes"
   },
   {
    "trait_type": "FRACTURE_STYLE",
@@ -55,15 +59,15 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "sept"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "spiralworld"
+   "value": "stripeworld"
   },
   {
    "trait_type": "POLAR",
-   "value": "polar"
+   "value": "cartesian"
   },
   {
    "trait_type": "SHADE_STYLE",
@@ -71,7 +75,7 @@
   },
   {
    "trait_type": "TRAILS",
-   "value": "ghost"
+   "value": "sharp"
   }
  ],
  "collection": {

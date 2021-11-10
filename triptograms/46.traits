@@ -1,14 +1,14 @@
 {
  "INVERT_COLORS": "yes",
- "ANIMATION_STYLE": "fritz",
- "COLOR_MODE": "green",
+ "ANIMATION_STYLE": "pulsar",
+ "COLOR_MODE": "teal",
  "TRAILS": "sharp",
- "FRACTURE_STYLE": "clearview",
+ "FRACTURE_STYLE": "gems",
  "FBM": "yes",
- "LEADING_EXPONENT_SIGN": "stripeworld",
- "SHADE_STYLE": "regularness",
+ "LEADING_EXPONENT_SIGN": "spiralworld",
+ "SHADE_STYLE": "fantasy",
  "POLAR": "polar",
  "JITTERY": "kalm",
- "LEADING_EXPONENT": "sept",
+ "LEADING_EXPONENT": "dragon",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

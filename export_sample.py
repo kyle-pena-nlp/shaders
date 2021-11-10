@@ -50,19 +50,25 @@ if __name__ == "__main__":
 
     html = wrap_in_html_shell(shader_text)
 
-    html_fpath = ensure_ext(args.out, "html")
+    promo_dir = args.shader + "_promo"
+
+    os.makedirs(promo_dir, exist_ok = True)
+
+    html_fpath = os.path.join(promo_dir, ensure_ext(args.out, "html"))
 
     with open(html_fpath, "w+") as html_f:
         html_f.write(html)
 
     url = to_url(html_fpath)
 
+    out_fpath = os.path.join(promo_dir, args.out)
+
     export(url = url, 
         x = args.x, 
         y = args.y, 
         frames_per_second = args.frames_per_second, 
         num_seconds = num_seconds, 
-        out = args.out, 
+        out = out_fpath, 
         out_format = args.format,
         compress = args.compress)
 

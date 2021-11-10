@@ -24,7 +24,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 // undocumented value: 0: none
 // { "twist": ("1", 0.33), "fritz": ("2", 0.33), "pulsar": ("3", 0.33) }
-#define ANIMATION_STYLE 3
+#define ANIMATION_STYLE 1
 
 // { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
 #define JITTERY 0.
@@ -56,10 +56,10 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define SHADE_STYLE 0
 
 // { "no": ("0", 0.50), "yes": ("1", 0.50) }
-#define INVERT_COLORS 0
+#define INVERT_COLORS 1
 
-// { "yes": ("1", 0.70), "no": ("0", 0.30) }
-#define FBM 0
+// { "yes": ("1", 0.30), "no": ("0", 0.70) }
+#define FBM 1
 
 #define VIGNETTE 1.
 

@@ -3,12 +3,12 @@
  "ANIMATION_STYLE": "pulsar",
  "COLOR_MODE": "teal",
  "TRAILS": "sharp",
- "FRACTURE_STYLE": "tiles",
- "FBM": "yes",
+ "FRACTURE_STYLE": "clearview",
+ "FBM": "no",
  "LEADING_EXPONENT_SIGN": "spiralworld",
  "SHADE_STYLE": "regularness",
  "POLAR": "cartesian",
- "JITTERY": "kalm",
- "LEADING_EXPONENT": "tri",
+ "JITTERY": "jittery",
+ "LEADING_EXPONENT": "quad",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

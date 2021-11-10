@@ -1,10 +1,10 @@
 {
  "INVERT_COLORS": "no",
  "ANIMATION_STYLE": "twist",
- "COLOR_MODE": "loop",
+ "COLOR_MODE": "teal",
  "TRAILS": "sharp",
  "FRACTURE_STYLE": "clearview",
- "FBM": "yes",
+ "FBM": "no",
  "LEADING_EXPONENT_SIGN": "spiralworld",
  "SHADE_STYLE": "regularness",
  "POLAR": "cartesian",

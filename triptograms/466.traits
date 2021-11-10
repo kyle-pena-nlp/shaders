@@ -1,14 +1,14 @@
 {
- "INVERT_COLORS": "yes",
+ "INVERT_COLORS": "no",
  "ANIMATION_STYLE": "twist",
- "COLOR_MODE": "teal",
+ "COLOR_MODE": "red",
  "TRAILS": "sharp",
- "FRACTURE_STYLE": "cubist",
- "FBM": "no",
+ "FRACTURE_STYLE": "clearview",
+ "FBM": "yes",
  "LEADING_EXPONENT_SIGN": "stripeworld",
- "SHADE_STYLE": "fantasy",
+ "SHADE_STYLE": "regularness",
  "POLAR": "cartesian",
  "JITTERY": "kalm",
- "LEADING_EXPONENT": "dragon",
+ "LEADING_EXPONENT": "quad",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

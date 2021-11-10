@@ -1,14 +1,14 @@
 {
- "INVERT_COLORS": "no",
+ "INVERT_COLORS": "yes",
  "ANIMATION_STYLE": "fritz",
- "COLOR_MODE": "red",
+ "COLOR_MODE": "teal",
  "TRAILS": "ghost",
- "FRACTURE_STYLE": "clearview",
- "FBM": "yes",
+ "FRACTURE_STYLE": "cubist",
+ "FBM": "no",
  "LEADING_EXPONENT_SIGN": "stripeworld",
- "SHADE_STYLE": "velvet",
+ "SHADE_STYLE": "regularness",
  "POLAR": "cartesian",
  "JITTERY": "kalm",
- "LEADING_EXPONENT": "tri",
+ "LEADING_EXPONENT": "quad",
  "CONSTANT_REAL_TERM": "zoomout"
 }

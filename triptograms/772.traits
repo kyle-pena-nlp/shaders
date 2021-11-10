@@ -1,6 +1,6 @@
 {
- "INVERT_COLORS": "no",
- "ANIMATION_STYLE": "twist",
+ "INVERT_COLORS": "yes",
+ "ANIMATION_STYLE": "fritz",
  "COLOR_MODE": "blue",
  "TRAILS": "sharp",
  "FRACTURE_STYLE": "clearview",
@@ -9,6 +9,6 @@
  "SHADE_STYLE": "regularness",
  "POLAR": "cartesian",
  "JITTERY": "kalm",
- "LEADING_EXPONENT": "quad",
+ "LEADING_EXPONENT": "sept",
  "CONSTANT_REAL_TERM": "nakedeye"
 }

@@ -145,8 +145,8 @@ def generate_trait_combos(args, shader, override_traits):
     # Shuffle results
     idxs = list(range(N))
     random.shuffle(idxs)
-    trait_values_array = trait_values_array[idxs]
-    trait_names_array = trait_names_array[idxs]
+    trait_values_array = list(np.asarray(trait_values_array)[idxs])
+    trait_names_array = list(np.asarray(trait_names_array)[idxs])
 
     return trait_values_array, trait_names_array
 
@@ -158,10 +158,6 @@ def generate(args, shader, name, trait_values_array, trait_names_array):
 
     out_dir = name
     os.makedirs(os.path.join(".", out_dir), exist_ok = True)
-
-    
-
-
 
     if args.test:
         return
