@@ -152,7 +152,21 @@ def convert_img(image_bytes, out_format, palette, compress):
                 b.seek(0)
                 return b.read()
         else:
+            #PIL_img = bytes_to_PIL(image_bytes)
+            #palettized = palettize(PIL_img, palette)
+            #with BytesIO() as b:
+            #    palettized.save(b, format = "png", optimize = True, quality = 85)
+            #    b.seek(0)
+            #    return b.read()            
+            
             return image_bytes
+            
+            #PIL_img = bytes_to_PIL(image_bytes)
+            #with BytesIO() as b:
+            #    # We save a little bit by dropping the alpha channel
+            #    PIL_img.convert("RGB").save(b, format = "png", optimize = True)
+            #    b.seek(0)
+            #    return b.read()
     else:
         raise Exception("Unknown format: '{}'".format(out_format))
 
