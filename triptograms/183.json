@@ -1,13 +1,13 @@
 {
  "name": "Triptograms",
  "symbol": "TRIPT",
- "image": "183.png",
+ "image": "183.mp4",
  "external_url": "https://www.bonkworld.art/",
  "properties": {
   "files": [
    {
-    "uri": "183.png",
-    "type": "image/png"
+    "uri": "183.mp4",
+    "type": "image/mp4"
    }
   ],
   "category": "image",

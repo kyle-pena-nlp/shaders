@@ -93,9 +93,7 @@ def get_writer(frames_per_second, out, out_format, compress):
     if out_format == "gif":
         return imageio.get_writer(fpath, mode='I', duration = (1/frames_per_second), subrectangles = True )
     elif out_format == "mp4":
-        #quality = 8 if compress else 10
-        # bitrate set for compatibility with twitter
-        return imageio.get_writer(fpath, mode='I', fps=frames_per_second, quality = 9) # codec="H264", 
+        return imageio.get_writer(fpath, mode='I', fps=frames_per_second, quality = 10) # quality = 9
     elif out_format == "png":
         return APNGWriter(fpath, fps = frames_per_second)
         #return imageio.get_writer(fpath, mode = 'I', duration = (1/frames_per_second))
@@ -118,7 +116,7 @@ def get_canvas_image_bytes(time, x, y, driver):
 
 def bytes_to_PIL(image_bytes):
     png_img = imageio.imread(image_bytes, "png")
-    PIL_img = Image.fromarray(png_img, mode = "RGBA")
+    PIL_img = Image.fromarray(png_img, mode = "RGBA").convert("RGB")
     return PIL_img
 
 def get_palette(img):
@@ -159,8 +157,16 @@ def convert_img(image_bytes, out_format, palette, compress):
             #    b.seek(0)
             #    return b.read()            
             
-            return image_bytes
-            
+            with BytesIO() as b:
+                # We save a little bit by dropping the alpha channel
+                arr = np.asarray(bytes_to_PIL(image_bytes).convert("RGB"))
+                png_image = png.from_array(arr, mode="RGB")
+                w = png.Writer()
+                w.write(b, png_image)
+                b.seek(0)
+                return b.read()
+
+
             #PIL_img = bytes_to_PIL(image_bytes)
             #with BytesIO() as b:
             #    # We save a little bit by dropping the alpha channel

@@ -76,14 +76,14 @@ def do_it(args):
 
         progress = tqdm(total = total_frames)
 
-        add_text_msg(args, writer, (400,400), "About that 11/12 mint...", 2, 25)
+        #add_text_msg(args, writer, (400,400), "About that 11/12 mint...", 2, 25)
         #add_text_msg(args, writer, (400,400), "Gate.io locked our account for 'Security Reasons'...", 2, 15)
         #add_text_msg(args, writer, (400,400), "Until our account is unlocked we can't mint.", 2, 15)
         #add_text_msg(args, writer, (400,400), "They won't tell us *when* or *if* it will unlock :(", 2, 15)
         #add_text_msg(args, writer, (400,400), "If you're mad like we are...", 2, 30)
         #add_text_msg(args, writer, (400,400), "Tell gate.io", 2, 40)
-        add_text_msg(args, writer, (400,400), "erm...", 2, 25)
-        add_text_msg(args, writer, (400,400), "Look at this!", 0.5, 25)
+        #add_text_msg(args, writer, (400,400), "erm...", 2, 25)
+        #add_text_msg(args, writer, (400,400), "Look at this!", 0.5, 25)
 
         while current_frame < total_frames: 
             
@@ -126,6 +126,7 @@ def do_it(args):
             img_seq_no += 1
             progress.update(frame_duration)
         
+        add_text_msg(args, writer, current_img.size, "MINTING SOON", 2, 40)
         #add_text_msg(args, writer, current_img.size, "MINTING 11/??/21", 2, 40)
         #add_text_msg(args, writer, current_img.size, "0.5 SOL", 2, 51)
         #add_text_msg(args, writer, current_img.size, "probably nothing...", 1, 30)
@@ -155,7 +156,7 @@ def parse_args():
     parser.add_argument("--image_range", nargs = 2, type = int, default = [0,999])
     parser.add_argument("--fps", type = int, default = 30)
     parser.add_argument("--dims", type = int, nargs = 2, default = [600,600])
-    parser.add_argument("--starting_frame_duration_seconds", type = float, default = (1/2))
+    parser.add_argument("--starting_frame_duration_seconds", type = float, default = (1/1))
     parser.add_argument("--ending_frame_duration_seconds", type = float, default = (1/30))
     return parser.parse_args()
 
