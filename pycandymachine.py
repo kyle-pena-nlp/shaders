@@ -176,7 +176,7 @@ def generate(args, shader, name, trait_values_array, trait_names_array):
             f.write(json.dumps(trait_value_names, indent = 1))
 
         with open(os.path.join(".", out_dir, "{}.json".format(i)), "w+") as f:
-            f.write(json.dumps(gen_metaplex_metadata(args, index = i, traits_dict = trait_value_names), indent = 1))
+            f.write(json.dumps(gen_mp4_metaplex_metadata(args, index = i, traits_dict = trait_value_names), indent = 1))
 
         html_text = wrap_in_html_shell(shader_text)
         html_fpath = os.path.join(".", out_dir, "{}.html".format(i))
@@ -185,15 +185,49 @@ def generate(args, shader, name, trait_values_array, trait_names_array):
 
         yield html_fpath, shader_text, x, y, fps, format, compress
 
-def gen_metaplex_metadata(args, index, traits_dict):
+format_2_category = {
+    "png": "image",
+    "gif": "image",
+    "jpg": "image",
+    
+    "mp4": "video",
+    "mov": "video",
+    
+    "html": "html"
+}
 
-    format = args.format
+format_2_mimetype_namespace = {
+    "png": "image",
+    "gif": "image",
+    "jpg": "image",    
+
+    "mp4": "video",
+    "mov": "video",
+
+    "html": "text"
+}
+
+def get_mimetype(format):
+    mimetype_namespace = format_2_mimetype_namespace[format]
+    mime_type = "{}/{}".format(mimetype_namespace, format)
+    return mime_type
+
+def gen_mp4_metaplex_metadata(args, index, traits_dict):
+
+    animation_format = "mp4"
+    image_format = "mp4"
 
     shader_name = args.shader
-    image_filename = "{}.{}".format(index, format)
     titleized_name = shader_name.title()
     symbol_name = re.sub(r"\s+", "", shader_name.upper())[:5]
-    mime_type = "image/{}".format(format)
+
+    animation_filename =  "{}.{}".format(index, animation_format)
+    image_filename = "{}.{}".format(index, image_format)
+
+    animation_mimetype = get_mimetype(animation_format)
+    image_mimetype     = get_mimetype(image_format)
+    
+    category = format_2_category[animation_format]
 
     attributes = []
     for trait_name in sorted(traits_dict):
@@ -203,11 +237,16 @@ def gen_metaplex_metadata(args, index, traits_dict):
     data = {
         "name": titleized_name,
         "symbol": symbol_name,
+        "description": "Perfectly looping, color-rich math art for gazing deep and thinking big thoughts.",        
         "image": image_filename,
+        "animation_url": animation_filename,
         "external_url": "https://www.bonkworld.art/",
         "properties": {
-            "files": [{ "uri": image_filename, "type": mime_type }],
-            "category": "image",
+            "files": [
+                { "uri": image_filename, "type": image_mimetype },
+                #{ "uri": animation_filename, "type": animation_mimetype } #no point in a duplicate
+            ],
+            "category": category,
             "creators": [
                 {
                     "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
@@ -223,7 +262,6 @@ def gen_metaplex_metadata(args, index, traits_dict):
                 }                
             ]
         },
-        "description": "Perfectly looping, color-rich math art for gazing deep and thinking big thoughts.",
         "seller_fee_basis_points": 500,
         "attributes": attributes,
         "collection": { "name": titleized_name, "family": "Bonk World" }
@@ -276,6 +314,9 @@ def execute(args):
 if __name__ == "__main__":
 
     args, traits = parse_args()
+
+    if args.format != "mp4":
+        raise Exception("Metadata generation currently hardcoded for mp4!")
 
     name = os.path.basename(remove_ext(args.shader)) if args.shader is not None else "EXAMPLE"
 

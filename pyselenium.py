@@ -157,22 +157,23 @@ def convert_img(image_bytes, out_format, palette, compress):
             #    b.seek(0)
             #    return b.read()            
             
-            with BytesIO() as b:
-                # We save a little bit by dropping the alpha channel
-                arr = np.asarray(bytes_to_PIL(image_bytes).convert("RGB"))
-                png_image = png.from_array(arr, mode="RGB")
-                w = png.Writer()
-                w.write(b, png_image)
-                b.seek(0)
-                return b.read()
+            #with BytesIO() as b:
+            #    # We save a little bit by dropping the alpha channel
+            #    arr = np.asarray(bytes_to_PIL(image_bytes).convert("RGB"))
+            #    png_image = png.from_array(arr, mode="RGB")
+            #    w = png.Writer()
+            #    w.write(b, png_image)
+            #    b.seek(0)
+            #    return b.read()
 
 
             #PIL_img = bytes_to_PIL(image_bytes)
-            #with BytesIO() as b:
-            #    # We save a little bit by dropping the alpha channel
-            #    PIL_img.convert("RGB").save(b, format = "png", optimize = True)
-            #    b.seek(0)
-            #    return b.read()
+            PIL_img = bytes_to_PIL(image_bytes)
+            with BytesIO() as b:
+                # We save a little bit by dropping the alpha channel
+                PIL_img.convert("RGB").save(b, format = "png", optimize = True)
+                b.seek(0)
+                return b.read()
     else:
         raise Exception("Unknown format: '{}'".format(out_format))
 

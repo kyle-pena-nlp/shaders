@@ -1,5 +1,5 @@
 
-// { "uv": ("3", 0.34),  "image_idxs": ("4", 0.33), "lighting": ("5", 0.33) }
+// { "uv": ("3", 0.25),  "image_idxs": ("4", 0.25), "lighting": ("5", 0.25), "normals": ("1", 0.25) }
 #define RENDER_MODE 4
 
 // 0 - unnormalized UV
@@ -324,7 +324,7 @@ vec3 render2(in vec2 fragCoord)
 		lin += (2.00 + spec)*spe*vec3(0.80,0.80,0.80)*dif;
         lin += 0.40*amb*vec3(0.60,0.60,0.60)*occ;
         //lin += 0.50*dom*vec3(0.60,0.60,0.60)*occ;
-        lin += 0.50*bac*vec3(0.25,0.25,0.25)*occ;
+        //lin += 0.50*bac*vec3(0.25,0.25,0.25)*occ;
         lin += 0.25*fre*vec3(1.00,1.00,1.00)*occ;
 		col = col*lin;  
 

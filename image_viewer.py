@@ -1,13 +1,15 @@
 import http.server
 import socketserver
+import os
 PORT = 8000
+DIRECTORY = "./" # ="D:/"
 
 from argparse import ArgumentParser
 
 class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory="D:/", **kwargs)
+        super().__init__(*args, directory=DIRECTORY, **kwargs)
 
     def do_GET(self):
         if self.path == "/":
@@ -16,7 +18,7 @@ class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument("--shader", type = str)
+    parser.add_argument("--shader", type = str, default = "triptograms")
     return parser.parse_args()
 
 def start_an_image_server(directory):

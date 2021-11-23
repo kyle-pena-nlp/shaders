@@ -1,17 +1,17 @@
 <html>
     <head>
         <style>
-            img.grid {
+            .grid {
                 float: left;
-                height: 200px;
-                width: 200px;
+                height: 150px;
+                width: 150px;
             }
         </style>
 
         <script type="text/javascript">
         
         app = {
-            "img_idx": 0,
+            "video_idx": 0,
             "MAX_IMAGES": 20
         }
 
@@ -23,33 +23,45 @@
             
             for (var i = 0; i < app.MAX_IMAGES; i++) {
 
-                const img = document.createElement("img");
-                img.setAttribute("id", "img" + i);
-                img.classList.add("grid");
-                document.body.append(img);
-                img.onload = function() {
-                    img.style = "filter: brightness(100%)";
+                const video = document.createElement("video");
+                video.setAttribute("id", "video" + i);
+                video.classList.add("grid");
+                video.setAttribute("autoplay", "true");
+                video.setAttribute("loop", "true");
+                document.body.append(video);
+
+                const cover = document.createElement("img");
+                cover.setAttribute("id", "cover" + i);
+                cover.classList.add("grid");
+                document.body.append(cover);
+
+                video.onplay = function() {
+                    video.style = "filter: brightness(100%)";
+                    cover.style = "filter: brightness(100%)"
                 };
             }
 
             const render = function() {
                 for (let i = 0; i < app.MAX_IMAGES; i++) {
-                    let img = document.getElementById("img" + i);
-                    img.style = "filter: brightness(0%)";
-                    img.src = "http://localhost:8000/triptograms/" + (parseInt(app.img_idx,10) + i) + ".png";
+                    let video = document.getElementById("video" + i);
+                    video.style = "filter: brightness(0%)";
+                    video.src = "http://localhost:8000/triptograms/" + (parseInt(app.video_idx,10) + i) + ".mp4";
+                    let cover = document.getElementById("cover" + i);
+                    cover.style = "filter: brightness(0%)";
+                    cover.src = "http://localhost:8000/triptograms/" + (parseInt(app.video_idx,10) + i) + ".cover.gif";
                 }
             };
 
             const updateIdx = function(key) {
 
                 if (key == "ArrowLeft") {
-                    app.img_idx -= app.MAX_IMAGES;
+                    app.video_idx -= app.MAX_IMAGES;
                 }
                 else if (key == "ArrowRight") {
-                    app.img_idx += app.MAX_IMAGES;
+                    app.video_idx += app.MAX_IMAGES;
                 }
 
-                app.img_idx = Math.min(1000 - app.MAX_IMAGES, Math.max(0, app.img_idx));
+                app.video_idx = Math.min(1000 - app.MAX_IMAGES, Math.max(0, app.video_idx));
             };
 
             window.onkeyup = function(e) {

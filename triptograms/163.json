@@ -1,16 +1,18 @@
 {
  "name": "Triptograms",
  "symbol": "TRIPT",
+ "description": "Perfectly looping, color-rich math art for gazing deep and thinking big thoughts.",
  "image": "163.mp4",
+ "animation_url": "163.mp4",
  "external_url": "https://www.bonkworld.art/",
  "properties": {
   "files": [
    {
     "uri": "163.mp4",
-    "type": "image/mp4"
+    "type": "video/mp4"
    }
   ],
-  "category": "image",
+  "category": "video",
   "creators": [
    {
     "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
@@ -26,7 +28,6 @@
    }
   ]
  },
- "description": "Perfectly looping, color-rich math art for gazing deep and thinking big thoughts.",
  "seller_fee_basis_points": 500,
  "attributes": [
   {
