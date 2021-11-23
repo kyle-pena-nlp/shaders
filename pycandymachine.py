@@ -128,7 +128,7 @@ def check_for_trait_uniqueness(trait_values_array):
 
 def generate_trait_combos(args, shader, override_traits):
 
-    N = args.N
+    N               = args.N
     traits          = parse_traits(shader)      # { TRAIT : { NAME: (OPTION, FREQUENCY) } }
     trait_values_array, trait_names_array = generate_random_trait_values(N, traits, override_traits)
 
@@ -150,7 +150,7 @@ def generate_trait_combos(args, shader, override_traits):
 
     return trait_values_array, trait_names_array
 
-def generate(args, shader, name, trait_values_array, trait_names_array):
+def generate_pre_image_artifacts(args, shader, name, trait_values_array, trait_names_array):
 
     N = args.N; x = args.x; y = args.y; fps = args.fps; format = args.format; compress = args.compress
 
@@ -158,9 +158,6 @@ def generate(args, shader, name, trait_values_array, trait_names_array):
 
     out_dir = name
     os.makedirs(os.path.join(".", out_dir), exist_ok = True)
-
-    if args.test:
-        return
 
     for i, trait_values in enumerate(trait_values_array):      
 
@@ -215,14 +212,14 @@ def get_mimetype(format):
 def gen_mp4_metaplex_metadata(args, index, traits_dict):
 
     animation_format = "mp4"
-    image_format = "mp4"
+    image_format = "gif"
 
     shader_name = args.shader
     titleized_name = shader_name.title()
     symbol_name = re.sub(r"\s+", "", shader_name.upper())[:5]
 
+    image_filename     = "{}.cover.{}".format(index, image_format)
     animation_filename =  "{}.{}".format(index, animation_format)
-    image_filename = "{}.{}".format(index, image_format)
 
     animation_mimetype = get_mimetype(animation_format)
     image_mimetype     = get_mimetype(image_format)
@@ -237,14 +234,14 @@ def gen_mp4_metaplex_metadata(args, index, traits_dict):
     data = {
         "name": titleized_name,
         "symbol": symbol_name,
-        "description": "Perfectly looping, color-rich math art for gazing deep and thinking big thoughts.",        
+        "description": "Perfectly looping math art for thinking big thoughts",        
         "image": image_filename,
         "animation_url": animation_filename,
         "external_url": "https://www.bonkworld.art/",
         "properties": {
             "files": [
                 { "uri": image_filename, "type": image_mimetype },
-                #{ "uri": animation_filename, "type": animation_mimetype } #no point in a duplicate
+                { "uri": animation_filename, "type": animation_mimetype }
             ],
             "category": category,
             "creators": [
@@ -272,15 +269,15 @@ def gen_mp4_metaplex_metadata(args, index, traits_dict):
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument("--shader", type = str, required = False, default = None)
-    parser.add_argument("--N", type = int, required = False, default = 10)
+    parser.add_argument("--N", type = int, required = False, default = 1000)
     parser.add_argument("--seed", type = int, required = False, default = 42)
     parser.add_argument("--parallel", type = int, required = False, default = 1)
-    parser.add_argument("--x", type = int, default = 300)
-    parser.add_argument("--y", type = int, default = 300)
+    parser.add_argument("--x", type = int, default = 400)
+    parser.add_argument("--y", type = int, default = 400)
     parser.add_argument("--fps", type = int, default = 30)
     parser.add_argument("--format", default = "mp4", choices = ["mp4","gif","png"])
     parser.add_argument("--compress", default = False, type = bool)
-    parser.add_argument("--test", type = bool, default = False)
+    parser.add_argument("--just_pre_image_artifacts", type = bool, default = False)
     #parser.add_argument("--traits_file", type = str, required = False, default = None)
     args = parser.parse_args()
     override_traits = {}
@@ -325,18 +322,17 @@ if __name__ == "__main__":
     random.seed(args.seed)
 
     trait_values_array, trait_names_array = generate_trait_combos(args, shader_text, traits)
-    
-    if args.test:
-        print("Test mode. Not generating.")
 
-    results = generate(args, shader_text, name, trait_values_array, trait_names_array)
+    results = generate_pre_image_artifacts(args, shader_text, name, trait_values_array, trait_names_array)
+
+    if not args.just_pre_image_artifacts:
     
-    if args.parallel > 0:
-        pool = multiprocessing.Pool()
-        pool.map(execute, results)
-    else:
-        for result in tqdm(results, total = args.N):
-            execute(result)
+        if args.parallel > 0:
+            pool = multiprocessing.Pool()
+            pool.map(execute, results)
+        else:
+            for result in tqdm(results, total = args.N):
+                execute(result)
 
     print("Done.")
 
