@@ -277,7 +277,7 @@ def parse_args():
     parser.add_argument("--fps", type = int, default = 30)
     parser.add_argument("--format", default = "mp4", choices = ["mp4","gif","png"])
     parser.add_argument("--compress", default = False, type = bool)
-    parser.add_argument("--just_pre_image_artifacts", type = bool, default = False)
+    parser.add_argument("--just_pre_image_artifacts", type = bool)
     #parser.add_argument("--traits_file", type = str, required = False, default = None)
     args = parser.parse_args()
     override_traits = {}
