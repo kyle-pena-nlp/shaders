@@ -1,0 +1,110 @@
+<html>
+    <head>
+        <style>
+            .grid {
+                float: left;
+                height: 150px;
+                width: 150px;
+            }
+        </style>
+
+        <script type="text/javascript">
+
+            app = {
+                idx: 0,
+                MAX_IMAGES: 20,
+                DATAS: null
+            };
+
+            const get_datas = function() {
+                var xhr = new XMLHttpRequest();
+                xhr.responseType = 'json';
+                xhr.open( "GET", "http://localhost:8000/data", true ); // false for synchronous request
+                //xhr.send( null );
+                //return xhr.response;
+
+                xhr.onload = function (e) {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            app.DATAS = xhr.response;
+                        } else {
+                            console.error(xhr.statusText);
+                        }
+                    }
+                };
+                xhr.onerror = function (e) {
+                    console.error(xhr.statusText);
+                };
+                xhr.send(null);
+            };
+
+            const createElements = function() {
+                for (var i = 0; i < app.MAX_IMAGES; i++) {
+
+                    const video = document.createElement("video");
+                    video.setAttribute("id", "video" + i);
+                    video.classList.add("grid");
+                    video.setAttribute("autoplay", "true");
+                    video.setAttribute("loop", "true");
+                    document.body.append(video);
+
+                    const cover = document.createElement("img");
+                    cover.setAttribute("id", "cover" + i);
+                    cover.classList.add("grid");
+                    document.body.append(cover);
+
+                    video.onplay = function() {
+                        video.style = "filter: brightness(100%)";
+                        cover.style = "filter: brightness(100%)"
+                    };
+                }                
+            }
+
+            const updateIdx = function(key) {
+                if (key == "ArrowLeft") {
+                    app.idx -= app.MAX_IMAGES;
+                }
+                else if (key == "ArrowRight") {
+                    app.idx += app.MAX_IMAGES;
+                }
+                app.idx = Math.min(app.DATAS.length - app.MAX_IMAGES, Math.max(0, app.idx));
+            };
+
+            const render = function() {
+                for (let i = 0; i < app.MAX_IMAGES; i++) {
+
+                    const renderIdx = i;
+                    const realIdx = (parseInt(app.idx,10) + i);
+
+                    let video = document.getElementById("video" + i);
+                    video.style = "filter: brightness(0%)";
+                    video.src = "http://localhost:8000/triptograms/" + app.DATAS[realIdx]["animation_url"];
+                    let cover = document.getElementById("cover" + i);
+                    cover.style = "filter: brightness(0%)";
+                    cover.src = "http://localhost:8000/triptograms/" + app.DATAS[realIdx]["image"];
+                }
+            };
+
+
+            window.onload = function() {
+
+                createElements();
+
+                app.DATAS = get_datas();
+
+                window.onkeyup = function(e) {
+                    const key = e.code;
+                    updateIdx(key);
+                    render();
+                };
+
+            };
+        </script>
+    </head>
+
+    <body>
+
+
+    </body>
+
+</html>
