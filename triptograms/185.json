@@ -2,21 +2,16 @@
  "name": "Triptograms",
  "symbol": "TRIPT",
  "description": "Perfectly looping math art for thinking big thoughts",
- "image": "185.cover.gif",
- "animation_url": "185.mp4",
+ "image": "185.gif",
  "external_url": "https://www.bonkworld.art/",
  "properties": {
   "files": [
    {
-    "uri": "185.cover.gif",
+    "uri": "185.gif",
     "type": "image/gif"
-   },
-   {
-    "uri": "185.mp4",
-    "type": "video/mp4"
    }
   ],
-  "category": "video",
+  "category": "image",
   "creators": [
    {
     "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",

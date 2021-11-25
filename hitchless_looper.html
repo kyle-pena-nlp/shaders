@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <style>
+
+            #video1 {
+                opacity: 100%;
+            }
+
+            #video2 {
+                opacity: 0%;
+            }
+
+            video {
+                position: absolute;
+                left: 0px;
+                top: 0px;
+            }
+        </style>
+
+        <script type="text/javascript">
+            window.onload = function() {
+
+                const video1 = document.getElementById("video1");
+                const video2 = document.getElementById("video2");
+
+                video1.onended = function() {
+                    video2.style.opacity = "100%";
+                    video1.style.opacity = "0%";
+                    video2.play();
+                };
+
+                video2.onended = function() {
+                    video1.style.opacity = "100%";
+                    video2.style.opacity = "0%";                    
+                    video1.play();
+                };    
+                
+                // TODO: don't play until video2 
+                /*video1.onload = function() {
+                    video1.play();
+                };*/
+
+                //video1.play();
+            }
+        </script>
+    </head>
+
+    <body>
+        <video id="video1" src="http://localhost:8000/triptograms/1.mp4" autoplay="true" muted="muted" ></video>
+        <video id="video2" src="http://localhost:8000/triptograms/1.mp4" muted="muted"></video>
+    </body>
+</html>

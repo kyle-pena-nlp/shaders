@@ -25,23 +25,41 @@ def do_it(args):
     normals = Image.open(os.path.join(directory, 'bonkworld_normals.png'))
     image_idxs = Image.open(os.path.join(directory, "bonkworld_image_idxs.png"))
     all = [uvs, lighting, normals, image_idxs]
-
     nframes = uvs.n_frames
-
     print(nframes)
 
-    images_holder = {}
+    # Pre-load all rendering data
+    all_uv_frames, all_lighting_frames, all_normals_frames, all_image_idx_frames = [], [], [], []
+    for t in tqdm(list(range(nframes))):
+        for img in all:
+            img.seek(t)
+        all_uv_frames.append(np.asarray(uvs))
+        all_lighting_frames.append(np.asarray(all_lighting_frames))
+        all_normals_frames.append(np.asarray(normals))
+        all_image_idx_frames.append(np.asarray(image_idxs))
+    all_uv_frames = np.asarray(all_uv_frames)
+    all_lighting_frames = np.asarray(all_lighting_frames)
+    all_normals_frames = np.asarray(all_normals_frames)
+    all_image_idx_frames = np.asarray(all_image_idx_frames)
 
+    #Pre-load image atlas
+    images_holder = {}
     images_atlas = [ fp for fp in glob(os.path.join("triptograms", "*.png")) if re.match(r"\d+\.png", os.path.basename(fp)) ]
     random.shuffle(images_atlas)
+
+    # TODO: separate process to assemble giant image sheet.
+
     images_atlas = images_atlas * 5
     images_atlas = np.asarray(images_atlas)[:(70*70)].reshape(70,70)
+
+
 
     x,y,source_nframes = None,None,None
 
     with get_writer(frames_per_second = args.fps, out = "promo3.mp4", out_format = "mp4", compress = False) as writer:
 
         for t in tqdm(range(nframes)):
+
             for img in all:
                 img.seek(t)
             np_uvs = np.asarray(uvs)
@@ -54,7 +72,9 @@ def do_it(args):
 
             # In progress: vectorization of image index normalization
             np_img_idxs = np_img_idxs.astype(np.float)
-            np_img_idxs = np.concat([np_img_idxs[:,:,0] / np_img_idxs[:,:,2], np_img_idxs[:,:,1] / np_img_idxs[:,:,2]]).astype(np.int)
+            zeros_mask = np_img_idxs[...,2] == 0
+            np_img_idxs = np.stack([np_img_idxs[:,:,0] / np_img_idxs[:,:,2], np_img_idxs[:,:,1] / np_img_idxs[:,:,2]], axis = 2).astype(np.int)
+            np_img_idxs[zeros_mask,:] = 0
             uq_img_idxs = set(zip(np_img_idxs[:,:,0].ravel(), np_img_idxs[:,:,1].ravel()))
             for uq_img_idx in uq_img_idxs:
                 requested_images.add(uq_img_idx)
@@ -80,11 +100,9 @@ def do_it(args):
             np_uvs = np.asarray(uvs)
             for i in range(np_uvs.shape[0]):
                 for j in range(np_uvs.shape[1]):
-                    R,G,B = np_img_idxs[i,j,:]
-                    if R == 0 and G == 0 and B == 0:
+                    img_i,img_j = np_img_idxs[i,j,:]
+                    if img_i == 0 and img_j == 0:
                         continue
-                    img_i = int(round(R/B))
-                    img_j = int(round(G/B))
                     if (img_i,img_j) not in frame_cache:
                         source_nframes = source_nframes or images_holder[(img_i,img_j)].n_frames
                         frame_cache[(img_i,img_j)] = np.asarray(images_holder[(img_i, img_j)])

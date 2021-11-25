@@ -172,8 +172,13 @@ def generate_pre_image_artifacts(args, shader, name, trait_values_array, trait_n
         with open(os.path.join(".", out_dir, "{}.traits".format(i)), "w+") as f:
             f.write(json.dumps(trait_value_names, indent = 1))
 
+        if format == "mp4":
+            metadata_json = gen_mp4_metaplex_metadata_with_cover_gif(args, index = i, traits_dict = trait_value_names)
+        else:
+            metadata_json = gen_metaplex_metadata_with_just_image(args, index = i, traits_dict = trait_value_names, image_format = format)
+
         with open(os.path.join(".", out_dir, "{}.json".format(i)), "w+") as f:
-            f.write(json.dumps(gen_mp4_metaplex_metadata(args, index = i, traits_dict = trait_value_names), indent = 1))
+            f.write(json.dumps(metadata_json, indent = 1))
 
         html_text = wrap_in_html_shell(shader_text)
         html_fpath = os.path.join(".", out_dir, "{}.html".format(i))
@@ -209,20 +214,71 @@ def get_mimetype(format):
     mime_type = "{}/{}".format(mimetype_namespace, format)
     return mime_type
 
-def gen_mp4_metaplex_metadata(args, index, traits_dict):
-
-    animation_format = "mp4"
-    image_format = "gif"
+def gen_metaplex_metadata_with_just_image(args, index, traits_dict, image_format):
 
     shader_name = args.shader
     titleized_name = shader_name.title()
     symbol_name = re.sub(r"\s+", "", shader_name.upper())[:5]
 
-    image_filename     = "{}.cover.{}".format(index, image_format)
+    image_filename     = "{}.{}".format(index, image_format)
+
+    image_mimetype     = get_mimetype(image_format)
+    
+    category = format_2_category[image_format]
+
+    attributes = []
+    for trait_name in sorted(traits_dict):
+        trait_value = traits_dict[trait_name]
+        attributes.append({ "trait_type": trait_name, "value": trait_value })
+
+    data = {
+        "name": titleized_name,
+        "symbol": symbol_name,
+        "description": "Perfectly looping math art for thinking big thoughts",        
+        "image": image_filename,
+        "external_url": "https://www.bonkworld.art/",
+        "properties": {
+            "files": [
+                { "uri": image_filename, "type": image_mimetype }
+            ],
+            "category": category,
+            "creators": [
+                {
+                    "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
+                    "share": 20
+                }, 
+                {
+                    "address": "udhne2o5r2wFKKt4uCAF4LH3mX2LwmczuaAQw9PrJJr",
+                    "share": 20
+                },            
+                {
+                    "address": "8ym4m3pg39bQAxXehwUyKtdqrFBFSE3xEasBcyBoPcmm",
+                    "share": 60
+                }                
+            ]
+        },
+        "seller_fee_basis_points": 500,
+        "attributes": attributes,
+        "collection": { "name": titleized_name, "family": "Bonk World" }
+    }
+
+    return data
+
+
+def gen_mp4_metaplex_metadata_with_cover_gif(args, index, traits_dict):
+
+    cover_image_format = "gif"
+    animation_format = "mp4"
+
+    shader_name = args.shader
+    titleized_name = shader_name.title()
+    symbol_name = re.sub(r"\s+", "", shader_name.upper())[:5]
+
+    image_filename     = "{}.cover.{}".format(index, cover_image_format)
     animation_filename =  "{}.{}".format(index, animation_format)
 
     animation_mimetype = get_mimetype(animation_format)
-    image_mimetype     = get_mimetype(image_format)
+    image_mimetype     = get_mimetype(cover_image_format)
     
     category = format_2_category[animation_format]
 
@@ -312,8 +368,8 @@ if __name__ == "__main__":
 
     args, traits = parse_args()
 
-    if args.format != "mp4":
-        raise Exception("Metadata generation currently hardcoded for mp4!")
+    #if args.format != "mp4":
+    #    raise Exception("Metadata generation currently hardcoded for mp4!")
 
     name = os.path.basename(remove_ext(args.shader)) if args.shader is not None else "EXAMPLE"
 

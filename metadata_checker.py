@@ -9,7 +9,6 @@ import socketserver
 import time
 import shutil
 
-from fashdrive_copier import FLASHDRIVE
 PORT = 8000
 DIRECTORY = None # "D:/"
 
@@ -88,8 +87,11 @@ def do_it(args):
     for metadata_fp in tqdm(metadata_fps, desc = "Scraping metadatas"):
         #print(".")
         DATAS.append(scrape_metadata_urls(metadata_fp))
-    shutil.copy2("./metadata_checker.html", os.path.join(DIRECTORY, "./metadata_checker.html"))
-    os.chdir(FLASHDRIVE)
+    try:
+        shutil.copy2("./metadata_checker.html", os.path.join(DIRECTORY, "./metadata_checker.html"))
+    except shutil.SameFileError:
+        pass
+    os.chdir(args.directory)
     start_an_image_server()
 
 if __name__ == "__main__":
