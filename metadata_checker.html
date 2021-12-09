@@ -13,52 +13,111 @@
             app = {
                 idx: 0,
                 MAX_IMAGES: 20,
-                DATAS: null
+                DATAS: null,
+                hasAnimationURL: false,
+                hasImage: true
             };
 
             const get_datas = function() {
                 var xhr = new XMLHttpRequest();
                 xhr.responseType = 'json';
                 xhr.open( "GET", "http://localhost:8000/data", true ); // false for synchronous request
-                //xhr.send( null );
-                //return xhr.response;
 
                 xhr.onload = function (e) {
                     if (xhr.readyState === 4) {
                         if (xhr.status === 200) {
                             app.DATAS = xhr.response;
+                            return xhr.response;
                         } else {
-                            console.error(xhr.statusText);
+                            throw xhr.statusText;
                         }
                     }
                 };
+
                 xhr.onerror = function (e) {
-                    console.error(xhr.statusText);
+                    throw xhr.statusText;
                 };
+
                 xhr.send(null);
             };
 
-            const createElements = function() {
-                for (var i = 0; i < app.MAX_IMAGES; i++) {
+            const createElements = function(i) {
 
-                    const video = document.createElement("video");
+                let video = null, img = null;
+
+                if (app.hasAnimationURL) {
+                    video = document.createElement("video");
                     video.setAttribute("id", "video" + i);
                     video.classList.add("grid");
                     video.setAttribute("autoplay", "true");
                     video.setAttribute("loop", "true");
-                    document.body.append(video);
+                    document.body.append(video);  
+                }
+                
+                if (app.hasImage) {
+                    img = document.createElement("img");
+                    img.setAttribute("id", "img" + i.toString());
+                    img.classList.add("grid");
+                    document.body.append(img);
+                }
 
-                    const cover = document.createElement("img");
-                    cover.setAttribute("id", "cover" + i);
-                    cover.classList.add("grid");
-                    document.body.append(cover);
-
+                if (app.hasAnimationURL && app.hasImage) {
                     video.onplay = function() {
                         video.style = "filter: brightness(100%)";
-                        cover.style = "filter: brightness(100%)"
+                        img.style = "filter: brightness(100%)";
                     };
+                }
+                else if (app.hasAnimationURL) {
+                    video.onplay = function() {
+                        video.style = "filter: brightness(100%)";
+                    };
+                }
+                else if (app.hasImage) {
+                    img.onload = function() {
+                        img.style = "filter: brightness(100%)";                        
+                    };
+
+                    img.onmouseover = function() {
+                        const image_number = parseInt(img.getAttribute("src").split("/").pop().split(".")[0],10);
+                        const attributes = app.DATAS[image_number]["attributes"];
+                        let msg = "";
+                        for (let i = 0; i < attributes.length; i++) {
+                            let attribute = attributes[i];
+                            let key = attribute["trait_type"];
+                            let value = attribute["value"];
+                            msg = msg + "\n" + key + ": " + value;
+                        }
+                        //const metadata_string = JSON.stringify(metadata);
+                        img.setAttribute("title", msg);
+                    }
+                }
+            };
+
+            const renderElements = function(renderIdx) {
+                const realIdx = (parseInt(app.idx,10) + renderIdx);
+                if (app.hasAnimationURL) {
+                    let video = document.getElementById("video" + renderIdx);
+                    video.style = "filter: brightness(0%)";
+                    video.src = "http://localhost:8000/triptograms/" + app.DATAS[realIdx]["animation_url"];
+                }
+                if (app.hasImage) {
+                    let img = document.getElementById("img" + renderIdx);
+                    img.style = "filter: brightness(0%)";
+                    img.src = "http://localhost:8000/triptograms/" + app.DATAS[realIdx]["image"];
+                }
+            };            
+
+            const createAllElements = function() {
+                for (var i = 0; i < app.MAX_IMAGES; i++) {
+                    createElements(i);
                 }                
-            }
+            };
+
+            const render = function() {
+                for (let i = 0; i < app.MAX_IMAGES; i++) {
+                    renderElements(i);
+                }
+            };
 
             const updateIdx = function(key) {
                 if (key == "ArrowLeft") {
@@ -70,27 +129,11 @@
                 app.idx = Math.min(app.DATAS.length - app.MAX_IMAGES, Math.max(0, app.idx));
             };
 
-            const render = function() {
-                for (let i = 0; i < app.MAX_IMAGES; i++) {
-
-                    const renderIdx = i;
-                    const realIdx = (parseInt(app.idx,10) + i);
-
-                    let video = document.getElementById("video" + i);
-                    video.style = "filter: brightness(0%)";
-                    video.src = "http://localhost:8000/triptograms/" + app.DATAS[realIdx]["animation_url"];
-                    let cover = document.getElementById("cover" + i);
-                    cover.style = "filter: brightness(0%)";
-                    cover.src = "http://localhost:8000/triptograms/" + app.DATAS[realIdx]["image"];
-                }
-            };
-
-
             window.onload = function() {
 
-                createElements();
-
                 app.DATAS = get_datas();
+
+                createAllElements();                
 
                 window.onkeyup = function(e) {
                     const key = e.code;

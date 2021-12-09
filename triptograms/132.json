@@ -51,7 +51,7 @@
   },
   {
    "trait_type": "INVERT_COLORS",
-   "value": "yes"
+   "value": "no"
   },
   {
    "trait_type": "JITTERY",
@@ -59,11 +59,11 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "tri"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "stripeworld"
+   "value": "spiralworld"
   },
   {
    "trait_type": "POLAR",
@@ -72,10 +72,6 @@
   {
    "trait_type": "SHADE_STYLE",
    "value": "regularness"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
   }
  ],
  "collection": {

@@ -1,5 +1,5 @@
 import os
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
 import numpy as np
 import random
 from PIL import Image
@@ -11,11 +11,23 @@ from PIL import ImageDraw, ImageFont
 import math
 
 DEBUG = False
+END_ZOOM_t = 0.6
+STARTING_TILES = 2
+FINAL_TILES = 10
+MSG = "TRIPTOGRAMS"
 
+def _str_2_bool(x):
+    x = x.lower()
+    if x in ("y", "yes", "true", "t"):
+        return True
+    elif x in ("n", "no", "false", "f"):
+        return False
+    else:
+        raise ArgumentTypeError(x)
 
 def create_promo_animation(args):
 
-    out = os.path.join(args.dir, "PROMO1.mp4")
+    out = os.path.join(args.dir + "_promo", "PROMO1.{}".format(args.out_format))
 
     fn_grid = fill_image_fn_grid(args)    
     image_holder = {}
@@ -25,7 +37,7 @@ def create_promo_animation(args):
     fade_color = Image.fromarray(np.zeros(image_dims, dtype=int), mode = "RGB")
 
 
-    with get_writer(frames_per_second = args.fps, out = out, out_format = "mp4", compress = False) as writer:
+    with get_writer(frames_per_second = args.fps, out = out, out_format = args.out_format, compress = False) as writer:
 
         images_holder = {}
         for t in tqdm(np.linspace(0, args.anim_seconds, num = args.anim_seconds * args.fps)):
@@ -33,8 +45,9 @@ def create_promo_animation(args):
             images_holder = request_images(images_holder, worldspace_viewport, fn_grid)
             fill_promo_image(args, images_holder, promo_image, worldspace_viewport, t)
 
-            #paint_text(promo_image, t)
-            promo_image = create_fade(args, promo_image, fade_color, t)
+            #paint_text(args, promo_image, t)
+            if args.do_fade:
+                promo_image = create_fade(args, promo_image, fade_color, t)
 
             if DEBUG:
                 plt.imshow(promo_image)
@@ -46,7 +59,7 @@ def create_promo_animation(args):
 # https://www.fontspace.com/collection/my-font-selections-cnrdeoe
 fnt_outline = ImageFont.truetype("./RademosRegular-9YGrK.ttf", 110)
 
-msg = "TRIPTOGRAMS"
+
 
 def create_fade(args, promo_image, fade_color, t):
     intro_fade = 1.0 - smoothstep(0.00 * args.anim_seconds, 0.1 * args.anim_seconds, t)
@@ -55,22 +68,22 @@ def create_fade(args, promo_image, fade_color, t):
     return Image.blend(promo_image, fade_color, fade)
 
 
-def paint_text(promo_image, t):
+def paint_text(args, promo_image, t):
     d = ImageDraw.Draw(promo_image)
 
     r = 5
     for angle in np.linspace(0,2*math.pi,30):
         off_x = r * math.cos(angle)
         off_y = r * math.cos(angle)
-        paint_text_color_size(d, promo_image, size = 100, offset = ( off_x, off_y), color = (0,0,0))      
-    paint_text_color_size(d, promo_image, size = 100, color = (125,0,0))
+        paint_text_color_size(args, d, promo_image, size = 100, offset = ( off_x, off_y), color = (0,0,0))      
+    paint_text_color_size(args, d, promo_image, size = 100, color = (125,0,0))
 
 
 def paint_text_color_size(d, promo_image, size, color, offset = (0,0)):
 
     fnt = ImageFont.truetype("./RademosRegular-9YGrK.ttf", size)
 
-    w, h = d.textsize(msg, font = fnt)
+    w, h = d.textsize(args.msg, font = fnt)
     c = promo_image.size[0] // 2
 
     x,y = int(c - w/2), (promo_image.size[1] * 0.2) - h/2
@@ -78,32 +91,39 @@ def paint_text_color_size(d, promo_image, size, color, offset = (0,0)):
     x += offset[0]
     y += offset[1]
 
-    d.text((x, y), msg, font = fnt, fill = color)
+    d.text((x, y), args.msg, font = fnt, fill = color)
 
 def fill_promo_image(args, images_holder, promo_image, worldspace_viewport, t):
     
     #(x0,y0),(x1,y1) = worldspace_viewport
     
     for (i,j) in images_holder:
-        img = get_frame(images_holder[(i,j)],args,t).convert("RGB")
+        img = get_frame(images_holder[(i,j)],args,t)
         a,b = world_2_image(args,worldspace_viewport, (i,j))
         c,d = world_2_image(args,worldspace_viewport, (i+1,j+1))
         a,b,c,d = map(int, (a,b,c,d))
         box = (a,b,c,d)
 
-        img = img.resize((c-a,d-b))
+        img = img.convert("RGB").resize((c-a,d-b))
 
         promo_image.paste(img, box = box)
 
 def get_frame(img, args, t):
+    
     frame = int(args.fps * t)
-    frame = frame % img.n_frames
+    n_frames = args.n_frames or img.n_frames
+    frame = frame % n_frames
+    
+    # If you're behind where you want to be, you have to go back to the start before seeking (at least, I think that's true)
     if (frame < img.tell()):
         img.seek(0)
+    
     try:
         img.seek(frame)
-    except EOFError:
-        img.seek(0)
+    except EOFError as e:
+        print(t, frame, n_frames)
+        raise e
+        #img.seek(0)
     return img
 
 def world_2_image(args, worldspace_viewport, pt):
@@ -124,12 +144,10 @@ def get_viewport(args, t):
 
 def get_origin(args, t):
     # TODO: pathing
-    x = args.img_grid[0] // 2 + 5.0*(t/args.anim_seconds)
+    x = args.img_grid[0] // 2 + args.scroll_speed*(t/args.anim_seconds)
     y = args.img_grid[1] // 2 
     return (x,y)
 
-STARTING_TILES = 2
-FINAL_TILES = 10
 
 def smoothstep(start, end, t):
     if t < start:
@@ -143,7 +161,7 @@ def smoothstep(start, end, t):
 
 def get_zoom(args, t):
     # TODO: pathing
-    return STARTING_TILES + (FINAL_TILES - STARTING_TILES) * smoothstep(0.0, 0.6*args.anim_seconds, t)
+    return args.start_zoom_amt + (args.end_zoom_amt - args.start_zoom_amt) * smoothstep(0.0, args.end_zoom_t*args.anim_seconds, t)
 
 def request_images(images_holder, worldspace_viewport, fn_grid):
     #print("worldspace_viewport", worldspace_viewport)
@@ -191,12 +209,20 @@ def fill_image_fn_grid(args):
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument("--dir", required = False, default = "./triptograms")
-    parser.add_argument("--img_range", nargs=2, default = [0,99], type = int)
+    parser.add_argument("--img_range", nargs=2, default = [0,999], type = int)
     parser.add_argument("--img_format", type= str, default = "png")
     parser.add_argument("--img_grid", nargs = 2, default = [20,20], type = int)
     parser.add_argument("--anim_seconds", type = int, default = 20)
     parser.add_argument("--fps", type = int, default = 30)
     parser.add_argument("--image_dims", nargs=2, type = int, default = [800,800])
+    parser.add_argument("--start_zoom_amt", type = float, default = STARTING_TILES)
+    parser.add_argument("--end_zoom_amt", type = float, default = FINAL_TILES)
+    parser.add_argument("--end_zoom_t", type = float, default = END_ZOOM_t)
+    parser.add_argument("--msg", type = str, default = MSG)
+    parser.add_argument("--do_fade", type = _str_2_bool, default = True)
+    parser.add_argument("--n_frames", type = int, default = None)
+    parser.add_argument("--out_format", type = str, default = "mp4")
+    parser.add_argument("--scroll_speed", type = float, default = 5.0)
     return parser.parse_args()
 
 

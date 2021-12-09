@@ -35,11 +35,11 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "teal"
+   "value": "green"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "zoomout"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FBM",
@@ -59,11 +59,11 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "sept"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "stripeworld"
+   "value": "spiralworld"
   },
   {
    "trait_type": "POLAR",
@@ -72,10 +72,6 @@
   {
    "trait_type": "SHADE_STYLE",
    "value": "regularness"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
   }
  ],
  "collection": {

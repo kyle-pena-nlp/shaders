@@ -31,7 +31,7 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "pulsar"
+   "value": "fritz"
   },
   {
    "trait_type": "COLOR_MODE",
@@ -39,7 +39,7 @@
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "zoomout"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FBM",
@@ -47,7 +47,7 @@
   },
   {
    "trait_type": "FRACTURE_STYLE",
-   "value": "tiles"
+   "value": "gems"
   },
   {
    "trait_type": "INVERT_COLORS",
@@ -59,7 +59,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "sept"
+   "value": "dragon"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
@@ -67,15 +67,11 @@
   },
   {
    "trait_type": "POLAR",
-   "value": "polar"
+   "value": "cartesian"
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "regularness"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "neons"
   }
  ],
  "collection": {

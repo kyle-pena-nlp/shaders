@@ -1,0 +1,7 @@
+{
+ "ANIMATION_STYLE": "pulsar",
+ "QUADRATIC_TERM": "yes",
+ "SHADE_STYLE": "neons",
+ "POLAR": "cartesian",
+ "INVERT_COLORS": "yes"
+}

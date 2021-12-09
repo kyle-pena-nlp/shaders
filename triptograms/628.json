@@ -31,11 +31,11 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "twist"
+   "value": "fritz"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "loop"
+   "value": "teal"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -67,15 +67,11 @@
   },
   {
    "trait_type": "POLAR",
-   "value": "polar"
+   "value": "cartesian"
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "regularness"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "velvet"
   }
  ],
  "collection": {

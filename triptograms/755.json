@@ -35,7 +35,7 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "red"
+   "value": "loop"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -59,7 +59,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "sept"
+   "value": "dragon"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
@@ -71,11 +71,7 @@
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "regularness"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "ghost"
+   "value": "neons"
   }
  ],
  "collection": {

@@ -55,15 +55,15 @@
   },
   {
    "trait_type": "JITTERY",
-   "value": "kalm"
+   "value": "jittery"
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "dragon"
+   "value": "quad"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "stripeworld"
+   "value": "spiralworld"
   },
   {
    "trait_type": "POLAR",
@@ -71,11 +71,7 @@
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "regularness"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "neons"
   }
  ],
  "collection": {

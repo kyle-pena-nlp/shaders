@@ -1,14 +1,13 @@
 {
- "INVERT_COLORS": "no",
- "ANIMATION_STYLE": "pulsar",
- "COLOR_MODE": "red",
- "TRAILS": "sharp",
- "FRACTURE_STYLE": "cubist",
- "FBM": "no",
- "LEADING_EXPONENT_SIGN": "stripeworld",
- "SHADE_STYLE": "regularness",
- "POLAR": "cartesian",
+ "COLOR_MODE": "blue",
+ "LEADING_EXPONENT": "dragon",
  "JITTERY": "kalm",
- "LEADING_EXPONENT": "quad",
- "CONSTANT_REAL_TERM": "nakedeye"
+ "POLAR": "cartesian",
+ "SHADE_STYLE": "neons",
+ "LEADING_EXPONENT_SIGN": "spiralworld",
+ "FBM": "yes",
+ "FRACTURE_STYLE": "cubist",
+ "CONSTANT_REAL_TERM": "nakedeye",
+ "ANIMATION_STYLE": "fritz",
+ "INVERT_COLORS": "no"
 }

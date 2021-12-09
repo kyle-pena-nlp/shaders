@@ -27,16 +27,15 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define ANIMATION_STYLE 2
 
 // { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
-#define JITTERY 1.
+#define JITTERY 0.
 
 
 
 // { "clearview": ("-1", 0.70), "tiles": ("0", 0.10), "gems": ("1", 0.10), "cubist": ("3", 0.10)}
-#define FRACTURE_STYLE 0
+#define FRACTURE_STYLE -1
 
 #define SCANLINE 0.
 
-// { "ghost": ("3", 0.20), "sharp": ("0", 0.80) }
 #define TRAILS 0
 
 
@@ -53,10 +52,10 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define POLAR 0
 
 // {  "regularness": ("0", 0.625), "velvet": ("1", 0.125), "neons": ("2", 0.125), "fantasy": ("3", 0.125) } 
-#define SHADE_STYLE 3
+#define SHADE_STYLE 0
 
 // { "no": ("0", 0.50), "yes": ("1", 0.50) }
-#define INVERT_COLORS 0
+#define INVERT_COLORS 1
 
 // { "yes": ("1", 0.30), "no": ("0", 0.70) }
 #define FBM 0

@@ -35,23 +35,23 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "red"
+   "value": "loop"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "zoomout"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FBM",
-   "value": "no"
+   "value": "yes"
   },
   {
    "trait_type": "FRACTURE_STYLE",
-   "value": "clearview"
+   "value": "gems"
   },
   {
    "trait_type": "INVERT_COLORS",
-   "value": "no"
+   "value": "yes"
   },
   {
    "trait_type": "JITTERY",
@@ -63,19 +63,15 @@
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "stripeworld"
+   "value": "spiralworld"
   },
   {
    "trait_type": "POLAR",
-   "value": "cartesian"
+   "value": "polar"
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "fantasy"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "neons"
   }
  ],
  "collection": {

@@ -31,15 +31,15 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "pulsar"
+   "value": "fritz"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "blue"
+   "value": "teal"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "zoomout"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FBM",
@@ -51,7 +51,7 @@
   },
   {
    "trait_type": "INVERT_COLORS",
-   "value": "no"
+   "value": "yes"
   },
   {
    "trait_type": "JITTERY",
@@ -67,15 +67,11 @@
   },
   {
    "trait_type": "POLAR",
-   "value": "polar"
+   "value": "cartesian"
   },
   {
    "trait_type": "SHADE_STYLE",
    "value": "regularness"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "ghost"
   }
  ],
  "collection": {

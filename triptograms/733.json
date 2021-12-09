@@ -31,7 +31,7 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "pulsar"
+   "value": "fritz"
   },
   {
    "trait_type": "COLOR_MODE",
@@ -51,7 +51,7 @@
   },
   {
    "trait_type": "INVERT_COLORS",
-   "value": "yes"
+   "value": "no"
   },
   {
    "trait_type": "JITTERY",
@@ -63,7 +63,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "stripeworld"
+   "value": "spiralworld"
   },
   {
    "trait_type": "POLAR",
@@ -72,10 +72,6 @@
   {
    "trait_type": "SHADE_STYLE",
    "value": "fantasy"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
   }
  ],
  "collection": {

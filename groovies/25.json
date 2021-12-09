@@ -1,0 +1,62 @@
+{
+ "name": "Groovies",
+ "symbol": "GROOV",
+ "description": "Perfectly looping math art for thinking big thoughts",
+ "image": "25.cover.gif",
+ "animation_url": "25.mp4",
+ "external_url": "https://www.bonkworld.art/",
+ "properties": {
+  "files": [
+   {
+    "uri": "25.cover.gif",
+    "type": "image/gif"
+   },
+   {
+    "uri": "25.mp4",
+    "type": "video/mp4"
+   }
+  ],
+  "category": "video",
+  "creators": [
+   {
+    "address": "F7snYM4cE5RMbNXcuJTMwcKtxXNtXopJf9PNKXmSqNvv",
+    "share": 20
+   },
+   {
+    "address": "udhne2o5r2wFKKt4uCAF4LH3mX2LwmczuaAQw9PrJJr",
+    "share": 20
+   },
+   {
+    "address": "8ym4m3pg39bQAxXehwUyKtdqrFBFSE3xEasBcyBoPcmm",
+    "share": 60
+   }
+  ]
+ },
+ "seller_fee_basis_points": 500,
+ "attributes": [
+  {
+   "trait_type": "ANIMATION_STYLE",
+   "value": "pulsar"
+  },
+  {
+   "trait_type": "INVERT_COLORS",
+   "value": "no"
+  },
+  {
+   "trait_type": "POLAR",
+   "value": "polar"
+  },
+  {
+   "trait_type": "QUADRATIC_TERM",
+   "value": "yes"
+  },
+  {
+   "trait_type": "SHADE_STYLE",
+   "value": "velvet"
+  }
+ ],
+ "collection": {
+  "name": "Groovies",
+  "family": "Bonk World"
+ }
+}

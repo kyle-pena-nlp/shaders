@@ -1,14 +1,13 @@
 {
- "INVERT_COLORS": "no",
- "ANIMATION_STYLE": "twist",
- "COLOR_MODE": "green",
- "TRAILS": "sharp",
- "FRACTURE_STYLE": "cubist",
- "FBM": "no",
- "LEADING_EXPONENT_SIGN": "stripeworld",
+ "COLOR_MODE": "teal",
+ "LEADING_EXPONENT": "quad",
+ "JITTERY": "kalm",
+ "POLAR": "polar",
  "SHADE_STYLE": "regularness",
- "POLAR": "cartesian",
- "JITTERY": "jittery",
- "LEADING_EXPONENT": "dragon",
- "CONSTANT_REAL_TERM": "nakedeye"
+ "LEADING_EXPONENT_SIGN": "stripeworld",
+ "FBM": "yes",
+ "FRACTURE_STYLE": "gems",
+ "CONSTANT_REAL_TERM": "nakedeye",
+ "ANIMATION_STYLE": "pulsar",
+ "INVERT_COLORS": "no"
 }

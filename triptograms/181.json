@@ -35,11 +35,11 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "green"
+   "value": "red"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "zoomout"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FBM",
@@ -47,11 +47,11 @@
   },
   {
    "trait_type": "FRACTURE_STYLE",
-   "value": "tiles"
+   "value": "cubist"
   },
   {
    "trait_type": "INVERT_COLORS",
-   "value": "yes"
+   "value": "no"
   },
   {
    "trait_type": "JITTERY",
@@ -71,11 +71,7 @@
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "fantasy"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "regularness"
   }
  ],
  "collection": {

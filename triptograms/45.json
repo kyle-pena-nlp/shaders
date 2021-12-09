@@ -59,7 +59,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "tri"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
@@ -67,15 +67,11 @@
   },
   {
    "trait_type": "POLAR",
-   "value": "polar"
+   "value": "cartesian"
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "neons"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "regularness"
   }
  ],
  "collection": {

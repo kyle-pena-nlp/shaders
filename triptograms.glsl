@@ -36,7 +36,6 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 #define SCANLINE 0.
 
-// { "ghost": ("3", 0.20), "sharp": ("0", 0.80) }
 #define TRAILS 0
 
 

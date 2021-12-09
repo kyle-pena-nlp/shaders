@@ -1,14 +1,13 @@
 {
- "INVERT_COLORS": "yes",
- "ANIMATION_STYLE": "twist",
  "COLOR_MODE": "green",
- "TRAILS": "ghost",
- "FRACTURE_STYLE": "clearview",
- "FBM": "no",
- "LEADING_EXPONENT_SIGN": "stripeworld",
- "SHADE_STYLE": "fantasy",
- "POLAR": "cartesian",
+ "LEADING_EXPONENT": "sept",
  "JITTERY": "kalm",
- "LEADING_EXPONENT": "tri",
- "CONSTANT_REAL_TERM": "nakedeye"
+ "POLAR": "cartesian",
+ "SHADE_STYLE": "fantasy",
+ "LEADING_EXPONENT_SIGN": "stripeworld",
+ "FBM": "no",
+ "FRACTURE_STYLE": "clearview",
+ "CONSTANT_REAL_TERM": "zoomout",
+ "ANIMATION_STYLE": "twist",
+ "INVERT_COLORS": "no"
 }

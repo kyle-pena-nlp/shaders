@@ -31,11 +31,11 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "twist"
+   "value": "pulsar"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "red"
+   "value": "green"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -51,7 +51,7 @@
   },
   {
    "trait_type": "INVERT_COLORS",
-   "value": "yes"
+   "value": "no"
   },
   {
    "trait_type": "JITTERY",
@@ -59,7 +59,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "dragon"
+   "value": "quad"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
@@ -67,15 +67,11 @@
   },
   {
    "trait_type": "POLAR",
-   "value": "polar"
+   "value": "cartesian"
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "velvet"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "regularness"
   }
  ],
  "collection": {

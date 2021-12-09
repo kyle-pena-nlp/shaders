@@ -35,7 +35,7 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "green"
+   "value": "loop"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -47,11 +47,11 @@
   },
   {
    "trait_type": "FRACTURE_STYLE",
-   "value": "gems"
+   "value": "cubist"
   },
   {
    "trait_type": "INVERT_COLORS",
-   "value": "no"
+   "value": "yes"
   },
   {
    "trait_type": "JITTERY",
@@ -63,7 +63,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "stripeworld"
+   "value": "spiralworld"
   },
   {
    "trait_type": "POLAR",
@@ -72,10 +72,6 @@
   {
    "trait_type": "SHADE_STYLE",
    "value": "regularness"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
   }
  ],
  "collection": {

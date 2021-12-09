@@ -92,8 +92,10 @@ def get_writer(frames_per_second, out, out_format, compress):
     print("Writing to '{}'".format(fpath))
     if out_format == "gif":
         return imageio.get_writer(fpath, mode='I', duration = (1/frames_per_second), subrectangles = True )
-    elif out_format == "mp4":
-        return imageio.get_writer(fpath, mode='I', fps=frames_per_second, quality = 10) # quality = 9
+    elif out_format in ("mp4",):
+        return imageio.get_writer(fpath, mode='I', fps=frames_per_second, output_params = [ "-profile:v", "baseline" ]) # quality = 9
+    elif out_format == "webm":
+        return imageio.get_writer(fpath, mode='I', fps=frames_per_second) # quality = 9
     elif out_format == "png":
         return APNGWriter(fpath, fps = frames_per_second)
         #return imageio.get_writer(fpath, mode = 'I', duration = (1/frames_per_second))
@@ -139,7 +141,7 @@ def convert_img(image_bytes, out_format, palette, compress):
         PIL_img = bytes_to_PIL(image_bytes)
         palettized = palettize(PIL_img, palette, adaptive= True)
         return np.asarray(palettized) # todo: convert to PIL?
-    elif out_format in ("mp4",):
+    elif out_format in ("mp4","mov","webm"):
         return imageio.imread(image_bytes, "png")
     elif out_format in ("png",):
         if compress:

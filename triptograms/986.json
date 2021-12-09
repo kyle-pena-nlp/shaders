@@ -31,11 +31,11 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "fritz"
+   "value": "pulsar"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "green"
+   "value": "red"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -47,7 +47,7 @@
   },
   {
    "trait_type": "FRACTURE_STYLE",
-   "value": "tiles"
+   "value": "clearview"
   },
   {
    "trait_type": "INVERT_COLORS",
@@ -67,15 +67,11 @@
   },
   {
    "trait_type": "POLAR",
-   "value": "polar"
+   "value": "cartesian"
   },
   {
    "trait_type": "SHADE_STYLE",
    "value": "regularness"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
   }
  ],
  "collection": {

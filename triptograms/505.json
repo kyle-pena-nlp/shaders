@@ -35,7 +35,7 @@
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "blue"
+   "value": "green"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -47,7 +47,7 @@
   },
   {
    "trait_type": "FRACTURE_STYLE",
-   "value": "clearview"
+   "value": "gems"
   },
   {
    "trait_type": "INVERT_COLORS",
@@ -72,10 +72,6 @@
   {
    "trait_type": "SHADE_STYLE",
    "value": "regularness"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
   }
  ],
  "collection": {

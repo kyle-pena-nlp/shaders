@@ -31,19 +31,19 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "fritz"
+   "value": "twist"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "loop"
+   "value": "green"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "zoomout"
+   "value": "nakedeye"
   },
   {
    "trait_type": "FBM",
-   "value": "no"
+   "value": "yes"
   },
   {
    "trait_type": "FRACTURE_STYLE",
@@ -51,7 +51,7 @@
   },
   {
    "trait_type": "INVERT_COLORS",
-   "value": "no"
+   "value": "yes"
   },
   {
    "trait_type": "JITTERY",
@@ -59,11 +59,11 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "sept"
+   "value": "tri"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
-   "value": "stripeworld"
+   "value": "spiralworld"
   },
   {
    "trait_type": "POLAR",
@@ -71,11 +71,7 @@
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "fantasy"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "regularness"
   }
  ],
  "collection": {

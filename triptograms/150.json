@@ -31,15 +31,15 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "twist"
+   "value": "fritz"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "loop"
+   "value": "red"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
-   "value": "nakedeye"
+   "value": "zoomout"
   },
   {
    "trait_type": "FBM",
@@ -59,7 +59,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "dragon"
+   "value": "quad"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
@@ -71,11 +71,7 @@
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "velvet"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "regularness"
   }
  ],
  "collection": {

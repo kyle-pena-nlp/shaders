@@ -31,7 +31,7 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "pulsar"
+   "value": "twist"
   },
   {
    "trait_type": "COLOR_MODE",
@@ -43,15 +43,15 @@
   },
   {
    "trait_type": "FBM",
-   "value": "yes"
+   "value": "no"
   },
   {
    "trait_type": "FRACTURE_STYLE",
-   "value": "tiles"
+   "value": "gems"
   },
   {
    "trait_type": "INVERT_COLORS",
-   "value": "no"
+   "value": "yes"
   },
   {
    "trait_type": "JITTERY",
@@ -67,15 +67,11 @@
   },
   {
    "trait_type": "POLAR",
-   "value": "cartesian"
+   "value": "polar"
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "neons"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "regularness"
   }
  ],
  "collection": {

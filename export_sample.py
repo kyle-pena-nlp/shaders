@@ -23,7 +23,7 @@ def parse_args():
     parser.add_argument("--x", type = int)
     parser.add_argument("--y", type = int)
     parser.add_argument("--frames_per_second", type = int)
-    parser.add_argument("--format", type = str, choices = ["mp4","png","gif"])
+    parser.add_argument("--format", type = str, choices = ["mp4","png","gif", "webm", "mov"])
     parser.add_argument("--compress", type = bool, default = False)
     args = parser.parse_args()
     return args

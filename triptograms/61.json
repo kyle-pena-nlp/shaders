@@ -31,11 +31,11 @@
  "attributes": [
   {
    "trait_type": "ANIMATION_STYLE",
-   "value": "twist"
+   "value": "fritz"
   },
   {
    "trait_type": "COLOR_MODE",
-   "value": "blue"
+   "value": "loop"
   },
   {
    "trait_type": "CONSTANT_REAL_TERM",
@@ -55,11 +55,11 @@
   },
   {
    "trait_type": "JITTERY",
-   "value": "kalm"
+   "value": "jittery"
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "quad"
+   "value": "sept"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
@@ -71,11 +71,7 @@
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "velvet"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "ghost"
+   "value": "fantasy"
   }
  ],
  "collection": {

@@ -20,7 +20,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 
 // { "loop": ("-1.", 0.10), "blue": ("0.", 0.23), "red": ("1.", 0.23), "green":("2.", 0.22), "teal": ("3.", 0.22) }
-#define COLOR_MODE 3.
+#define COLOR_MODE 0.
 
 // undocumented value: 0: none
 // { "twist": ("1", 0.33), "fritz": ("2", 0.33), "pulsar": ("3", 0.33) }
@@ -36,7 +36,6 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 #define SCANLINE 0.
 
-// { "ghost": ("3", 0.20), "sharp": ("0", 0.80) }
 #define TRAILS 0
 
 
@@ -50,7 +49,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define CONSTANT_REAL_TERM -1.
 
 // { "polar": ("1",0.25), "cartesian": ("0",0.75) }
-#define POLAR 0
+#define POLAR 1
 
 // {  "regularness": ("0", 0.625), "velvet": ("1", 0.125), "neons": ("2", 0.125), "fantasy": ("3", 0.125) } 
 #define SHADE_STYLE 0

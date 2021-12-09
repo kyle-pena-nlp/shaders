@@ -24,10 +24,10 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 // undocumented value: 0: none
 // { "twist": ("1", 0.33), "fritz": ("2", 0.33), "pulsar": ("3", 0.33) }
-#define ANIMATION_STYLE 1
+#define ANIMATION_STYLE 3
 
 // { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
-#define JITTERY 1.
+#define JITTERY 0.
 
 
 
@@ -36,15 +36,14 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 #define SCANLINE 0.
 
-// { "ghost": ("3", 0.20), "sharp": ("0", 0.80) }
 #define TRAILS 0
 
 
 // { "dragon": ("2.", 0.25), "tri": ("3.", 0.25), "quad": ("4.", 0.25),  "sept": ("6.", 0.25) }
-#define LEADING_EXPONENT 6.
+#define LEADING_EXPONENT 4.
 
 // { "stripeworld": ("-1.", 0.50), "spiralworld": ("1.", 0.50) }
-#define LEADING_EXPONENT_SIGN -1.
+#define LEADING_EXPONENT_SIGN 1.
 
 // { "zoomout": ("-0.1", 0.25), "nakedeye": ("-1.",0.75)}
 #define CONSTANT_REAL_TERM -0.1
@@ -56,7 +55,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 #define SHADE_STYLE 0
 
 // { "no": ("0", 0.50), "yes": ("1", 0.50) }
-#define INVERT_COLORS 0
+#define INVERT_COLORS 1
 
 // { "yes": ("1", 0.30), "no": ("0", 0.70) }
 #define FBM 0

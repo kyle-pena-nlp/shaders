@@ -24,7 +24,7 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 // undocumented value: 0: none
 // { "twist": ("1", 0.33), "fritz": ("2", 0.33), "pulsar": ("3", 0.33) }
-#define ANIMATION_STYLE 3
+#define ANIMATION_STYLE 1
 
 // { "kalm": ("0.", 0.80), "jittery": ("1.", 0.20) }
 #define JITTERY 0.
@@ -32,12 +32,11 @@ mat2 noise2d_rotator = mat2(-0.8, 0.6, 0.6, 0.8);
 
 
 // { "clearview": ("-1", 0.70), "tiles": ("0", 0.10), "gems": ("1", 0.10), "cubist": ("3", 0.10)}
-#define FRACTURE_STYLE -1
+#define FRACTURE_STYLE 0
 
 #define SCANLINE 0.
 
-// { "ghost": ("3", 0.20), "sharp": ("0", 0.80) }
-#define TRAILS 3
+#define TRAILS 0
 
 
 // { "dragon": ("2.", 0.25), "tri": ("3.", 0.25), "quad": ("4.", 0.25),  "sept": ("6.", 0.25) }

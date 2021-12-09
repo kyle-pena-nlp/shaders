@@ -11,6 +11,46 @@ import matplotlib.pyplot as plt
 import sys
 from pyselenium import get_writer
 from io import BytesIO
+from typing import List, Tuple, Dict
+
+TEST_MODE = True
+
+class FrameAtlas:
+
+    def __init__(self, directory, dims, dtype, format = "gif"):
+        self.directory = directory
+        self.dims = dims
+        self.dtype = dtype
+        self.format = format
+        self.indexing = {}
+        self._init()
+        self.cache = None
+        self.filepaths = None
+        self.N = None
+        self.img_idxs_2_cache_idxs = None
+
+    def _init_(self):
+        self.filepaths = [ fp for fp in glob(os.path.join(self.directory, "*.{}".format(self.format))) if re.match(r"\d+\." + re.escape(self.format), os.path.basename(fp))]
+        random.shuffle(self.filepaths)
+        self.cache = np.zeros((self.length, self.dims[0], self.dims[1], 3), dtype = self.dtype)
+        self.N = int(float(len(self.filepaths))**0.5)
+        self.ij_to_i = np.asarray(list(range(len(self.filepaths)))[:(self.N**2)]).reshape(self.N,self.N)
+    
+    def update(self, np_img_idxs, t):
+
+        # Per pixel, which image idx (per self.filepaths) 
+        xs, ys = np.mod(np_img_idxs[:,0]), np.mod(np_img_idxs[:,1])
+        np_img_idxs  = self.ij_2_i[xs, ys]
+
+        flat_img_idxs = np_img_idxs.ravel()
+        np_cache_idxs = self.img_idxs_2_cache_idxs[flat_img_idxs].reshape(*np_img_idxs.shape)
+        
+
+
+
+
+    def request_images(self, idxs : List[Tuple[int,int]]):
+        pass
 
 def do_it(args):
 
@@ -44,7 +84,7 @@ def do_it(args):
 
     #Pre-load image atlas
     images_holder = {}
-    images_atlas = [ fp for fp in glob(os.path.join("triptograms", "*.png")) if re.match(r"\d+\.png", os.path.basename(fp)) ]
+    images_atlas = [ fp for fp in glob(os.path.join("triptograms", "*.gif")) if re.match(r"\d+\.gif", os.path.basename(fp)) ]
     random.shuffle(images_atlas)
 
     # TODO: separate process to assemble giant image sheet.
@@ -64,6 +104,9 @@ def do_it(args):
                 img.seek(t)
             np_uvs = np.asarray(uvs)
 
+            # get light level per pixel
+            light_level = np.asarray(lighting).astype(np.float) / 255
+
             # Find out which images are requested
             requested_images = set()
             np_img_idxs = np.asarray(image_idxs)
@@ -76,19 +119,11 @@ def do_it(args):
             np_img_idxs = np.stack([np_img_idxs[:,:,0] / np_img_idxs[:,:,2], np_img_idxs[:,:,1] / np_img_idxs[:,:,2]], axis = 2).astype(np.int)
             np_img_idxs[zeros_mask,:] = 0
             uq_img_idxs = set(zip(np_img_idxs[:,:,0].ravel(), np_img_idxs[:,:,1].ravel()))
-            for uq_img_idx in uq_img_idxs:
-                requested_images.add(uq_img_idx)
-            # TODO: vectorize this
-            """
-            for i in range(np_img_idxs.shape[0]):
-                for j in range(np_img_idxs.shape[1]):
-                    R,G,B = np_img_idxs[i,j,:]
-                    if R == 0 and G == 0 and B == 0:
-                        continue
-                    img_i = int(round(R/B))
-                    img_j = int(round(G/B))
-                    requested_images.add((img_i, img_j))
-            """
+            if TEST_MODE:
+                requested_images.add((20,20))
+            else:
+                for uq_img_idx in uq_img_idxs:
+                    requested_images.add(uq_img_idx)
             # Request them
             ensure_requested_images(images_holder, requested_images, images_atlas, t)
 
@@ -101,16 +136,23 @@ def do_it(args):
             for i in range(np_uvs.shape[0]):
                 for j in range(np_uvs.shape[1]):
                     img_i,img_j = np_img_idxs[i,j,:]
+                    if TEST_MODE:
+                        img_i, img_j = 20,20
                     if img_i == 0 and img_j == 0:
                         continue
                     if (img_i,img_j) not in frame_cache:
                         source_nframes = source_nframes or images_holder[(img_i,img_j)].n_frames
-                        frame_cache[(img_i,img_j)] = np.asarray(images_holder[(img_i, img_j)])
+                        frame_cache[(img_i,img_j)] = np.asarray(images_holder[(img_i, img_j)].convert("RGB"))
                     img_u,img_v,_ = np_uvs[i,j] 
-                    img_u,img_v = round(x*img_u/255), round(y*img_v/255)
+                    #print(np.amin(np_uvs), np.amax(np_uvs))
+                    img_u,img_v = int(1.5*x*img_u/255), int(1.5*y*img_v/255)
+                    #print(img_u, img_v)
+                    
+                    #print("shape", frame_cache[(img_i,img_j)].shape)
                     diffuse =frame_cache[(img_i,img_j)][img_u,img_v, :3]
                     # TODO: lighting compositing
-                    scene[i, j] = diffuse
+                    
+                    scene[i, j] = diffuse * light_level[i,j]
 
             #plt.imshow(scene)
             #plt.show()

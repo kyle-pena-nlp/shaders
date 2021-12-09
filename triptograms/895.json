@@ -47,7 +47,7 @@
   },
   {
    "trait_type": "FRACTURE_STYLE",
-   "value": "cubist"
+   "value": "gems"
   },
   {
    "trait_type": "INVERT_COLORS",
@@ -59,7 +59,7 @@
   },
   {
    "trait_type": "LEADING_EXPONENT",
-   "value": "dragon"
+   "value": "quad"
   },
   {
    "trait_type": "LEADING_EXPONENT_SIGN",
@@ -71,11 +71,7 @@
   },
   {
    "trait_type": "SHADE_STYLE",
-   "value": "velvet"
-  },
-  {
-   "trait_type": "TRAILS",
-   "value": "sharp"
+   "value": "regularness"
   }
  ],
  "collection": {
