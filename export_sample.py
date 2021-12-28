@@ -25,6 +25,7 @@ def parse_args():
     parser.add_argument("--frames_per_second", type = int)
     parser.add_argument("--format", type = str, choices = ["mp4","png","gif", "webm", "mov"])
     parser.add_argument("--compress", type = bool, default = False)
+    parser.add_argument("--penguin", action = "store_true")
     args = parser.parse_args()
     return args
 
@@ -70,7 +71,8 @@ if __name__ == "__main__":
         num_seconds = num_seconds, 
         out = out_fpath, 
         out_format = args.format,
-        compress = args.compress)
+        compress = args.compress,
+        penguin = args.penguin)
 
     print("Done.")
 

@@ -1,0 +1,13 @@
+{
+ "COLOR_MODE": "blue",
+ "LEADING_EXPONENT": "tri",
+ "JITTERY": "kalm",
+ "POLAR": "cartesian",
+ "SHADE_STYLE": "neons",
+ "LEADING_EXPONENT_SIGN": "spiralworld",
+ "FBM": "no",
+ "FRACTURE_STYLE": "tiles",
+ "CONSTANT_REAL_TERM": "wayout",
+ "ANIMATION_STYLE": "twist",
+ "INVERT_COLORS": "no"
+}

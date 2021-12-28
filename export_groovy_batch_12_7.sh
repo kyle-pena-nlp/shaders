@@ -1,0 +1,9 @@
+python export_sample.py --shader groovies --traits_file groovies/14.traits --out 14 --x 2048 --y 2048 --frames_per_second 30 --format mp4
+python export_sample.py --shader groovies --traits_file groovies/17.traits --out 17 --x 2048 --y 2048 --frames_per_second 30 --format mp4
+python export_sample.py --shader groovies --traits_file groovies/21.traits --out 21 --x 2048 --y 2048 --frames_per_second 30 --format mp4
+python export_sample.py --shader groovies --traits_file groovies/22.traits --out 22 --x 2048 --y 2048 --frames_per_second 30 --format mp4
+python export_sample.py --shader groovies --traits_file groovies/24.traits --out 24 --x 2048 --y 2048 --frames_per_second 30 --format mp4
+python export_sample.py --shader groovies --traits_file groovies/25.traits --out 25 --x 2048 --y 2048 --frames_per_second 30 --format mp4
+python export_sample.py --shader groovies --traits_file groovies/33.traits --out 33 --x 2048 --y 2048 --frames_per_second 30 --format mp4
+python export_sample.py --shader groovies --traits_file groovies/35.traits --out 35 --x 2048 --y 2048 --frames_per_second 30 --format mp4
+python export_sample.py --shader groovies --traits_file groovies/36.traits --out 36 --x 2048 --y 2048 --frames_per_second 30 --format mp4

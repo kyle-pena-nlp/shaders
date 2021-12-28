@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-import pygifsicle
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import base64
@@ -14,7 +14,11 @@ from PIL.Image import ADAPTIVE
 
 # For Windows, install gifsicle and add it to your PATH
 # Otherwise use apt-get or brew
-from pygifsicle import optimize
+try:
+    import pygifsicle
+    from pygifsicle import optimize
+except:
+    pass
 
 COMPRESS = True
 
@@ -37,6 +41,9 @@ def wait_until_ready(driver):
             print("Page is ready.")
             break
 
+def load_penguin(driver):
+    PENGUIN_SCRIPT = """gShaderToy.SetTexture(0, {mSrc:'https://dl.dropboxusercontent.com/s/k4w7r528ivg1l5o/117fec13-4937-4cfd-bc85-c5485a6f7cdf.png?dl=0', mType:'texture', mID:1, mSampler:{ filter: 'mipmap', wrap: 'repeat', vflip:'true', srgb:'false', internal:'byte' }});"""
+    driver.execute_script(PENGUIN_SCRIPT)
 
 # TODO: PIL APNG writer
 
@@ -87,11 +94,11 @@ class APNGWriter:
         else:
             raise Exception("Not bytes or a numpy array")
 
-def get_writer(frames_per_second, out, out_format, compress):
+def get_writer(frames_per_second, out, out_format, compress, loop_gif = True):
     fpath = out
     print("Writing to '{}'".format(fpath))
     if out_format == "gif":
-        return imageio.get_writer(fpath, mode='I', duration = (1/frames_per_second), subrectangles = True )
+        return imageio.get_writer(fpath, mode='I', duration = (1/frames_per_second), subrectangles = True, loop = 1 if not loop_gif else 0 )
     elif out_format in ("mp4",):
         return imageio.get_writer(fpath, mode='I', fps=frames_per_second, output_params = [ "-profile:v", "baseline" ]) # quality = 9
     elif out_format == "webm":
@@ -179,7 +186,7 @@ def convert_img(image_bytes, out_format, palette, compress):
     else:
         raise Exception("Unknown format: '{}'".format(out_format))
 
-def export(url, x, y, frames_per_second, num_seconds, out, out_format, compress):
+def export(url, x, y, frames_per_second, num_seconds, out, out_format, compress, penguin = False):
     
     chrome_options = Options()
 
@@ -191,6 +198,9 @@ def export(url, x, y, frames_per_second, num_seconds, out, out_format, compress)
         
         # Wait until initialized
         wait_until_ready(driver)
+
+        if penguin:
+            load_penguin(driver)
         
         # Stop the animation
         driver.execute_script("stop()")

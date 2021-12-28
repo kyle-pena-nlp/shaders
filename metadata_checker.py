@@ -10,7 +10,7 @@ import time
 import shutil
 
 PORT = 8000
-DIRECTORY = None # "D:/"
+DIRECTORY = "./"
 
 class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
 

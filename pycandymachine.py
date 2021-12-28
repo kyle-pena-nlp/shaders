@@ -164,6 +164,9 @@ def generate_pre_image_artifacts(args, shader, name, trait_values_array, trait_n
         template_parameters = trait_values
         shader_text = string_template.format(**template_parameters)
         shader_text = set_preprocessor_directive(shader_text, "JITTER_SALT",  "{:.1f}".format(i))
+
+        if args.penguin:
+            shader_text = set_preprocessor_directive(shader_text, "PENGUIN", 1)
         
         with open(os.path.join(".", out_dir, "{}.glsl".format(i)), "w+") as f:
             f.write(shader_text)
@@ -334,6 +337,7 @@ def parse_args():
     parser.add_argument("--format", default = "mp4", choices = ["mp4","gif","png"])
     parser.add_argument("--compress", default = False, type = bool)
     parser.add_argument("--just_pre_image_artifacts", type = bool)
+    parser.add_argument("--penguin", action = "store_true")
     #parser.add_argument("--traits_file", type = str, required = False, default = None)
     args = parser.parse_args()
     override_traits = {}
@@ -352,7 +356,8 @@ def execute(args):
         num_seconds = parse_num_seconds(genned_shader_text),
         out = html_fpath,
         out_format = format,
-        compress = compress)  
+        compress = compress,
+        penguin = args.penguin)  
     
     """
     export(url = to_url(html_fpath), x = 800, y = 600,
