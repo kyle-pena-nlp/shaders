@@ -120,8 +120,17 @@ vec2 get_random_v(in vec2 fragCoord) {
 vec2 camGradient(in vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
     vec2 e = vec2(0.5/iResolution.x, 0.);
+    #if SOURCE == 0
     vec2 grad = vec2(length(texture(iChannel3, uv + e.xy).xyz) - length(texture(iChannel3, uv - e.xy).xyz),
                 length(texture(iChannel3, uv + e.yx).xyz) - length(texture(iChannel3, uv - e.yx).xyz));
+    #else
+    vec2 grad = vec2(length(voronoi_f1_colors( uv + e.xy, VORONOI_RANDOMNESS, VORONOI_EXPONENT, VORONOI_ANGLE ).xyz) -
+    length(voronoi_f1_colors( uv - e.xy, VORONOI_RANDOMNESS, VORONOI_EXPONENT, VORONOI_ANGLE ).xyz),
+    length(voronoi_f1_colors( uv + e.yx, VORONOI_RANDOMNESS, VORONOI_EXPONENT, VORONOI_ANGLE ).xyz) -
+    length(voronoi_f1_colors( uv - e.yx, VORONOI_RANDOMNESS, VORONOI_EXPONENT, VORONOI_ANGLE ).xyz));
+    //vec2 grad = vec2(length(texture(iChannel3, uv + e.xy).xyz) - length(texture(iChannel3, uv - e.xy).xyz),
+    //            length(texture(iChannel3, uv + e.yx).xyz) - length(texture(iChannel3, uv - e.yx).xyz));
+    #endif
     return grad;
 }
 

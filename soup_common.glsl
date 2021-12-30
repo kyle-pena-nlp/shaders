@@ -1,4 +1,6 @@
 
+#define SOURCE 1
+
 #define VORONOI_EXPONENT 2.0
 #define VORONOI_RANDOMNESS 1.0
 #define VORONOI_ANGLE 3.14159/4.

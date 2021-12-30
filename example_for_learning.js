@@ -287,7 +287,7 @@
 
         // Buffer A
         {
-            gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, framebufferA);
+            gl.bindFramebuffer(gl.FRAMEBUFFER, framebufferA);
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureA, 0);
 
             gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);

@@ -79,10 +79,15 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     // TRAITS: 0.99, 0.999
     prev*=0.99;
     
-    //vec4 colors =  voronoi_f1_colors( VORONOI_UV_SCALE * fragCoord / iResolution.xy, VORONOI_RANDOMNESS, VORONOI_EXPONENT, VORONOI_ANGLE);
     
-    // TRAIT: 1.- is a trait
+    #if SOURCE == 0
     vec4 colors = texture(iChannel3, fragCoord / iResolution.xy);
+    #else
+    vec4 colors =  voronoi_f1_colors( VORONOI_UV_SCALE * fragCoord / iResolution.xy, VORONOI_RANDOMNESS, VORONOI_EXPONENT, VORONOI_ANGLE);    
+    #endif
+
+    // TRAIT: 1.- is a trait
+    //
 
     vec3 result = clamp(0.15*divergence * colors.xyz + (1.-0.15*divergence) * prev.xyz, 0., 1.);
     

@@ -1,53 +1,155 @@
 "use strict";
 
 // stuff gets swapped into here
-const common_code     = `#COMMON_CODE#`
+const common_code     = `#COMMON_PLACEHOLDER#`
 const external_code = `#SHADER_PLACEHOLDER#`;
 const external_code_A = `#SHADER_PLACEHOLDER_A#`;
 const external_code_B = `#SHADER_PLACEHOLDER_B#`;
 const external_code_C = `#SHADER_PLACEHOLDER_C#`;
 
-class ImportError extends Error {}
-
 // Some of this code is based off of: https://codepen.io/jbltx/pen/eYZwEja
 
 const app = {
-    mode: null, /* capture or animate */
-    status : null, /* null or 'ready' */
-    capture: null, /* base64 capture */
-    render: null, /* capture or animation callback */
-    canvas: null,
-    gl: null,
-    mouseX: 0,
-    mouseY: 0,
-    program: null,
 
+    status : null, /* null (uninitialized), 'ready', 'animate', 'capture' */
+
+    canvas: null, /* The canvas element */
+    gl: null, /* Webgl2 context for the canvas */
+    mode: null, /* capture or animate */
+    capture: null, /* base64 capture */
+
+    // mouse tracking
+    mouseX: 0.0,
+    mouseY: 0.0,
+    mouseZ: 0.0,
+
+    /* not sure about this one */
     vertexArray: null,
 
+    /* programs */
+    program: null,
     bufferAProgram: null,
     bufferBProgram: null,
     bufferCProgram: null,
 
+    // frame buffers
     framebufferA : null,
     framebufferB : null,
     framebufferC : null,
 
+    // textures
     textureA: null,
     textureB: null,
-    textureC: null
+    textureC: null,
+
+    /* Time stuff */
+    frame: 0,
+    time: 0,
+    lastTime: 0
 };
 
-function resizeCanvasToWindow() {
-    const canvas = app.canvas;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+
+function init() {
+
+  createCanvasIfNotExists();
+  createWebGLContextIfNotExists();
+  createVertexArray();
+  createPrograms();
+  createFrameBuffers();
+  createNewTextures();
+
+  app.status = "ready";
 }
 
-function setMousePosition(e) {
+function render(now) {
+
+  setTime(now);
+
+  drawBuffer(app.bufferAProgram, app.framebufferA, app.textureA);
+  drawBuffer(app.bufferBProgram, app.framebufferB, app.textureB);
+  drawBuffer(app.bufferCProgram, app.framebufferC, app.textureC);
+  drawShader(app.program);
+
+  app.frame += 1;
+
+  // if render was called in "capture" mode, dump the canvas to app.capture and don't request another frame
+  if (app.mode == "capture") {
+    app.capture = app.canvas.toDataURL('image/png', 1).substring(22);
+  }
+  // if render was called in "animate" mode, request another frame
+  else if (app.mode == "animate") {
+     requestAnimationFrame(render);
+  }
+
+}
+
+
+function capture(time, x, y) {
+  resizeCanvas(x,y);
+  app.mode = "capture";
+  render(time);
+}
+
+function animate() {
+  app.mode = "animate";
+  requestAnimationFrame(render);
+}
+
+function stop() {
+  app.mode = "capture"; // todo: 'stopped' status?
+}
+
+
+function click_setMouseXY(e) {
     const canvas = app.canvas;
     const rect = canvas.getBoundingClientRect();
     app.mouseX = e.clientX - rect.left;
     app.mouseY = rect.height - (e.clientY - rect.top) - 1;  // bottom is 0 in WebGL
+}
+
+function touch_setMouseXY(e) {
+  e.preventDefault();
+  const canvas = app.canvas;
+  const rect = canvas.getBoundingClientRect();
+  
+  // i'm reading that on android mobile the property is changedTouches
+  let touch = null;
+  if (e.touches) {
+    touch = e.touches[0]
+  }
+  else if (e.changedTouches) {
+    touch = e.changedTouches[0]
+  }
+
+  app.mouseX = touch.pageX - rect.left;
+  app.mouseY = rect.height - (touch.pageY - rect.top) - 1;  // bottom is 0 in WebGL
+}
+
+function handle_mousedown(e) {
+  e.preventDefault();
+  app.mouseZ = 1.0;
+}
+
+function handle_mouseup(e) {
+  e.preventDefault();
+  app.mouseZ = 0.0;
+}
+
+function handle_touchstart(e) {
+  e.preventDefault();
+  app.mouseZ = 1.0;
+}
+
+function handle_touchend(e) {
+  e.preventDefault();
+  app.mouseZ = 0.0;
+}
+
+function createWebGLContextIfNotExists() {
+  // lazy load the web gl context
+  if (!app.gl) {
+      app.gl = app.canvas.getContext("webgl2");
+  }
 }
 
 // create a canvas element the size of the screen, that also automatically resizes and updates mouse positions
@@ -55,69 +157,108 @@ function createCanvasIfNotExists() {
 
     // lazy create the canvas
     if (!app.canvas) {
-        const canvas = document.createElement('canvas')
-        canvas.setAttribute("id", "canvas")
-        document.body.appendChild(canvas)
+        const canvas = document.createElement('canvas');
+        canvas.setAttribute("id", "canvas");
+        document.body.appendChild(canvas);
         app.canvas = canvas;
     }
 
-    // size the canvas to the entire window
-    resizeCanvasToWindow();
+    // make the canvas as big as the window
+    resizeCanvas(window.innerWidth, window.innerHeight);
 
-    window.addEventListener('resize', resizeCanvasToWindow);
-    app.canvas.addEventListener('mousemove', setMousePosition);
+    // and if the window ever changes sizes, resize the canvas to match it
+    window.addEventListener('resize', handleResize);
+
+    // touchmove (tablets/phones) or mousemove...
+    app.canvas.addEventListener('mousemove', click_setMouseXY);
+    app.canvas.addEventListener('touchmove', touch_setMouseXY);
+
+    // touchstart/end (tablets/phones) or mouseup/down
+    app.canvas.addEventListener('mousedown', handle_mousedown);
+    app.canvas.addEventListener('mouseup', handle_mouseup);
+    app.canvas.addEventListener('touchstart', handle_touchstart);
+    app.canvas.addEventListener('touchend', handle_touchend);
 }
 
-function createWebGLContextIfNotExists() {
-    // lazy load the web gl context
-    if (!app.gl) {
-        app.gl = app.canvas.getContext("webgl2");
+function handleResize() {
+  resizeCanvas(window.innerWidth, window.innerHeight);
+}
+
+function resizeCanvas(x,y) {
+
+    const canvas = app.canvas;
+
+    if (!canvas) {
+      return;
+    }
+
+    const dirty = (x != canvas.width) || (y != canvas.height);
+
+    if (dirty) {
+      canvas.width = x;
+      canvas.height = y;
+    }
+  
+    // if the canvas size changes, we have to recreate our multipass textures with the new dimensions
+    const initialized = !!app.mode;
+    const valid = (canvas.width >= 0 && canvas.height >= 0);
+
+    if (dirty && valid && initialized) {
+      createNewTextures();
     }
 }
 
-function configureVertexArray() {
+
+function createNewTextures() {
+
+  const gl = app.gl;
+
+  if (app.textureA) {
+    gl.deleteTexture(app.textureA);
+  }
+  app.textureA = createTexture();   
+  
+  if (app.textureB) {
+    gl.deleteTexture(app.textureB);
+  }
+  app.textureB = createTexture(); 
+
+  if (app.textureB) {
+    gl.deleteTexture(app.textureC);
+  }
+  app.textureC = createTexture();   
+
+}
+
+function createVertexArray() {
   const gl = app.gl;
   app.vertexArray = gl.createVertexArray();
   gl.bindVertexArray(app.vertexArray);
   gl.bindVertexArray(null);
 }
 
-function init() {
 
-    createCanvasIfNotExists();
-    createWebGLContextIfNotExists();
+function createPrograms() {
+  app.bufferAProgram = createShaderProgram(getCommonShaderCode() + getBufferFragmentShaderCode("A"));
+  app.bufferBProgram = createShaderProgram(getCommonShaderCode() + getBufferFragmentShaderCode("B"));
+  app.bufferCProgram = createShaderProgram(getCommonShaderCode() + getBufferFragmentShaderCode("C"));
+  app.program        = createShaderProgram(getCommonShaderCode() + getFragmentShaderCode());  
+}
 
-    const gl = app.gl;
-
-    // make the buffers
-    app.bufferAProgram = createShaderProgram(getCommonShaderCode() + getBufferFragmentShaderCode("A"));
-    app.bufferBProgram = createShaderProgram(getCommonShaderCode() + getBufferFragmentShaderCode("B"));
-    app.bufferCProgram = createShaderProgram(getCommonShaderCode() + getBufferFragmentShaderCode("C"));
-    app.program        = createShaderProgram(getCommonShaderCode() + getFragmentShaderCode());  
-    
-    // make the frame buffers (???)
-    app.framebufferA = gl.createFramebuffer();
-    app.framebufferB = gl.createFramebuffer();    
-    app.framebufferC = gl.createFramebuffer();   
-    
-    // make the textures
-    app.textureA = createTexture(gl, gl.canvas.width, gl.canvas.height);   
-    app.textureB = createTexture(gl, gl.canvas.width, gl.canvas.height); 
-    app.textureC = createTexture(gl, gl.canvas.width, gl.canvas.height);      
-
-    // do a bunch of other stuff
-    configureWebGLContext();
-
-    app.status = "ready";
+function createFrameBuffers() {
+  const gl = app.gl;
+  app.framebufferA = gl.createFramebuffer();
+  app.framebufferB = gl.createFramebuffer();    
+  app.framebufferC = gl.createFramebuffer();  
 }
 
 function createShaderProgram(fragmentShaderCode) {
-    
+  
+  const gl = app.gl;
+
+  const program = gl.createProgram();
   const vertexShader = createShader(getVertexShaderCode(), gl.VERTEX_SHADER);
   const fragmentShader = createShader(fragmentShaderCode, gl.FRAGMENT_SHADER);
-
-  const gl = app.gl;
-  const program = gl.createProgram();
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
   gl.linkProgram(program);
@@ -146,256 +287,140 @@ function createShader(shaderCode, shaderType) {
   return shader;
 }
 
-function createTexture(w, h) 
+function createTexture() 
 {
     const gl = app.gl;
+    const w = gl.canvas.width;
+    const h = gl.canvas.height;
+
+    //var ext = gl.getExtension('OES_texture_float');
+    //ext = gl.getExtension("EXT_color_buffer_float");
+    
     const texture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 
                                    0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-                                   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.bindTexture(gl.TEXTURE_2D, null);
     return texture;
 }
 
-// TODO: create frame rendering API
+function drawShader(program) {
 
-function configureWebGLContext() {
-    
-    const gl = app.gl;    
+  const gl = app.gl;
+  const time = app.time;
 
-    const program = app.program;
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-    // look up where the vertex data needs to go.
-    const positionAttributeLocation = gl.getAttribLocation(program, "position");
+  // TODO: remove these lines? 
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  //gl.clearColor(0, 0, 0, 0);
+  //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // look up uniform locations
-    const resolutionLocation = gl.getUniformLocation(program, "iResolution");
-    const mouseLocation      = gl.getUniformLocation(program, "iMouse");
-    const timeLocation       = gl.getUniformLocation(program, "iTime");
+  gl.useProgram(program);
 
-    // Create a buffer to put three 2d clip space points in
-    const positionBuffer = gl.createBuffer();
+  gl.uniform1f(gl.getUniformLocation(program, "iTime"), time);
+  gl.uniform3f(gl.getUniformLocation(program, "iMouse"), app.mouseX, app.mouseY, app.mouseZ);
+  gl.uniform3f(gl.getUniformLocation(program, "iResolution"), gl.canvas.width, gl.canvas.height, 1.0);
+  gl.uniform1i(gl.getUniformLocation(program, "iFrame"), app.frame);    
 
-    // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+  // bind channel 0
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, app.textureA);
+  gl.uniform1i(gl.getUniformLocation(program, "iChannel0"), 0);
 
-    // fill it with a 2 triangles that cover clipspace
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -1, -1,  // first triangle
-     1, -1,
-    -1,  1,
-    -1,  1,  // second triangle
-     1, -1,
-     1,  1,
-    ]), gl.STATIC_DRAW);
+  // bind channel 1
+  gl.activeTexture(gl.TEXTURE1);
+  gl.bindTexture(gl.TEXTURE_2D, app.textureB);
+  gl.uniform1i(gl.getUniformLocation(program, "iChannel1"), 1);
 
-    let then = 0;
-    let time = 0;
-    
-    function render(now) {
+  // bind channel 2
+  gl.activeTexture(gl.TEXTURE2);
+  gl.bindTexture(gl.TEXTURE_2D, app.textureC);
+  gl.uniform1i(gl.getUniformLocation(program, "iChannel2"), 2);
 
-      let gl = app.gl;
-
-      if (app.mode == "animate") {
-        now *= 0.001;  // convert to seconds
-        const elapsedTime = Math.min(now - then, 0.1);
-        time += elapsedTime;
-        then = now;
-      }
-      else if (app.mode == "capture") {
-        time = now;
-      }
-
-      drawBuffer(app.bufferAProgram, time, frame);
-      drawBuffer(app.bufferBProgram, time, frame);
-      drawBuffer(app.bufferCProgram, time, frame);
-  
-      // Tell WebGL how to convert from clip space to pixels
-      gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-  
-      // Tell it to use our program (pair of shaders)
-      gl.useProgram(program);
-  
-      // Turn on the attribute
-      gl.enableVertexAttribArray(positionAttributeLocation);
-  
-      // Bind the position buffer.
-      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-  
-      // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-      gl.vertexAttribPointer(
-          positionAttributeLocation,
-          2,          // 2 components per iteration
-          gl.FLOAT,   // the data is 32bit floats
-          false,      // don't normalize the data
-          0,          // 0 = move forward size * sizeof(type) each iteration to get the next position
-          0,          // start at the beginning of the buffer
-      );
-  
-      gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
-      gl.uniform2f(mouseLocation, app.mouseX, app.mouseY);
-      gl.uniform1f(timeLocation, time);
-  
-      gl.drawArrays(
-          gl.TRIANGLES,
-          0,     // offset
-          6,     // num vertices to process
-      );
-
-      if (app.mode == "capture") {
-        // TODO: proper DPI tricks if DPI != 96 desired.
-        app.capture = app.canvas.toDataURL('image/png', 1).substring(22);
-      }
-      else if (app.mode == "animate") {
-         requestAnimationFrame(app.render);
-      }
-
-    }
-
-    app.render = render;
+  gl.bindVertexArray(app.vertexArray);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
-function drawBuffer(program, time, frame) {
+function drawBuffer(program, frameBuffer, texture) {
 
     const gl = app.gl;
+    const time = app.time;
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
 
     // TODO: remove these lines? 
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-    //gl.clearColor(0, 0, 0, 0);
+    //gl.clearColor(0, 0, 0, 0); // this line doesn't cause an error
     //gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
 
     gl.useProgram(program);
 
     gl.uniform1f(gl.getUniformLocation(program, "iTime"), time);
-    gl.uniform1i(gl.getUniformLocation(app.bufferAProgram, "iFrame"), frame);
-    gl.uniform2f(gl.getUniformLocation(program, "iMouse"), app.mouseX, app.mouseY);
+    gl.uniform3f(gl.getUniformLocation(program, "iMouse"), app.mouseX, app.mouseY, app.mouseZ);
     gl.uniform3f(gl.getUniformLocation(program, "iResolution"), gl.canvas.width, gl.canvas.height, 1.0);
-    
+    gl.uniform1i(gl.getUniformLocation(program, "iFrame"), app.frame);    
+
     // bind channel 0
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, app.textureA);
-    gl.uniform1i(gl.getUniformLocation(program, "iChannel0"), 0);
+    if (texture != app.textureA) {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, app.textureA);
+      gl.uniform1i(gl.getUniformLocation(program, "iChannel0"), 0);
+    }
+
 
     // bind channel 1
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, app.textureB);
-    gl.uniform1i(gl.getUniformLocation(program, "iChannel1"), 1);
+    if (texture != app.textureB) {
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, app.textureB);
+      gl.uniform1i(gl.getUniformLocation(program, "iChannel1"), 1);
+    }
+
   
     // bind channel 2
-    gl.activeTexture(gl.TEXTURE2);
-    gl.bindTexture(gl.TEXTURE_2D, app.textureC);
-    gl.uniform1i(gl.getUniformLocation(program, "iChannel2"), 2);
+    if (texture != app.textureC) {
+      gl.activeTexture(gl.TEXTURE2);
+      gl.bindTexture(gl.TEXTURE_2D, app.textureC);
+      gl.uniform1i(gl.getUniformLocation(program, "iChannel2"), 2);
+    }
+
+    
 
     gl.bindVertexArray(app.vertexArray);
-
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    
 }
 
-function draw(time)
-{
-    frame = (frame + 1);
-    time *= 0.001;
-
-    const gl = app.gl;    
-    
-    if (resize(gl.canvas))
-    {
-        if (gl.canvas.width <= 0 || gl.canvas.width <= 0)
-          return;
-      
-        gl.deleteTexture(app.textureA);
-        gl.deleteTexture(app.textureB);
-        gl.deleteTexture(app.textureC);
-
-        app.textureA = createTexture(gl, gl.canvas.width, gl.canvas.height);   
-        app.textureB = createTexture(gl, gl.canvas.width, gl.canvas.height);
-        app.textureC = createTexture(gl, gl.canvas.width, gl.canvas.height);   
-    }
-
-    // Buffer A
-    {
-        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, app.framebufferA);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, app.textureA, 0);
-
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        gl.clearColor(0, 0, 0, 0);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        gl.useProgram(bufferAProgram);
-        gl.uniform1f(gl.getUniformLocation(app.bufferAProgram, "iTime"), time);
-        gl.uniform1i(gl.getUniformLocation(app.bufferAProgram, "iFrame"), frame);
-        gl.uniform3f(gl.getUniformLocation(app.bufferAProgram, "iResolution"), gl.canvas.width, gl.canvas.height, 1.0);
-      
-        gl.bindVertexArray(vertexArray);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-    }
-
-    // Buffer B
-    {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, framebufferB);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, textureB, 0);
-
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        gl.clearColor(0, 0, 0, 0);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        gl.useProgram(bufferBProgram);
-        gl.uniform3f(gl.getUniformLocation(bufferBProgram, "iResolution"), gl.canvas.width, gl.canvas.height, 1.0);
-        
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, textureA);
-        gl.uniform1i(gl.getUniformLocation(bufferBProgram, "iChannel0"), 0);
-      
-        gl.bindVertexArray(vertexArray);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-    }
-
-    // Image
-    {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-        gl.clearColor(0, 0, 0, 0);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-        gl.useProgram(imageProgram);
-        gl.uniform1f(gl.getUniformLocation(imageProgram, "iTime"), time);
-        gl.uniform3f(gl.getUniformLocation(imageProgram, "iResolution"), gl.canvas.width, gl.canvas.height, 1.0);
-        
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, textureA);
-        gl.uniform1i(gl.getUniformLocation(imageProgram, "iChannel0"), 0);
-        gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, textureB);
-        gl.uniform1i(gl.getUniformLocation(imageProgram, "iChannel1"), 1);
-      
-        gl.bindVertexArray(vertexArray);
-
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-    }            
+function setTime(now) {
+  // if render was called in "animate" mode, add the elapsed item to current time
+  if (app.mode == "animate") {
+    now *= 0.001;  // convert to seconds
+    const elapsedTime = Math.min(now - app.lastTime, 0.1);
+    app.time += elapsedTime;
+    app.lastTime = now;
+  }
+  // if render was called in "capture" mode, the requested time ("now") is the time we want
+  else if (app.mode == "capture") {
+    app.time = now;
+  }
 }
 
 function getVertexShaderCode() {
-    const vs = `#version 300 es
-
-    // an attribute will receive data from a buffer
-    in vec4 position;
-
-    // all shaders have a main function
-    void main() {
-
-      // gl_Position is a special variable a vertex shader
-      // is responsible for setting
-      gl_Position = position;
-    }`;
-    return vs;
+  const vertexPlane = `#version 300 es  
+    void main()
+    {
+      float x = float((gl_VertexID & 1) << 2);
+      float y = float((gl_VertexID & 2) << 1);
+      gl_Position = vec4(x - 1.0, y - 1.0, 0, 1);
+    }
+  `;
+  return vertexPlane;
 }
 
 
@@ -403,18 +428,12 @@ function getCommonShaderCode() {
 
   const fs = `#version 300 es
 
-    precision mediump float;`
+    precision mediump float;
+`
 
     +
 
-    common
-
-    +
-
-    `void main() {
-      mainImage(myOutputColor, gl_FragCoord.xy);
-    }
-  `;
+    common_code;
 
   return fs;
 }
@@ -425,15 +444,18 @@ function getBufferFragmentShaderCode(buffer) {
   const buffer_code = ({ "A": external_code_A, "B": external_code_B, "C": external_code_C })[buffer];
 
   const fs = `
-    out vec4 myOutputColor;
+    layout(location = 0) out vec4 myOutputColor;
 
     uniform sampler2D iChannel0;
     uniform sampler2D iChannel1;
     uniform sampler2D iChannel2;
+    uniform sampler2D iChannel3;
 
-    uniform vec2 iResolution;
-    uniform vec2 iMouse;
-    uniform float iTime;`
+    uniform vec3 iResolution;
+    uniform vec3 iMouse;
+    uniform float iTime;
+    uniform int iFrame;
+    `
 
     
 
@@ -443,7 +465,9 @@ function getBufferFragmentShaderCode(buffer) {
 
     +
 
-    `void main() {
+    `
+    
+    void main() {
       mainImage(myOutputColor, gl_FragCoord.xy);
     }
   `;
@@ -455,15 +479,18 @@ function getBufferFragmentShaderCode(buffer) {
 function getFragmentShaderCode() {
   // build the fragment shader by prepending / postpending other code
   const fs = `
-    out vec4 myOutputColor;
+    layout(location = 0) out vec4 myOutputColor;
 
     uniform sampler2D iChannel0;
     uniform sampler2D iChannel1;
-    uniform sampler2D iChannel2;    
+    uniform sampler2D iChannel2; 
+    uniform sampler2D iChannel3;    
 
-    uniform vec2 iResolution;
-    uniform vec2 iMouse;
-    uniform float iTime;`
+    uniform vec3 iResolution;
+    uniform vec3 iMouse;
+    uniform float iTime;
+    uniform int iFrame;
+    `
 
     
 
@@ -473,7 +500,9 @@ function getFragmentShaderCode() {
 
     +
 
-    `void main() {
+    `
+    
+    void main() {
       mainImage(myOutputColor, gl_FragCoord.xy);
     }
   `;
@@ -482,22 +511,6 @@ function getFragmentShaderCode() {
 
 }
 
-function capture(time, x, y) {
-    app.canvas.width = x;
-    app.canvas.height = y;
-    app.mode = "capture";
-    app.render(time);
-}
-
-function animate() {
-    resizeCanvasToWindow();
-    app.mode = "animate";
-    requestAnimationFrame(app.render);
-}
-
-function stop() {
-    app.mode = "capture";
-}
 
 
 init();
