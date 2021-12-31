@@ -51,8 +51,8 @@ const app = {
 
 function init() {
 
-  createCanvasIfNotExists();
-  createWebGLContextIfNotExists();
+  createCanvas();
+  createWebGLContext();
   createVertexArray();
   createPrograms();
   createFrameBuffers();
@@ -108,7 +108,9 @@ function click_setMouseXY(e) {
 }
 
 function touch_setMouseXY(e) {
+
   e.preventDefault();
+  
   const canvas = app.canvas;
   const rect = canvas.getBoundingClientRect();
   
@@ -145,23 +147,19 @@ function handle_touchend(e) {
   app.mouseZ = 0.0;
 }
 
-function createWebGLContextIfNotExists() {
+function createWebGLContext() {
   // lazy load the web gl context
-  if (!app.gl) {
-      app.gl = app.canvas.getContext("webgl2");
-  }
+  app.gl = app.canvas.getContext("webgl2");
 }
 
 // create a canvas element the size of the screen, that also automatically resizes and updates mouse positions
-function createCanvasIfNotExists() {
+function createCanvas() {
 
     // lazy create the canvas
-    if (!app.canvas) {
-        const canvas = document.createElement('canvas');
-        canvas.setAttribute("id", "canvas");
-        document.body.appendChild(canvas);
-        app.canvas = canvas;
-    }
+    const canvas = document.createElement('canvas');
+    canvas.setAttribute("id", "canvas");
+    document.body.appendChild(canvas);
+    app.canvas = canvas;
 
     // make the canvas as big as the window
     resizeCanvas(window.innerWidth, window.innerHeight);
@@ -223,7 +221,7 @@ function createNewTextures() {
   }
   app.textureB = createTexture(); 
 
-  if (app.textureB) {
+  if (app.textureC) {
     gl.deleteTexture(app.textureC);
   }
   app.textureC = createTexture();   
@@ -366,6 +364,7 @@ function drawBuffer(program, frameBuffer, texture) {
     gl.uniform3f(gl.getUniformLocation(program, "iResolution"), gl.canvas.width, gl.canvas.height, 1.0);
     gl.uniform1i(gl.getUniformLocation(program, "iFrame"), app.frame);    
 
+    /*
     // bind channel 0
     if (texture != app.textureA) {
       gl.activeTexture(gl.TEXTURE0);
@@ -389,7 +388,7 @@ function drawBuffer(program, frameBuffer, texture) {
       gl.uniform1i(gl.getUniformLocation(program, "iChannel2"), 2);
     }
 
-    
+    */
 
     gl.bindVertexArray(app.vertexArray);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
