@@ -26,6 +26,7 @@ const app = {
     /* not sure about this one */
     vertexArray: null,
 
+
     /* programs */
     program: null,
     bufferAProgram: null,
